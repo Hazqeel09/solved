@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 27 entries, comprising 23 research proof drafts and 4 finite verification records. Twenty-three Lean modules include supporting lemmas and complete formalizations of the squaring counterexample and the main additive subtraction-gap theorem. Independent mathematical review remains pending.
+**Current catalogue:** 27 entries, comprising 23 research proof drafts and 4 finite verification records. Twenty-four Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, and its computable-threshold extension. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -14,7 +14,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 | [Two-small-step addition–multiplication chains](results/two-small-steps/PROOF.md) | An all-length block classification manuscript, with independent finite enumeration. |
 | [Real arithmetic-chain defects](results/am-defect-order/PROOF.md) | Proposed well-ordering and global ordinal type, with a separate [bounded-slice argument](results/am-defect-slices/PROOF.md). |
 | [Subtraction and computation length](results/subtraction-gap/PROOF.md) | An end-to-end Lean proof of unbounded **additive** savings on the tower-minus-one family. Polynomial equivalence remains a separate question. |
-| [Effective control cutoffs](results/effective-control-cutoffs/PROOF.md) | A fully formalized reference algorithm computes a complete basis and safe cutoff for each admissible parameter domain. Universal threshold assembly remains a written argument. |
+| [Effective control cutoffs](results/effective-control-cutoffs/PROOF.md) | An end-to-end Lean construction of complete bases and a computable universal threshold for the additive subtraction gap. No practical numerical threshold is claimed. |
 | [Integer factor recovery](results/narrow-products/PROOF.md) | A sharp interval-width condition, exact graph reconstruction, [finite-palette complexity](results/product-palettes/PROOF.md), and [directed nonlinear recovery](results/directed-monotone-recovery/PROOF.md). |
 | [Essential components](results/periodic-essential-components/PROOF.md) | An elementary eventually-periodic case; the general problem remains outside this result. |
 

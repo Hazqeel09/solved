@@ -8,6 +8,7 @@ from pathlib import Path
 
 from checks.verify_basis_formalization import verify as verify_basis_models
 from checks.verify_profile_formalization import verify as verify_profile_models
+from checks.verify_universal_formalization import verify as verify_universal_components
 from scripts.check_catalogue import ROOT, local_file
 
 ALLOWED_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
@@ -88,6 +89,11 @@ def main():
     print("Kernel-checked Python/Lean model comparison: " + json.dumps(comparison, sort_keys=True))
     basis_comparison = verify_basis_models()
     print("Compiled Lean/Python basis comparison: " + json.dumps(basis_comparison, sort_keys=True))
+    universal_components = verify_universal_components()
+    print(
+        "Universal-construction component checks: "
+        + json.dumps(universal_components, sort_keys=True)
+    )
 
 
 if __name__ == "__main__":

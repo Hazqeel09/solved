@@ -1,10 +1,10 @@
 # Effective cutoffs for square-run arithmetic controls
 
-**Status: proof draft, awaiting independent review and novelty assessment.**
-The arithmetic ideal oracle, constructive witnesses, a terminating reference
-basis algorithm and a safe cutoff for each admissible lower-corner domain
-now have Lean proofs. The finite cover of all admissible corners and the
-universal threshold assembly remain written arguments. See the
+**Status: the stated main claims now have complete Lean formalizations.**
+The written presentation retains proof-draft status pending independent
+review and novelty assessment. The checked construction includes ideal
+intersection, complete bases, exact-solution inclusion, per-domain cutoffs,
+finite coverage and a concrete computable universal threshold. See the
 [statement correspondence](FORMALIZATION.md).
 
 ## 1. Question and scope
@@ -15,7 +15,8 @@ only finitely many indices n satisfy
     τ₊(2^(2^n)−1) ≤ n+C
 
 for any fixed C. Its finite-control/Dickson argument does not itself compute
-the final exceptional index. Here we supply a proposed effective extension.
+the final exceptional index. Here we supply an effective extension with
+a fully checked reference algorithm.
 
 A **control** is a finite list starting from the saved value 1. Each block
 either adds or multiplies two earlier saved values, or squares one earlier
@@ -266,12 +267,45 @@ has at most 3p+1≤12C+13 blocks, preserves the endpoint and exact cost,
 and supplies legal earlier-mark references.
 
 There are finitely many such controls and excesses j=r−n in [0,C].
-Enumerate them, apply the finite admissible-corner cover and the complete
-basis algorithm to each, and take the maximum of their cutoffs and 1.
-Every hypothetical witness with n beyond this maximum would belong to
-one of the exhausted control families. This proves the stated computable
-F(C). The enumeration is finite but can be immense; no efficient bound
-on the number of controls, minimal points or integer bit lengths follows.
+The formal construction uses the following finite cover of their run
+parameters. Replace every positive run g_i by
+
+    l_i = min(g_i,C+1).
+
+If no run changes, the base cost is the original cost and is at least j.
+If a run changes, the base includes at least C+1 writes from that run
+alone, so its cost is again at least j. Thus every admissible program
+belongs to one of the finitely many domains with positive bases in
+[1,C+1]. Increasing those base runs by g_i−l_i reconstructs the original
+program and its exact primitive cost.
+
+Set M=12C+13. Enumerate all words of length at most M over the cells
+
+    add(a,b), multiply(a,b)     with 0≤a,b≤M,
+    square_run(a,l)            with 0≤a≤M and 1≤l≤C+1.
+
+This is a finite superset of the marked controls. The formal marked
+interpreter extends out-of-range saved addresses with copies of 1, and
+the arithmetic cutoff theorem also applies to that explicitly stated
+semantics. Every legal encoding is included; the extra controls can only
+enlarge the maximum cutoff.
+
+For each cell word and j∈[0,C], compute its cutoff when the base cost is
+at least j. Inadmissible inputs return no leaf bound, rather than an
+emptiness claim. Let P(C) be the maximum of the returned cutoffs and set
+
+    F(C) = max(1,P(C)).
+
+Every hypothetical witness with n≥F(C) would belong to one of these
+domains, contradicting its proved cutoff. Normalization transfers the
+conclusion to arbitrary AM programs. All steps are present in
+[UniversalCutoff](../../lean/UniversalCutoff.lean), including finite-list
+membership, clipping, exact reconstruction and the final program theorem.
+
+The function F is a computable Lean definition, not a choice of an
+unspecified sufficiently large index. Its enumeration can be immense.
+No useful complexity bound or practical numerical evaluation of F is
+claimed.
 
 For an additive gap of at least K over signed programs, combine the
 cutoff for C=K+2 with the known n+2-write subtraction construction.
@@ -324,7 +358,11 @@ result follows from the formal proof. The [reference basis algorithm](../../lean
 complete the proof for every admissible lower-corner domain. Compiled Lean
 execution matches Python on 1,551 basis/cutoff cases, with 1,350 minimal
 points counted across cases and maximum compared cutoff 5. This is finite
-execution evidence, separate from the universal formal theorems. The cover
-of all admissible corners, universal control enumeration, Python refinement
-and the computable universal F assembly remain outside the formalization.
+execution evidence, separate from the universal formal theorems. The
+[universal construction](../../lean/UniversalCutoff.lean) now completes
+the finite cover and threshold assembly. Its component checker verifies
+10,640 clipping/cost assertions, six small finite aggregates and six guard
+cases. The aggregates deliberately use independently selected block bounds
+at most two; they are not values of the universal F. Universal refinement
+of the optimized Python implementation remains outside the formalization.
 See the [formal scope](FORMALIZATION.md).

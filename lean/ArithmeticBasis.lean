@@ -253,6 +253,21 @@ theorem emit_comparable {d : Nat} (template : Template d) {p q : Point d}
     · exact ⟨congrArg (List.cons (.mul _ _)) tail.1,SolvedInflation.Below.cons (Nat.le_refl _) tail.2⟩
     · exact ⟨congrArg (List.cons (.sq _)) tail.1,SolvedInflation.Below.cons (by omega) tail.2⟩
 
+theorem hit_upward {d : Nat} (template : Template d) (excess : Nat) {p q : Point d}
+    (ordered : Below p q) (hit : Hit template excess p) : Hit template excess q := by
+  have comparable := emit_comparable template ordered
+  exact SolvedIdeal.hits_upward comparable.1 comparable.2 hit
+
+theorem basis_membership_iff {d : Nat} (template : Template d) (excess : Nat)
+    (valid : Valid template) (indexValid : excess ≤ cost (emit d template (fun _ => 0)))
+    (p : Point d) :
+    Hit template excess p ↔ Covered (minimalBasis template excess valid indexValid) p := by
+  have correct := minimal_basis_correct template excess valid indexValid
+  constructor
+  · exact correct.2 p
+  · intro ⟨q,member,ordered⟩
+    exact hit_upward template excess ordered (correct.1 q member).1
+
 theorem exact_cost_unchanged {old new : List Instr} {excess : Nat}
     (same : erase old=erase new)
     (ordered : SolvedInflation.Below (parameters old) (parameters new))
@@ -311,5 +326,74 @@ theorem exact_below_cutoff {d : Nat} (template : Template d) (excess : Nat)
   have costs := exact_cost_unchanged comparable.1 comparable.2 qhit exactValue
   have bound := member_index_bound template excess _ q member
   simpa only [costs] using bound
+
+def Canonical {d : Nat} (template : Template d) (p : Point d) : Prop :=
+  ∀ i, match template i with | .squares _ _ => True | _ => p i=0
+
+theorem emit_cost_mono {d : Nat} (template : Template d) {p q : Point d}
+    (ordered : Below p q) : cost (emit d template p) ≤ cost (emit d template q) := by
+  have comparison := emit_comparable template ordered
+  obtain ⟨extra,inflated⟩ := comparable_inflation comparison.1 comparison.2
+  have costs := inflation_cost inflated
+  omega
+
+theorem canonical_cost_injective {d : Nat} (template : Template d) {p q : Point d}
+    (canonical : Canonical template p) (ordered : Below q p)
+    (equal : cost (emit d template q)=cost (emit d template p)) : q=p := by
+  induction d with
+  | zero => funext i; exact Fin.elim0 i
+  | succ d ih =>
+    have smaller := emit_cost_mono (fun i => template i.succ) (fun i => ordered i.succ)
+    have first := ordered 0
+    have canon := canonical 0
+    have tailCanon : Canonical (fun i => template i.succ) (fun i => p i.succ) :=
+      fun i => canonical i.succ
+    have tailOrdered : Below (fun i => q i.succ) (fun i => p i.succ) :=
+      fun i => ordered i.succ
+    cases cell : template 0 with
+    | add a b =>
+      simp only [emit,cell,instruction,cost] at equal
+      have tailEq : cost (emit d (fun i => template i.succ) (fun i => q i.succ)) =
+          cost (emit d (fun i => template i.succ) (fun i => p i.succ)) := by omega
+      have tails := ih (fun i => template i.succ) tailCanon tailOrdered tailEq
+      simp only [cell] at canon
+      funext i
+      cases i using Fin.cases with
+      | zero => omega
+      | succ i => exact congrFun tails i
+    | mul a b =>
+      simp only [emit,cell,instruction,cost] at equal
+      have tailEq : cost (emit d (fun i => template i.succ) (fun i => q i.succ)) =
+          cost (emit d (fun i => template i.succ) (fun i => p i.succ)) := by omega
+      have tails := ih (fun i => template i.succ) tailCanon tailOrdered tailEq
+      simp only [cell] at canon
+      funext i
+      cases i using Fin.cases with
+      | zero => omega
+      | succ i => exact congrFun tails i
+    | squares a base =>
+      simp only [emit,cell,instruction,cost] at equal
+      have tailEq : cost (emit d (fun i => template i.succ) (fun i => q i.succ)) =
+          cost (emit d (fun i => template i.succ) (fun i => p i.succ)) := by omega
+      have tails := ih (fun i => template i.succ) tailCanon tailOrdered tailEq
+      funext i
+      cases i using Fin.cases with
+      | zero => omega
+      | succ i => exact congrFun tails i
+
+theorem exact_solution_in_basis {d : Nat} (template : Template d) (excess : Nat)
+    (valid : Valid template) (indexValid : excess ≤ cost (emit d template (fun _ => 0)))
+    (p : Point d) (canonical : Canonical template p)
+    (exactValue : eval (emit d template p) (fun _ => 1) 0 =
+      2^(2^(cost (emit d template p)-excess))-1) :
+    p ∈ minimalBasis template excess valid indexValid := by
+  have own : Hit template excess p :=
+    ⟨Nat.le_trans indexValid (emit_cost_lower template p),Nat.le_of_eq exactValue⟩
+  have correct := minimal_basis_correct template excess valid indexValid
+  obtain ⟨q,member,ordered⟩ := correct.2 p own
+  have comparison := emit_comparable template ordered
+  have costs := exact_cost_unchanged comparison.1 comparison.2 (correct.1 q member).1 exactValue
+  have same := canonical_cost_injective template canonical ordered costs
+  exact same ▸ member
 
 end SolvedArithmeticBasis

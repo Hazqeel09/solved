@@ -1,6 +1,6 @@
 {
   "toolchain": "leanprover/lean4:v4.8.0",
-  "scope": "Consult each catalogue entry and its statement correspondence. SquareInstability and AdditiveSeparation prove their declared main claims end to end; other entries may have supporting lemmas only.",
+  "scope": "Consult each catalogue entry and its statement correspondence. SquareInstability, AdditiveSeparation and UniversalCutoff prove their declared main claims end to end; other entries may have supporting lemmas only.",
   "modules": [
     {
       "file": "lean/AMNormalization.lean",
@@ -46,9 +46,14 @@
         "SolvedArithmeticBasis.recover_spec",
         "SolvedArithmeticBasis.minimal_basis_correct",
         "SolvedArithmeticBasis.emit_comparable",
+        "SolvedArithmeticBasis.hit_upward",
+        "SolvedArithmeticBasis.basis_membership_iff",
         "SolvedArithmeticBasis.exact_cost_unchanged",
         "SolvedArithmeticBasis.member_index_bound",
-        "SolvedArithmeticBasis.exact_below_cutoff"
+        "SolvedArithmeticBasis.exact_below_cutoff",
+        "SolvedArithmeticBasis.emit_cost_mono",
+        "SolvedArithmeticBasis.canonical_cost_injective",
+        "SolvedArithmeticBasis.exact_solution_in_basis"
       ]
     },
     {
@@ -381,6 +386,32 @@
         "SolvedTwoSmall.lift_le",
         "SolvedTwoSmall.proper_sum",
         "SolvedTwoSmall.lag_crossing"
+      ]
+    },
+    {
+      "file": "lean/UniversalCutoff.lean",
+      "theorems": [
+        "SolvedUniversal.mem_upto",
+        "SolvedUniversal.mem_words",
+        "SolvedUniversal.emit_cons",
+        "SolvedUniversal.base_program",
+        "SolvedUniversal.clip_length",
+        "SolvedUniversal.clip_reconstruct",
+        "SolvedUniversal.clip_cost_alternative",
+        "SolvedUniversal.clip_admissible",
+        "SolvedUniversal.table_valid",
+        "SolvedUniversal.clip_positive",
+        "SolvedUniversal.clip_alphabet",
+        "SolvedUniversal.clip_enumerated",
+        "SolvedUniversal.maximum_contains",
+        "SolvedUniversal.template_cutoff_correct",
+        "SolvedUniversal.portfolio_contains",
+        "SolvedUniversal.threshold_positive",
+        "SolvedUniversal.bounded_code_index",
+        "SolvedUniversal.effective_chain_bound",
+        "SolvedUniversal.effective_program_bound",
+        "SolvedUniversal.effective_additive_gap",
+        "SolvedUniversal.effective_minima"
       ]
     }
   ]

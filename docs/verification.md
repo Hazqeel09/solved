@@ -10,7 +10,7 @@
 | `reviewed-proof` | A written proof with a linked independent review record. |
 | `withdrawn` | A claim retained for traceability but no longer asserted. |
 
-Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md) and the [main additive subtraction-gap theorem](../results/subtraction-gap/PROOF.md) have complete formalizations of their stated main claims. Their written presentations and publication priority still await independent review.
+Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md), the [main additive subtraction-gap theorem](../results/subtraction-gap/PROOF.md), and its [computable-threshold extension](../results/effective-control-cutoffs/PROOF.md) have complete formalizations of their stated main claims. Their written presentations and publication priority still await independent review.
 
 ## Python checks
 
@@ -37,7 +37,7 @@ Install the [official Lean toolchain](https://lean-lang.org/lean4/doc/quickstart
 python -m scripts.check_formalization
 ```
 
-This builds the complete import closure and prints the axiom dependencies of every theorem declaration registered in [formalization.json](formalization.json). It rejects missing theorem reports, unfinished proofs and project-specific axioms. Only Lean's standard `propext`, `Classical.choice` and `Quot.sound` are permitted. These are not a claim of axiom-free mathematics. The command also kernel-checks the [Python/Lean profile comparison](../checks/verify_profile_formalization.py) on 779 profiles, 1,558 endpoints and 3,073 box decisions. This finite comparison is separate from the universal arithmetic oracle proof. A second checker compares compiled execution of the proved Lean basis function against Python on 1,551 cases; its finite outputs are execution evidence, not kernel-evaluated equality proofs.
+This builds the complete import closure and prints the axiom dependencies of every theorem declaration registered in [formalization.json](formalization.json). It rejects missing theorem reports, unfinished proofs and project-specific axioms. Only Lean's standard `propext`, `Classical.choice` and `Quot.sound` are permitted. These are not a claim of axiom-free mathematics. The command also kernel-checks the [Python/Lean profile comparison](../checks/verify_profile_formalization.py) on 779 profiles, 1,558 endpoints and 3,073 box decisions. This finite comparison is separate from the universal arithmetic oracle proof. A second checker compares compiled execution of the proved Lean basis function against Python on 1,551 cases; its finite outputs are execution evidence, not kernel-evaluated equality proofs. UniversalCutoff component checks add 10,640 kernel-checked clipping/cost assertions, six small finite aggregates and six guard cases. They never evaluate the universal threshold itself.
 
 | Module | What the formal statements cover |
 |---|---|
@@ -53,7 +53,8 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [IdealOracle](../lean/IdealOracle.lean) | Box cofinality, Boolean ideal-intersection decisions and computed witnesses. |
 | [FiniteLists](../lean/FiniteLists.lean) | Shared list membership and duplicate-removal facts. |
 | [FiniteBasis](../lean/FiniteBasis.lean) | A total recursive reference search, strict box-rank descent, exact coverage and minimal-generator pruning. |
-| [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Instantiation with the arithmetic oracle and a safe cutoff for every admissible lower-corner domain. |
+| [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Complete basis membership, exact-solution inclusion and safe per-domain cutoffs using the concrete arithmetic oracle. |
+| [UniversalCutoff](../lean/UniversalCutoff.lean) | Finite clipping/control coverage and a computable universal threshold for arbitrary AM programs and the additive subtraction gap. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
 | [Compression](../lean/Compression.lean) | Common-power compression of ordinary intervals with local multiplication and square runs. |

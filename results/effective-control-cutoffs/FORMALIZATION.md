@@ -1,11 +1,38 @@
 # Formal scope of the effective cutoff construction
 
-The arithmetic ideal-intersection oracle, constructive witness function,
-terminating reference basis algorithm and safe cutoff for each admissible
-lower-corner domain now have end-to-end Lean proofs. The finite corner cover
-and universal computable-threshold assembly remain outside the formalization.
-The entry therefore retains its supporting-lemmas formalization status and proof-draft review status.
-Independent review and publication-priority assessment remain pending.
+The stated main claims have complete Lean formalizations, including the
+universal computable-threshold construction. The reference functions compute
+ideal witnesses, complete minimal bases, domain cutoffs, a finite cover and
+the final universal threshold. Proof-draft review status remains unchanged:
+independent mathematical review and publication-priority assessment are pending.
+
+## Universal conclusion
+
+SolvedUniversal.threshold is a concrete computable function from natural
+numbers to natural numbers. effective_program_bound proves:
+
+    threshold C ≤ n →
+    program.value r = 2^(2^n)−1 →
+    n+C < r
+
+for every nonnegative C,n,r and every SolvedNormalization.Program r.
+This is the general AM model, allowing repeated values, decreasing writes
+and unused overshoots. Its initial value is 1; every instruction is an
+addition or multiplication of earlier results. Cost counts instructions,
+with unrestricted retention and no magnitude cap.
+
+effective_additive_gap further proves:
+
+    threshold (C+2) ≤ n →
+    MinimumAM (2^(2^n)−1) a →
+    MinimumSLP (2^(2^n)−1) b →
+    b+C < a.
+
+The signed model permits zero and negative intermediate integers.
+effective_minima includes existence of both minimum costs in its conclusion.
+It reuses the existing signed construction and minimum-cost existence proof;
+the new universal threshold does not assume the earlier qualitative
+eventual-gap theorem.
 
 ## Exact checked decision
 
@@ -160,6 +187,14 @@ the excess, minimal_basis_correct proves that the computed finite list:
 2. Dominates every point satisfying that predicate in the entire unbounded
    increment domain.
 
+hit_upward and basis_membership_iff explicitly prove that membership in the
+upward closure of the computed basis is equivalent to the arithmetic
+predicate. exact_solution_in_basis proves that every canonical exact solution
+occurs in the basis. Canonical means that the bookkeeping coordinates of
+binary blocks are zero, as they are in the original square-run parameter
+space. canonical_cost_injective proves the necessary equality of parameter
+vectors from ordered coordinates and equal primitive costs.
+
 The safe-cutoff function is also computable. exact_cost_unchanged proves
 that a covered exact-target program must have the same primitive cost as
 its covering basis program: a positive cost increase would make its value
@@ -181,8 +216,66 @@ The reference recursion can revisit overlapping slices. Python retains
 coordinate minimization and global box reuse; no universal refinement proof
 equating that optimized implementation with the Lean function is claimed.
 
-The remaining mathematical assembly steps are the finite cover of every
-positive run vector with sufficiently large cost, enumeration of all
-controls under the marked-code bound, and combining their cutoffs into a
-universal computable threshold. Normalization, nonsquare-count bounds and
-complete marked encoding are already formalized and can be reused.
+## Finite cover and universal assembly
+
+UniversalCutoff closes those assembly steps with the following checked chain:
+
+| Step | Formal declarations |
+|---|---|
+| Exhaustive finite integers and finite words | mem_upto, mem_words |
+| Clip every run to the finite range [1,C+1] | clip, clip_length, clip_positive |
+| Exact reconstruction by nonnegative increments | clip_reconstruct |
+| Clipped base retains enough cost for every excess at most C | clip_cost_alternative, clip_admissible |
+| Every bounded marked program belongs to the enumeration | clip_alphabet, clip_enumerated |
+| Sound guarded leaf cutoff | template_cutoff_correct |
+| Every leaf bound is below the finite aggregate | maximum_contains, portfolio_contains |
+| Every bounded-control exact target lies below that aggregate | bounded_code_index |
+| Complete coverage of increasing chains | effective_chain_bound, using mersenne_encoding |
+| Transfer to arbitrary AM programs | effective_program_bound, using normalize |
+| Computable additive-gap threshold and nonvacuity | effective_additive_gap, effective_minima |
+
+For C, the construction sets M=12C+13 and enumerates all cell words of length
+at most M, with saved addresses at most M and positive base run counts at
+most C+1. The existing marked encoder proves that every relevant increasing
+chain has a code inside those bounds. The enumeration deliberately includes
+additional controls interpreted by the stated extended-history semantics.
+Their cutoffs may enlarge the aggregate; they cannot remove a legal witness.
+
+If no run is clipped, the original cost is preserved. If some run is clipped,
+the base still contains C+1 squarings from that run alone. Thus every program
+of cost at least its excess is reconstructed above an admissible finite base.
+This avoids assuming a complete candidate menu or an unproved bound on the
+actual run lengths.
+
+templateCutoff returns an optional natural number: invalid bases or bases whose
+target index would be negative return none, while a valid domain with no exact
+solutions may return some 0. portfolio uses zero only as a neutral aggregate
+value for absent leaves. Coverage proves that every relevant program has a
+present, certified leaf. threshold takes the maximum of the aggregate and 1,
+so the n=0 boundary is explicitly excluded from the final eventual statement.
+
+The definitions use no noncomputable choice to select the threshold. Their
+termination follows from finite enumeration and the proved basis recursion.
+The proof may use the standard classical axioms listed in the audit; those
+are not unspecified computational or arithmetic oracles.
+
+## Component verification and practical limits
+
+The new [component checker](../../checks/verify_universal_formalization.py)
+kernel-checks 10,640 clipping and primitive-cost assertions, including run
+counts of 10^100 and zero-count invalid inputs. It compares six finite
+aggregates against an independent Python enumeration and checks six guarded
+leaf cases, distinguishing absent bounds from valid zero cutoffs.
+
+The six (C,M) fixtures are (0,0), (0,1), (1,1), (0,2), (1,2), (2,2).
+Their enumerations contain 1, 11, 13, 463, 601 and 757 templates, and their
+aggregates are respectively 1, 2, 3, 3, 5 and 7. These M values are separately
+chosen component-test bounds. They are not the universal M=12C+13, so these
+numbers are not evaluations of threshold C.
+
+The universal function has not been numerically evaluated. Its exhaustive
+enumeration can be extremely large, and no useful complexity bound,
+closed-form growth rate or practical threshold is claimed. The optimized
+Python implementation has finite comparison evidence, not a universal
+formal refinement proof. Polynomial equivalence between AM and signed
+program lengths remains a separate, unresolved question in this work.

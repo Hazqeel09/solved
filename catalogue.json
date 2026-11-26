@@ -886,19 +886,30 @@
         "solved/control_basis.py",
         "checks/verify_control_cutoffs.py",
         "checks/verify_profile_formalization.py",
-        "checks/verify_basis_formalization.py"
+        "checks/verify_basis_formalization.py",
+        "checks/verify_universal_formalization.py"
       ],
       "formalization": {
-        "status": "supporting-lemmas",
+        "status": "complete",
         "files": [
           "lean/EffectiveCutoffs.lean",
           "lean/DiagonalProfiles.lean",
           "lean/IdealOracle.lean",
           "lean/FiniteBasis.lean",
-          "lean/ArithmeticBasis.lean"
+          "lean/ArithmeticBasis.lean",
+          "lean/UniversalCutoff.lean"
         ],
-        "scope": "Whole-program profiles, the arithmetic ideal oracle, constructive witnesses, a terminating reference basis algorithm and a safe cutoff for each admissible lower corner are proved end to end. The finite cover of all admissible corners, enumeration of all bounded controls, universal threshold assembly and a universal refinement proof for the optimized Python search remain outside the formalization.",
-        "statement_correspondence": "results/effective-control-cutoffs/FORMALIZATION.md"
+        "scope": "The stated main claims are proved end to end: ideal intersection, complete minimal bases, inclusion of canonical exact solutions, per-domain cutoffs, finite corner and control coverage, and a concrete computable universal threshold for arbitrary AM programs and the additive subtraction gap. No practical evaluation of that universal threshold, complexity bound, or universal refinement proof for the optimized Python implementation is claimed.",
+        "statement_correspondence": "results/effective-control-cutoffs/FORMALIZATION.md",
+        "theorems": [
+          "SolvedIdeal.decision_correct",
+          "SolvedArithmeticBasis.basis_membership_iff",
+          "SolvedArithmeticBasis.exact_solution_in_basis",
+          "SolvedArithmeticBasis.exact_below_cutoff",
+          "SolvedUniversal.effective_program_bound",
+          "SolvedUniversal.effective_additive_gap",
+          "SolvedUniversal.effective_minima"
+        ]
       },
       "sources": [
         {
@@ -919,6 +930,10 @@
         },
         {
           "url": "https://doi.org/10.4230/LIPIcs.ICALP.2024.153",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/1212.2549",
           "recorded": "2026-11-27"
         }
       ],
