@@ -298,9 +298,10 @@
         "status": "supporting-lemmas",
         "files": [
           "lean/MarkedComparison.lean",
-          "lean/FiniteControls.lean"
+          "lean/FiniteControls.lean",
+          "lean/ChainCoverage.lean"
         ],
-        "scope": "One-extra-square domination and finite-dimensional no-descending-sequence lemmas only. Chain encoding, logarithmic normalization, ordinal bounds and coverage remain written."
+        "scope": "Local chain coverage, one-extra-square domination and finite-dimensional no-descending-sequence lemmas. Complete chain encoding, logarithmic normalization, finite-control packaging and ordinal conclusions remain written."
       },
       "sources": [
         {
@@ -308,8 +309,8 @@
           "recorded": "2026-11-26"
         },
         {
-          "url": "https://doi.org/10.1016/j.tcs.2017.09.037",
-          "recorded": "2026-11-26"
+          "url": "https://arxiv.org/abs/1409.1627",
+          "recorded": "2026-11-27"
         },
         {
           "url": "https://doi.org/10.3934/Math.2026667",
@@ -362,19 +363,22 @@
       "statement": "For N_n=2^(2^n)−1 the draft derives τ_+(N_n)−n→∞ and hence an unbounded additive gap from subtraction-enabled computation.",
       "proof": "results/subtraction-gap/PROOF.md",
       "tests": [
-        "test_square_controls.py"
+        "test_square_controls.py",
+        "test_square_exclusions.py"
       ],
       "implementation": [
-        "solved/square_controls.py"
+        "solved/square_controls.py",
+        "solved/square_exclusions.py"
       ],
       "formalization": {
         "status": "supporting-lemmas",
         "files": [
           "lean/MarkedComparison.lean",
           "lean/FiniteControls.lean",
-          "lean/SubtractionGap.lean"
+          "lean/SubtractionGap.lean",
+          "lean/ChainCoverage.lean"
         ],
-        "scope": "Supporting algebraic domination, thinning and integer-contradiction lemmas only. The full asymptotic separation is not formalized."
+        "scope": "Local coverage of increasing AM chains, saved-history domination, thinning, strict integer gaps, upward-region exclusion and a finite-family obstruction with a supplied domination hypothesis. Normalization, the nonsquare count bound, finite-control packaging and the full asymptotic theorem remain written."
       },
       "sources": [
         {
@@ -384,6 +388,14 @@
         {
           "url": "https://doi.org/10.3934/Math.2026667",
           "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://arxiv.org/abs/1007.2989",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.ICALP.2024.153",
+          "recorded": "2026-11-27"
         }
       ],
       "dependencies": [],
@@ -591,12 +603,12 @@
       },
       "sources": [
         {
-          "url": "https://www.ijcai.org/proceedings/2009/78",
-          "recorded": "2026-11-26"
+          "url": "https://ijcai.org/proceedings/2009/78",
+          "recorded": "2026-11-27"
         },
         {
-          "url": "https://www.ijcai.org/proceedings/2007/29",
-          "recorded": "2026-11-26"
+          "url": "https://ijcai.org/proceedings/2007/0029.pdf",
+          "recorded": "2026-11-27"
         }
       ],
       "dependencies": [

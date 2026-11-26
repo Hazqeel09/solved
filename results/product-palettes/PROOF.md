@@ -18,7 +18,7 @@ Represent it as a binary clause forbidding both threshold events. The lower boun
 
 another binary clause, using the next threshold for the negation of xᵢ≤a. Bound searches skip gaps in a palette exactly. For an actual selected xᵢ=a, these two clauses force precisely the permitted interval for xⱼ. Every other clause is necessary for any feasible product. This proves equivalence. Loops simply use literals from the same threshold family. Exact integer division handles bounds of any bit length.
 
-This is a specialization of established order encodings and tractable binary constraint languages. The product-specific construction supplies a compact implementation and permits arbitrary finite source palettes. Its polynomial bound is in the explicit palette size, which can itself be large. [Connected row-convex constraints and threshold clauses](https://www.ijcai.org/proceedings/2009/78) · [Related variable-elimination algorithm](https://www.ijcai.org/proceedings/2007/29)
+This is a specialization of established order encodings and tractable binary constraint languages. The product-specific construction supplies a compact implementation and permits arbitrary finite source palettes. Its polynomial bound is in the explicit palette size, which can itself be large. [Connected row-convex constraints and threshold clauses](https://ijcai.org/proceedings/2009/78) · [Related variable-elimination algorithm](https://ijcai.org/proceedings/2007/0029.pdf)
 
 ## What source-cost objective is tractable?
 

@@ -46,7 +46,7 @@ Therefore each transition between marks is either a nonsquare with two reference
 
     r = p + Σgᵢ.
 
-This representation retains every nonsquare operand even when it lies inside a long run. The implemented encoder reconstructs the full numerical chain, with canonical normalization of 2→4. [Encoder and decoder](../../solved/square_controls.py)
+With p nonsquares there are at most 3p+1 block transitions and at most 2p+1 square-run parameters. There are finitely many operation labels and references to earlier marks at each of these boundedly many positions. This representation retains every nonsquare operand even when it lies inside a long run. The implemented encoder reconstructs the full numerical chain, with canonical normalization of 2→4. The Lean module ChainCoverage now proves that a nonsquare predecessor is marked, that a nonsquare boundary is adjacent to its preceding mark, and that a square boundary is exactly the iterated square of that mark. It formalizes these local coverage steps for every chain satisfying its explicit increasing-AM definition. [Encoder and decoder](../../solved/square_controls.py)
 
 ## 3. Domination when square parameters increase
 
@@ -74,7 +74,7 @@ But Aₘ=Aₙ^(2^(m−n)), and for any integer A≥2 and exponent q≥2,
 
     A^q−1 > (A−1)^q.
 
-Hence Nₘ>Nₙ^(2^(m−n)), the contradiction. It follows that for every C only finitely many n have τ₊(Nₙ)≤n+C. This proves τ₊(Nₙ)−n→∞. The signed program writes 2, squares n times, and subtracts the saved 1, using n+2 instructions. The additive gap therefore tends to infinity. Dickson's lemma also underlies the independently stated [AM-defect well-ordering argument](../am-defect-order/PROOF.md); the direct argument here uses only integer endpoint comparisons after the coarse nonsquare bound.
+Hence Nₘ>Nₙ^(2^(m−n)), the contradiction. It follows that for every C only finitely many n have τ₊(Nₙ)≤n+C. This proves τ₊(Nₙ)−n→∞. The signed program writes 2, squares n times, and subtracts the saved 1, using n+2 instructions. The Lean theorem finite_descriptions_obstruction now checks the contradiction for any supplied finite family satisfying the coordinate-domination property. It encodes the finite control and excess as a bounded label together with its complement; coordinatewise comparison forces label equality. Padding the run vector with zeros allows a fixed dimension. Connecting every arithmetic chain to that finite-family hypothesis remains part of the written proof. The additive gap therefore tends to infinity. Dickson's lemma also underlies the independently stated [AM-defect well-ordering argument](../am-defect-order/PROOF.md); the direct argument here uses only integer endpoint comparisons after the coarse nonsquare bound.
 
 ## 5. Other explicit families and bounded positive storage
 
@@ -90,6 +90,30 @@ The primary Mersenne-family separation also survives a cap equal to the target. 
 
 Exact division has an analogous separation from +,× on the powers Aₙ/2. Their consecutive ratio gives bₙ₊₁=2bₙ², and their level is n. Keeping 2 while squaring and then dividing by it gives n+2 instructions. This conclusion compares exact division with the monotone AM model.
 
+## 6. A constructive exclusion rule
+
+Fix a marked control and a nonnegative integer excess j. A parameter vector g with positive square-run lengths has written length r(g). Its associated target is
+
+    T(g) = 2^(2^(r(g)−j)) − 1,
+
+where r(g)≥j. Suppose a checked base description has endpoint E(g)≤T(g). For every coordinatewise extension h≥g with h≠g, put q=Σ(hᵢ−gᵢ)>0. The fixed control makes r(h)−r(g)=q. The comparison from §3 gives
+
+    E(h) ≤ E(g)^(2^q) ≤ T(g)^(2^q) < T(h).
+
+Thus **no strict extension can represent its associated tower-minus-one target at excess j**. If the base is strictly below its target, the base itself is excluded too. If it equals the target, retain that solution and exclude only strict extensions. This is a certificate for an entire upward region of parameters, including vectors with arbitrarily large coordinates. It does not exclude incomparable vectors, other controls or another excess.
+
+For example the chain 1,2,4,5,10,15 has length five, excess three, and endpoint N₂=15. Its marked control has one square run of length one. Increasing that run to length two produces 1,2,4,16,17,34,51, with length six and endpoint 51<N₃=255. Every further extension of the same run is excluded at excess three by the certificate, without constructing its endpoint.
+
+The implementation evaluates the base exactly and verifies membership of later parameter vectors by coordinate comparisons. It compares a base integer with 2^(2^n)−1 by bit length and the all-ones binary test, without materializing the target tower. A failed certificate condition supplies no exclusion. [Executable certificate](../../solved/square_exclusions.py) · [Independent finite checks](../../tests/test_square_exclusions.py). The Lean lemma exclusion_by_growth checks the strict propagation from a supplied domination inequality.
+
+## 7. What remains before an effective cutoff
+
+Dickson's lemma proves the finiteness used in §4. Known quantitative bounds for bad sequences additionally require a control function restricting coordinate growth. The later theory of strongly monotone descending chains supplies sharper bounds under further hypotheses. Neither condition has been established for the witnesses here. In particular, the index of the next exceptional tower exponent could be very large compared with its position in a list of exceptions. We therefore do not claim an effective cutoff or a numerical rate for the additive gap. [Figueira et al., controlled Dickson bounds](https://arxiv.org/abs/1007.2989) · [Schmitz and Schütze, ICALP 2024](https://doi.org/10.4230/LIPIcs.ICALP.2024.153).
+
+The exclusion certificate is useful even without such a cutoff: any verified base removes all its strict coordinate extensions at the same control and excess. A complete search must still account for every control and every remaining incomparable region. A new representation or arithmetic argument may be needed to make that coverage effective.
+
 ## Verification scope
 
-The finite-control encoder, reconstruction and one-square inflation are tested on all at-most-two-small-step chains through 10^18 and further small cases. Lean checks the single-insertion comparison, finite-dimensional thinning and the strict tower-minus-one power gap. Chain normalization, the nonsquare bound, finite coverage and the asymptotic conclusion remain written arguments. Independent review is pending. This is a proposed resolution of the additive-gap question; it establishes no polynomial separation and claims no publication priority.
+The finite-control encoder, reconstruction and one-square inflation are tested on all at-most-two-small-step chains through 10^18 and further small cases. Additional tests compare exclusion certificates against exact small endpoints, preserve an exact base solution, reject incomparable parameters, and test membership with an exponent parameter of 10^100 without expanding that candidate.
+
+Lean checks local chain coverage, the single-insertion comparison, finite-dimensional thinning, the strict tower-minus-one power gap, upward-region exclusion and the finite-family obstruction under its stated domination hypothesis. Chain normalization from general AM programs, the nonsquare count bound, finite-control packaging and the resulting end-to-end asymptotic conclusion remain written arguments. The Python encoder is tested, not formally verified. Independent review is pending. This is a proposed resolution of the additive-gap question; it establishes no polynomial separation and claims no publication priority.

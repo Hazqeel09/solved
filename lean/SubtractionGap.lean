@@ -1,5 +1,6 @@
 import Compression
 import TwoSmallBlocks
+import FiniteControls
 
 namespace SolvedSubtraction
 open SolvedCompression SolvedTwoSmall
@@ -33,6 +34,69 @@ theorem incompatible_endpoints {a newer : Nat} (large : 2 ≤ a) (q : Nat)
     (tower_identity : newer = iterSq (q+1) a - 1) : False := by
   have gap := tower_minus_one large q
   omega
+
+
+-- A checked base excludes every strict coordinate extension satisfying the
+-- marked-expression domination bound, at the same written-length excess.
+theorem exclusion_by_growth {base candidate n : Nat} (q : Nat)
+    (large : 2 ≤ iterSq n 2)
+    (base_bound : base ≤ iterSq n 2 - 1)
+    (domination : candidate ≤ iterSq (q+1) base) :
+    candidate < iterSq (n+(q+1)) 2 - 1 := by
+  have propagated := (lift_le (q+1)).mpr base_bound
+  have strict := tower_minus_one large q
+  rw [iterSq_add]
+  exact Nat.lt_of_le_of_lt (Nat.le_trans domination propagated) strict
+
+-- A finite collection of controls cannot represent infinitely many distinct
+-- tower-minus-one endpoints at one of finitely many fixed length excesses.
+-- The numerical domination hypothesis must be justified by the encoding.
+theorem finite_descriptions_obstruction
+    (index label : Nat → Nat) (parameters : Nat → Nat → Nat)
+    (labelBound dimension : Nat)
+    (labels_bounded : ∀ i, label i ≤ labelBound)
+    (indices_rise : ∀ i j, i < j → index i < index j)
+    (domination : ∀ i j, i < j → label i = label j →
+      (∀ k, k < dimension → parameters i k ≤ parameters j k) →
+      iterSq (index j) 2 - 1 ≤ iterSq (index j-index i) (iterSq (index i) 2 - 1)) :
+    False := by
+  let packed := fun i k => if k=0 then label i
+    else if k=1 then labelBound-label i else parameters i (k-2)
+  obtain ⟨g, rises, ordered⟩ := SolvedControls.thin packed (dimension+2)
+  let i := g 0
+  let j := g 1
+  have ij : i < j := rises 0 1 (by omega)
+  have first : label i ≤ label j := by
+    have h := ordered 0 (by omega) 0 1 (by omega)
+    simpa only [packed, if_pos rfl] using h
+  have second : labelBound-label i ≤ labelBound-label j := by
+    have h := ordered 1 (by omega) 0 1 (by omega)
+    simpa only [packed, Nat.one_ne_zero, if_false, if_pos rfl] using h
+  have same : label i=label j := by
+    have hi := labels_bounded i
+    have hj := labels_bounded j
+    omega
+  have params : ∀ k, k < dimension → parameters i k ≤ parameters j k := by
+    intro k hk
+    have h := ordered (k+2) (by omega) 0 1 (by omega)
+    have nz : k+2 ≠ 0 := by omega
+    have no : k+2 ≠ 1 := by omega
+    simpa only [packed, if_neg nz, if_neg no, Nat.add_sub_cancel] using h
+  have bound := domination i j ij same params
+  have increase := indices_rise i j ij
+  have positive : 0 < index j-index i := by omega
+  have gap : index j-index i = (index j-index i-1)+1 := by omega
+  have large : 2 ≤ iterSq (index i) 2 := by
+    have h := strict_iterSq (show 1 < 2 by omega) (index i)
+    rw [one_run] at h
+    omega
+  have tower : iterSq (index j) 2 - 1 =
+      iterSq ((index j-index i-1)+1) (iterSq (index i) 2) - 1 := by
+    rw [← gap, ← iterSq_add]
+    have eq : index i+(index j-index i)=index j := by omega
+    rw [eq]
+  rw [gap] at bound
+  exact incompatible_endpoints large (index j-index i-1) bound tower
 
 #print axioms square_gap
 #print axioms tower_minus_one

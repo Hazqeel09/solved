@@ -3,6 +3,21 @@
   "scope": "The listed formal statements are supporting lemmas. Consult each catalogue entry for unformalized steps.",
   "modules": [
     {
+      "file": "lean/ChainCoverage.lean",
+      "theorems": [
+        "SolvedCoverage.monotone",
+        "SolvedCoverage.at_least_two",
+        "SolvedCoverage.sum_le_square",
+        "SolvedCoverage.first_not_square",
+        "SolvedCoverage.reads_head_after_square",
+        "SolvedCoverage.predecessor_marked",
+        "SolvedCoverage.unmarked_is_square",
+        "SolvedCoverage.nonsquare_boundary_adjacent",
+        "SolvedCoverage.square_run",
+        "SolvedCoverage.square_boundary_run"
+      ]
+    },
+    {
       "file": "lean/Compression.lean",
       "theorems": [
         "SolvedCompression.iterSq_mul",
@@ -69,7 +84,9 @@
         "SolvedSubtraction.square_gap",
         "SolvedSubtraction.one_run",
         "SolvedSubtraction.tower_minus_one",
-        "SolvedSubtraction.incompatible_endpoints"
+        "SolvedSubtraction.incompatible_endpoints",
+        "SolvedSubtraction.exclusion_by_growth",
+        "SolvedSubtraction.finite_descriptions_obstruction"
       ]
     },
     {

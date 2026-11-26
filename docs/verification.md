@@ -41,6 +41,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 
 | Module | What the formal statements cover |
 |---|---|
+| [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
 | [Compression](../lean/Compression.lean) | Common-power compression of ordinary intervals with local multiplication and square runs. |
 | [MarkedComparison](../lean/MarkedComparison.lean) | Squared domination after one additional square, including saved-history reads. |
 | [FiniteControls](../lean/FiniteControls.lean) | Finite-dimensional thinning and a no-descending-sequence implication. |
@@ -48,9 +49,9 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [TwoSmallBlocks](../lean/TwoSmallBlocks.lean) | Proper-sum and inner-run lag inequalities. |
 | [SignedEnvelope](../lean/SignedEnvelope.lean) | A nonmaximal-operation estimate and a record-growth bound. |
 | [ProductIntervals](../lean/ProductIntervals.lean) | Narrow-interval transport, unique neighbors and antitone fixed-point uniqueness. |
-| [SubtractionGap](../lean/SubtractionGap.lean) | Strict tower-minus-one power inequalities and contradiction with supplied domination. |
+| [SubtractionGap](../lean/SubtractionGap.lean) | Strict power inequalities, upward-region exclusion, and the finite-family obstruction under supplied domination. |
 
-The main coverage arguments, asymptotic estimates, ordinal conclusions and global graph algorithms are written mathematics. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
+Complete finite-control packaging, the nonsquare count bound, asymptotic estimates, ordinal conclusions and global graph algorithms remain written mathematics. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
 
 ## Audit priorities
 

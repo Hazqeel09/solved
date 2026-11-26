@@ -6,3 +6,4 @@ import ProductIntervals
 import SignedEnvelope
 import SubtractionGap
 import TwoSmallBlocks
+import ChainCoverage
