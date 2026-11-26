@@ -1,0 +1,15 @@
+# Questions and boundaries
+
+The catalogue is organized around precise statements. Its initial arithmetic concentration reflects the available manuscripts; future work can add any mathematical subject.
+
+| Research question | Primary source | Current scope here |
+|---|---|---|
+| Classify addition–multiplication chains with two small steps. | [Tarek, Bahig and Anwar, §7](https://doi.org/10.3934/Math.2026667) | [All-length block-classification draft](../results/two-small-steps/PROOF.md). It classifies witnesses; distinct parameters may share an endpoint. |
+| Determine well-ordering and ordinal types of real AM-chain defects. | [Altman, thesis §6.2, Question 6.2.1](https://hjaltman.github.io/thesis-FIXED.pdf) | [Global-order draft](../results/am-defect-order/PROOF.md) and [slice draft](../results/am-defect-slices/PROOF.md), awaiting independent review. |
+| Can subtraction yield an unbounded additive gap, or superpolynomial savings? | [Saranurak and Jindal](https://arxiv.org/abs/1212.2549) | [Additive-gap draft](../results/subtraction-gap/PROOF.md). Polynomial equivalence is not settled by this argument. |
+| How can reusable intermediate arithmetic values be synthesized efficiently? | [Alcock et al.](https://arxiv.org/abs/2011.11767), [Cantaloube et al.](https://doi.org/10.4230/LIPIcs.CP.2026.11) | [Target saturation](../results/target-saturation/PROOF.md) and restricted exact domain results, each with explicit model assumptions. |
+| Is every DAG pebbling number captured tightly by a suitable visit rule? | [Bilardi and De Stefani](https://doi.org/10.4230/LIPIcs.FSTTCS.2022.7) | [One-shot register oracle](../results/one-shot-registers/PROOF.md) addresses a different, restricted scheduling problem. |
+| Does the Scholz–Brauer inequality hold for every exponent? | [Clift's research page](https://www.additionchains.com/ScholzBrauer.html) | [Finite certificates](../results/scholz-finite/PROOF.md) reproduce established cases for exponents 1–59. |
+| Is {0} ∪ {2^a 3^b : a,b≥0} an essential component? | [Erdős problem 1146](https://www.erdosproblems.com/1146) | [Eventually-periodic case](../results/periodic-essential-components/PROOF.md), with no conclusion for arbitrary intermediate-density sets. |
+
+Further directions within the current material include quantitative rates for the proposed additive gap, exact endpoint classification beyond witness families, higher-defect squaring stability, and full formalization of the finite-control coverage arguments. Each needs its own statement and literature audit before a new result is claimed.

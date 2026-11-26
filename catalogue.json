@@ -1,0 +1,757 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "id": "informative-cycles",
+      "title": "At most two assignments from an informative arithmetic cycle",
+      "subject": "Arithmetic constraint systems",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "A connected invertible fractional-linear observation template with a nonidentity cycle has at most two legal assignments.",
+      "proof": "results/informative-cycles/PROOF.md",
+      "tests": [
+        "test_math.py"
+      ],
+      "implementation": [
+        "solved/cycles.py",
+        "solved/rational.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://people.math.binghamton.edu/zaslav/Tpapers/bg1.jctb1989.pdf",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "38f4c390ab4df6f313f59e56e67043f924c88285ad856f670e1dfea263538470"
+    },
+    {
+      "id": "bounded-am-chains",
+      "title": "Complete bounded enumeration of two-small-step AM chains",
+      "subject": "Arithmetic complexity",
+      "status": "finite-verification",
+      "review": "independent-review-pending",
+      "statement": "Enumerate every strictly increasing value sequence with at most two small steps below a supplied cap, and determine minimum endpoint defect in that range.",
+      "proof": "results/bounded-am-chains/PROOF.md",
+      "tests": [
+        "test_math.py"
+      ],
+      "implementation": [
+        "solved/chains.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "38f4c390ab4df6f313f59e56e67043f924c88285ad856f670e1dfea263538470"
+    },
+    {
+      "id": "affine-domains",
+      "title": "Exact affine root domains in balanced components",
+      "subject": "Arithmetic constraint systems",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "When every transported value and executed prefix is affine, the integral feasible root domain is an arithmetic progression intersected with an interval.",
+      "proof": "results/affine-domains/PROOF.md",
+      "tests": [
+        "test_affine.py"
+      ],
+      "implementation": [
+        "solved/affine.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://people.math.binghamton.edu/zaslav/Tpapers/bg1.jctb1989.pdf",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "informative-cycles"
+      ],
+      "source_digest": "d24a6397d16cece0bf91a41ddcdc6d93f1795acc14f9cb3b7c9b83147877b969"
+    },
+    {
+      "id": "nonlinear-domains",
+      "title": "Divisor certificates for nonlinear fractional-linear domains",
+      "subject": "Arithmetic constraint systems",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For a primitive pole px+q, integrality forces px+q to divide a nonzero determinant-derived integer; coincident poles combine by gcd.",
+      "proof": "results/nonlinear-domains/PROOF.md",
+      "tests": [
+        "test_poles.py"
+      ],
+      "implementation": [
+        "solved/poles.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.CP.2026.11",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://arxiv.org/abs/1007.1526",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "affine-domains"
+      ],
+      "source_digest": "a2555fdd1fb65ae10bccd2ed595a06c8393c7b541a66b3fb66b98b5899dad8e0"
+    },
+    {
+      "id": "seven-nonsquares",
+      "title": "Twelve squaring rays with seven canonical nonsquares",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Classify the seven-canonical-nonsquare sector at defect two and exclude eight nonsquares; prove square stability at minimum defect at most two.",
+      "proof": "results/seven-nonsquares/PROOF.md",
+      "tests": [
+        "test_seven_steps.py"
+      ],
+      "implementation": [
+        "solved/seven_steps.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "43ba82db023fddd973d29c72a02d1609b64cca3562a0a3cbb3c744f10ed7ecee"
+    },
+    {
+      "id": "six-nonsquares",
+      "title": "Infinitely many primitive rays with six nonsquares",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "An explicit two-parameter nonsquare family has shortest AM defect two and shortest witnesses with six canonical nonsquares.",
+      "proof": "results/six-nonsquares/PROOF.md",
+      "tests": [
+        "test_seven_steps.py"
+      ],
+      "implementation": [
+        "solved/seven_steps.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "seven-nonsquares"
+      ],
+      "source_digest": "e50e38e7e36f88c27ae1a184b832d2bbae1bed809427da71e8d218c303b3a85f"
+    },
+    {
+      "id": "two-small-steps",
+      "title": "An all-length block classification of two-small-step chains",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Exactly eleven nonsquare event words suffice, with explicit operand and square-gap ranges, to generate every two-small-step increasing AM value sequence.",
+      "proof": "results/two-small-steps/PROOF.md",
+      "tests": [
+        "test_two_small_forms.py"
+      ],
+      "implementation": [
+        "solved/two_small_forms.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/TwoSmallBlocks.lean"
+        ],
+        "scope": "Only proper-sum and lag-crossing inequalities are formalized. Event-word coverage, classification completeness and the literature-dependent nonsquare bound remain written arguments."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "seven-nonsquares"
+      ],
+      "source_digest": "de9680c4f774cc5585801acfb57306079906b66f141a8337a2d3e81da7a08ad5"
+    },
+    {
+      "id": "two-defect-counting",
+      "title": "Sharp counting order for shortest defect-two endpoints",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "The number of shortest-defect-two endpoints through N is Θ((log log N)^5), and a complete level L contains Θ(L^4).",
+      "proof": "results/two-defect-counting/PROOF.md",
+      "tests": [
+        "test_counting.py"
+      ],
+      "implementation": [
+        "solved/counting.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "seven-nonsquares"
+      ],
+      "source_digest": "f246029f352d12e8169141cf9cd2cd21acdd509879d2f98bf7e85b350858accf"
+    },
+    {
+      "id": "fixed-defect-counting",
+      "title": "The counting exponent at every fixed AM defect",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For fixed s, complete-level counts have order Θ_s(L^(2s)); nonsquare and squaring-ray-entry counts have order Θ_s(L^(2s−1)) for s≥1.",
+      "proof": "results/fixed-defect-counting/PROOF.md",
+      "tests": [
+        "test_fixed_defect.py",
+        "test_counting.py"
+      ],
+      "implementation": [
+        "solved/fixed_defect.py",
+        "solved/counting.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/Compression.lean"
+        ],
+        "scope": "Only the ordinary-interval compression lemma is formalized. The covering, counting bounds, lower-family argument and asymptotic conclusion remain written."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://perso.ens-lyon.fr/pascal.koiran/Publis/tau.springer.pdf",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "3e32dc6dd89be6b5005c0344832c0489b0ecb3cdc500067ad3ba66a38177137d"
+    },
+    {
+      "id": "am-defect-order",
+      "title": "Well-ordering and global order type of real AM defects",
+      "subject": "Order theory and arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "The draft derives well-ordering and type ω^ω for real AM-chain defects, plus the lower bound ω^k on each slice below k.",
+      "proof": "results/am-defect-order/PROOF.md",
+      "tests": [
+        "test_square_controls.py",
+        "test_normalized_mass.py"
+      ],
+      "implementation": [
+        "solved/square_controls.py",
+        "solved/normalized_mass.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/MarkedComparison.lean",
+          "lean/FiniteControls.lean"
+        ],
+        "scope": "One-extra-square domination and finite-dimensional no-descending-sequence lemmas only. Chain encoding, logarithmic normalization, ordinal bounds and coverage remain written."
+      },
+      "sources": [
+        {
+          "url": "https://hjaltman.github.io/thesis-FIXED.pdf",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://doi.org/10.1016/j.tcs.2017.09.037",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "ed8c7f5bb22dc0666f2fa7d950d3ce91c3cd82d6636b5da61cfdd7bab89b9de5"
+    },
+    {
+      "id": "am-defect-slices",
+      "title": "The proposed sharp type of each bounded AM-defect slice",
+      "subject": "Order theory and arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "The draft derives order type ω^k for the real-defect slice below every positive integer k.",
+      "proof": "results/am-defect-slices/PROOF.md",
+      "tests": [
+        "test_normalized_mass.py"
+      ],
+      "implementation": [
+        "solved/normalized_mass.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/PositiveExpressions.lean",
+          "lean/FiniteControls.lean"
+        ],
+        "scope": "Generic positive-expression monotonicity and finite-dimensional thinning only. The reset parametrization, real analysis and complete ordinal theorem are not formalized."
+      },
+      "sources": [
+        {
+          "url": "https://hjaltman.github.io/thesis-FIXED.pdf",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "am-defect-order",
+        "fixed-defect-counting"
+      ],
+      "source_digest": "2becaa6e574010e0b3d5b051f913bee2df19707ca6cff647c9870a0c3da79e58"
+    },
+    {
+      "id": "subtraction-gap",
+      "title": "An unbounded additive advantage for subtraction: proof draft",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For N_n=2^(2^n)−1 the draft derives τ_+(N_n)−n→∞ and hence an unbounded additive gap from subtraction-enabled computation.",
+      "proof": "results/subtraction-gap/PROOF.md",
+      "tests": [
+        "test_square_controls.py"
+      ],
+      "implementation": [
+        "solved/square_controls.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/MarkedComparison.lean",
+          "lean/FiniteControls.lean",
+          "lean/SubtractionGap.lean"
+        ],
+        "scope": "Supporting algebraic domination, thinning and integer-contradiction lemmas only. The full asymptotic separation is not formalized."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1212.2549",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "14ea1ab7ecbbd17dff42701e2d0f811a5fd87743268b61dba038d5178e66f608"
+    },
+    {
+      "id": "prefix-extrema",
+      "title": "Sharp completion and increment bounds from an AM prefix",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Given prescribed square and nonsquare counts, Fibonacci products give the maximum endpoint; a finite maximum over last-square locations gives the exact next increment.",
+      "proof": "results/prefix-extrema/PROOF.md",
+      "tests": [
+        "test_prefix_growth.py"
+      ],
+      "implementation": [
+        "solved/prefix_growth.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "8cb0ddcfcbb837e6ee4b6ffca748e95399a19cc4e3dba46c51a221a34ee85b88"
+    },
+    {
+      "id": "signed-growth",
+      "title": "Extremal values and optimal simultaneous cancellation",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Determine the two largest distinct values reachable in a prescribed budget, deduce optimal near-maximum target families and a descending signed-defect sequence.",
+      "proof": "results/signed-growth/PROOF.md",
+      "tests": [
+        "test_growth_gap.py"
+      ],
+      "implementation": [
+        "solved/growth_gap.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/SignedEnvelope.lean"
+        ],
+        "scope": "A nonmaximal-operation bound and record-count bound only. Arbitrary-bank extrema and signed-defect order conclusions remain written."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1212.2549",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "208c345be19311a4861ee4085aee021463b2b7c1b83bf4a3b97305c6848077fe"
+    },
+    {
+      "id": "record-defect",
+      "title": "A sharp nonsquare bound for positive arithmetic with arbitrary seeds",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "With s record-level-preserving steps, the sharp nonsquare bound is max{b:2^b<2^(s+1)F_(b+2)}, attained with two registers as the cap varies.",
+      "proof": "results/record-defect/PROOF.md",
+      "tests": [
+        "test_record_defect.py"
+      ],
+      "implementation": [
+        "solved/record_defect.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "prefix-extrema",
+        "signed-growth"
+      ],
+      "source_digest": "ff56b044ffc2f8c4264668135c217706219169adcba6755276e0c31cff102458"
+    },
+    {
+      "id": "target-saturation",
+      "title": "Exact synthesis by target saturation and helper branching",
+      "subject": "Program synthesis",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "With unlimited retention, bounded positive four-operation synthesis can branch only on new non-target values after target closure; cost is polynomial for each fixed helper budget.",
+      "proof": "results/target-saturation/PROOF.md",
+      "tests": [
+        "test_helper_search.py"
+      ],
+      "implementation": [
+        "solved/helper_search.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.CP.2026.11",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "b0e414650273d979191f85aa56cdf4e6c9f71b4957d6f1fc6583955399fbfeee"
+    },
+    {
+      "id": "final-helper",
+      "title": "A complete finite menu for the final helper",
+      "subject": "Program synthesis",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "After target saturation, a final useful helper belongs to at most (6|K|+2)|T minus K| inverse candidates before deduplication.",
+      "proof": "results/final-helper/PROOF.md",
+      "tests": [
+        "test_helper_search.py"
+      ],
+      "implementation": [
+        "solved/helper_search.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.CP.2026.11",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "target-saturation"
+      ],
+      "source_digest": "25fd8adfb1992d494386f80f00da4e10c2f22d92f020b8396aca936bf183b426"
+    },
+    {
+      "id": "narrow-products",
+      "title": "Unique integer recovery from narrow product intervals",
+      "subject": "Discrete inverse problems",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "A connected product graph with widths below both factor lower bounds has at most one solution if anchored or non-bipartite; exact reconstruction is polynomial in input bit length.",
+      "proof": "results/narrow-products/PROOF.md",
+      "tests": [
+        "test_product_intervals.py"
+      ],
+      "implementation": [
+        "solved/product_intervals.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/ProductIntervals.lean"
+        ],
+        "scope": "Integer transport, unique-neighbor and antitone fixed-point lemmas. Global graph uniqueness, traversal correctness and complexity remain written."
+      },
+      "sources": [
+        {
+          "url": "https://jmlr.org/papers/volume21/19-359/19-359.pdf",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "af9d10a563fb89441ca304f8f543434633a35d684ecc69193cc25dfc279b5594"
+    },
+    {
+      "id": "product-palettes",
+      "title": "Product constraints over finite palettes: feasibility and costs",
+      "subject": "Constraint satisfaction",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Product-interval feasibility reduces to 2-SAT; bottleneck cost is polynomial, sum cost is hard in general and polynomial below the sharp narrow-width boundary.",
+      "proof": "results/product-palettes/PROOF.md",
+      "tests": [
+        "test_product_palettes.py"
+      ],
+      "implementation": [
+        "solved/product_palettes.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://www.ijcai.org/proceedings/2009/78",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://www.ijcai.org/proceedings/2007/29",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "narrow-products"
+      ],
+      "source_digest": "7bee806d63df6f45a317ac637b1b8d25a07204d11cdbec1f1e54eb5bc76c7ccd"
+    },
+    {
+      "id": "guarded-product-paths",
+      "title": "Factor recovery through guarded arithmetic paths",
+      "subject": "Discrete inverse problems",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Backward inverse intervals preserve every legal path input. Combined with unique narrow-product recovery and exact replay, they decide the guarded factor system.",
+      "proof": "results/guarded-product-paths/PROOF.md",
+      "tests": [
+        "test_path_intervals.py"
+      ],
+      "implementation": [
+        "solved/path_intervals.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.1145/3776694",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [
+        "narrow-products",
+        "product-palettes"
+      ],
+      "source_digest": "6aab7f9b835a9044e1bc92a53c4ae875367e5fc8ffbe352b4be1c517130e6033"
+    },
+    {
+      "id": "integer-255",
+      "title": "Exact computation costs for the integer 255",
+      "subject": "Arithmetic complexity",
+      "status": "finite-verification",
+      "review": "independent-review-pending",
+      "statement": "The minimum from-1 cost for 255 is six with addition/multiplication and five when subtraction is allowed.",
+      "proof": "results/integer-255/PROOF.md",
+      "tests": [
+        "test_classical.py"
+      ],
+      "implementation": [],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1212.2549",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "9789504e8f58cc17ff1efe8b6ea9e520cde89d50826e296b491e51cbb524c1fe"
+    },
+    {
+      "id": "one-shot-registers",
+      "title": "Exact register requirements for a fixed one-shot DAG",
+      "subject": "Graph algorithms",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Dynamic programming over executed ideals gives the exact destructive-overwrite register minimum for a fixed DAG with exit pins and no recomputation.",
+      "proof": "results/one-shot-registers/PROOF.md",
+      "tests": [
+        "test_registers.py"
+      ],
+      "implementation": [
+        "solved/registers.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.1137/0204020",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.FSTTCS.2022.7",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "9789504e8f58cc17ff1efe8b6ea9e520cde89d50826e296b491e51cbb524c1fe"
+    },
+    {
+      "id": "scholz-finite",
+      "title": "Star-chain lifting and finite Scholz–Brauer certificates",
+      "subject": "Addition chains",
+      "status": "finite-verification",
+      "review": "independent-review-pending",
+      "statement": "The classical star-chain lifting gives the Scholz–Brauer upper bound whenever a shortest exponent chain is a star chain; verification here covers n=1,…,59.",
+      "proof": "results/scholz-finite/PROOF.md",
+      "tests": [
+        "test_classical.py"
+      ],
+      "implementation": [],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://www.additionchains.com/ScholzBrauer.html",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ScholzConjecture.lean",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "9789504e8f58cc17ff1efe8b6ea9e520cde89d50826e296b491e51cbb524c1fe"
+    },
+    {
+      "id": "periodic-essential-components",
+      "title": "An elementary eventually-periodic case of essential components",
+      "subject": "Additive number theory",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Adding {0,1} strictly raises intermediate Schnirelmann density for eventually periodic sets; arbitrary sets are outside this result.",
+      "proof": "results/periodic-essential-components/PROOF.md",
+      "tests": [
+        "test_classical.py"
+      ],
+      "implementation": [],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://www.erdosproblems.com/1146",
+          "recorded": "2026-11-26"
+        },
+        {
+          "url": "https://home.olemiss.edu/~leth/papers/essential_components.pdf",
+          "recorded": "2026-11-26"
+        }
+      ],
+      "dependencies": [],
+      "source_digest": "9789504e8f58cc17ff1efe8b6ea9e520cde89d50826e296b491e51cbb524c1fe"
+    }
+  ]
+}

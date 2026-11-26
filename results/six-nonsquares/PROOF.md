@@ -1,0 +1,11 @@
+# Infinitely many primitive rays with six nonsquares
+
+**Status: research proof draft; independent mathematical review pending.** Automated evidence is scoped below and does not certify the complete argument.
+
+**Theorem.** For every h≥3 let R=2^h and A=2^R. For each r in {0,1,2,4,…,2^(h−1)}, put B=A+2^r. Then N=A³B⁵ has shortest defect exactly two, admits a shortest chain with six canonical nonsquares, and is not an integer square. For each h this produces h+1 distinct roots of squaring rays all at the same growth level. Across all h the roots remain distinct. Thus the finite-ray description for seven canonical nonsquares in C8 cannot extend unchanged to six. This is a constructive subfamily, rather than a classification of all six-nonsquare chains.
+
+**Construction and length.** Reach A by 1,2,4,16,…,A; every allowable 2^r is present in that prefix. Append B, AB, AB², A²B³ and A³B⁵. The last four values are products of the preceding two. All five new writes are strictly increasing canonical nonsquares, in addition to the initial 1+1. Since A<B<A², we have A⁸<N<A¹³<A¹⁶. The last level is exactly three greater than A's level (the thresholds above A are A², A⁴, A⁸, A¹⁶). Five writes gained three levels, so the witness has defect two.
+
+**Minimality.** Write d=R−r≥4. Then N=2^(3R+5r)(1+2^d)^5. The odd factor 1+2^d is not square: for odd u>1, u²−1=2^d forces u=3 and d=3. Raising a nonsquare to the odd power five preserves an odd prime valuation, so N is nonsquare. Its binary weight is ten. The six coefficients of (1+x)^5 are 1,5,10,10,5,1; each fits within a block of d bits and substitution of x=2^d produces disjoint blocks. Multiplication by a power of two preserves binary weight. By Theorem 1.2 of Tarek, Bahig and Anwar, an even nonsquare endpoint of defect at most one is either a pure power of two or has two binary digits set. The two claims above rule out both cases. Hence the constructed chain is shortest. [Published one-defect classification](https://doi.org/10.3934/Math.2026667)
+
+For a fixed h, increasing r increases N. Increasing h replaces A by A², and the next lower bound exceeds the previous upper bound. Since none of these N is a square, no two lie on the same squaring ray. C8's stability result applies to all their iterated squares. These are results for monotone chains from 1.

@@ -28,7 +28,6 @@
     "9": 1877,
     "10": 2541
   },
-  "filtered_seconds": 2.2398261250928044,
   "lower_family_by_level": {
     "4": 1,
     "5": 5,
@@ -39,7 +38,6 @@
     "10": 210
   },
   "lower_family_size": 462,
-  "reference_seconds": 4.060371249914169,
   "shortest_two": 20483,
   "square_entries": 0
 }

@@ -67,7 +67,7 @@ def missing_operand(target, known, limit):
 
 @lru_cache(maxsize=4096, typed=True)
 def bounded_divisors(value):
-    """Complete divisor list for the verifier's stated 64-bit input range."""
+    """Complete divisor list for the verifier's stated input range [1, 10**18]."""
     if type(value) is not int or not 1 <= value <= 10**18:
         raise ValueError("factorization input must lie in [1, 10**18]")
     from sympy import divisors

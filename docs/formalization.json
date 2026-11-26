@@ -1,0 +1,85 @@
+{
+  "toolchain": "leanprover/lean4:v4.8.0",
+  "scope": "The listed formal statements are supporting lemmas. Consult each catalogue entry for unformalized steps.",
+  "modules": [
+    {
+      "file": "lean/Compression.lean",
+      "theorems": [
+        "SolvedCompression.iterSq_mul",
+        "SolvedCompression.iterSq_add",
+        "SolvedCompression.head_squares",
+        "SolvedCompression.scale_mul",
+        "SolvedCompression.scale_tick",
+        "SolvedCompression.scale_squares",
+        "SolvedCompression.reset_squares",
+        "SolvedCompression.block_correct",
+        "SolvedCompression.ordinary_correct"
+      ]
+    },
+    {
+      "file": "lean/FiniteControls.lean",
+      "theorems": [
+        "SolvedControls.suffix_min",
+        "SolvedControls.next_spec",
+        "SolvedControls.places_rise",
+        "SolvedControls.places_good",
+        "SolvedControls.rising",
+        "SolvedControls.thin",
+        "SolvedControls.no_descending"
+      ]
+    },
+    {
+      "file": "lean/MarkedComparison.lean",
+      "theorems": [
+        "SolvedMarked.self_le_sq",
+        "SolvedMarked.add_bound",
+        "SolvedMarked.mul_bound",
+        "SolvedMarked.run_bound",
+        "SolvedMarked.push_bound",
+        "SolvedMarked.instruction_bound",
+        "SolvedMarked.suffix_bound",
+        "SolvedMarked.one_extra_square"
+      ]
+    },
+    {
+      "file": "lean/PositiveExpressions.lean",
+      "theorems": [
+        "SolvedPositive.normalized_monotone"
+      ]
+    },
+    {
+      "file": "lean/ProductIntervals.lean",
+      "theorems": [
+        "SolvedProducts.transport",
+        "SolvedProducts.unique_neighbor",
+        "SolvedProducts.fixed_point_unique"
+      ]
+    },
+    {
+      "file": "lean/SignedEnvelope.lean",
+      "theorems": [
+        "SolvedSigned.deviation",
+        "SolvedSigned.monotone",
+        "SolvedSigned.records_bound"
+      ]
+    },
+    {
+      "file": "lean/SubtractionGap.lean",
+      "theorems": [
+        "SolvedSubtraction.square_gap",
+        "SolvedSubtraction.one_run",
+        "SolvedSubtraction.tower_minus_one",
+        "SolvedSubtraction.incompatible_endpoints"
+      ]
+    },
+    {
+      "file": "lean/TwoSmallBlocks.lean",
+      "theorems": [
+        "SolvedTwoSmall.strict_iterSq",
+        "SolvedTwoSmall.lift_le",
+        "SolvedTwoSmall.proper_sum",
+        "SolvedTwoSmall.lag_crossing"
+      ]
+    }
+  ]
+}

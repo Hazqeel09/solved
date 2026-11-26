@@ -32,7 +32,6 @@
     "11": 3340,
     "12": 4288
   },
-  "filtered_seconds": 3.9927509999834,
   "lower_family_by_level": {
     "4": 1,
     "5": 5,
@@ -45,7 +44,6 @@
     "12": 495
   },
   "lower_family_size": 1287,
-  "reference_seconds": 8.312859708908945,
   "shortest_two": 47081,
   "square_entries": 0
 }
