@@ -1,4 +1,5 @@
 import TwoSmallBlocks
+import ControlInflation
 
 namespace SolvedRootBlocks
 open SolvedCompression
@@ -120,5 +121,33 @@ theorem square_one_plus_power_two {root k : Nat} (square : root*root=2^k+1) :
   have le := (Nat.pow_le_pow_iff_right (by decide : 1<2)).mp (Nat.le_of_eq eq)
   have ge := (Nat.pow_le_pow_iff_right (by decide : 1<2)).mp (Nat.le_of_eq eq.symm)
   exact ⟨r,by omega⟩
+
+theorem exchanged_square (u v : Nat) (square : u=v*v) :
+    ((u*u)*u+u*u)*((u*u)*u+u*u)*((u*u)*u) =
+      ((u*u+u)*((u*u)*v))*((u*u+u)*((u*u)*v)) := by
+  have factor : (u*u)*u+u*u = u*(u*u+u) := by
+    simp only [Nat.mul_add]
+    ac_rfl
+  rw [factor,square]
+  ac_rfl
+
+def exchangeSource : List SolvedMarked.Instr :=
+  [.mul 0 1,.add 0 1,.mul 0 0,.mul 0 2]
+
+def exchangeRoot : List SolvedMarked.Instr :=
+  [.add 0 1,.mul 1 3,.mul 0 1]
+
+theorem exchange_program (history : SolvedMarked.Hist)
+    (first : history 0=history 1*history 1)
+    (second : history 1=history 2*history 2) :
+    SolvedMarked.eval exchangeSource history 0 =
+      SolvedMarked.eval exchangeRoot history 0 * SolvedMarked.eval exchangeRoot history 0 := by
+  simp only [exchangeSource,exchangeRoot,SolvedMarked.eval,SolvedMarked.evalI,SolvedMarked.push]
+  rw [first]
+  have identity := exchanged_square (history 1) (history 2) second
+  simpa only [Nat.mul_comm,Nat.mul_left_comm,Nat.mul_assoc] using identity
+
+theorem exchange_cost :
+    SolvedInflation.cost exchangeRoot+1=SolvedInflation.cost exchangeSource := by decide
 
 end SolvedRootBlocks

@@ -28,7 +28,7 @@ def replay(chain):
 def eligible(chain, defect):
     return (
         defect == 2
-        and sum(y != x * x for x, y in zip(chain.values, chain.values[1:])) in (3, 7)
+        and sum(y != x * x for x, y in zip(chain.values, chain.values[1:])) in (3, 4, 7)
         and isqrt(chain.values[-1]) ** 2 == chain.values[-1]
     )
 
@@ -77,7 +77,7 @@ def verify(max_level=12, *, aliases=False):
             digest.update(reduction.rule.encode("ascii") + b"\0")
     return {
         "complete_through_level": max_level,
-        "source_sector": "exactly two small steps and three or seven canonical nonsquares",
+        "source_sector": "exactly two small steps and three, four or seven canonical nonsquares",
         "checked_square_chains_or_recipe_variants": sum(counts.values()),
         "unique_roots": len(square_roots),
         "rules": dict(sorted(counts.items())),

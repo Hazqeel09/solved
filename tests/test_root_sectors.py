@@ -2,7 +2,9 @@ import unittest
 
 from checks.verify_root_sectors import replay, verify
 from solved.chains import Chain, level
-from solved.root_sectors import reduce_square
+from solved.limits import ResourceLimit
+from solved.menu_programs import shortest_from_menu
+from solved.root_sectors import four_event_menu, reduce_square
 
 
 def explicit_chain(values):
@@ -40,6 +42,8 @@ class RootSectorTests(unittest.TestCase):
                 "doubled_tower_sum",
                 "seven_ray",
                 "seven_square_base",
+                "retained_root",
+                "four_event_menu",
             },
         )
 
@@ -80,7 +84,7 @@ class RootSectorTests(unittest.TestCase):
         for source in (
             explicit_chain((1, 2, 4)),
             explicit_chain((1, 2, 4, 5, 6)),
-            explicit_chain((1, 2, 3, 9, 27, 36)),
+            explicit_chain((1, 2, 3, 4, 7, 49, 2401, 117649)),
             Chain((1, 2, 4, 5, 9), (("+", 0, 0), ("*", 1, 1), ("+", 0, 2), ("+", 4, 4))),
             Chain((1, 2), (("+", True, 0),)),
             None,
@@ -98,3 +102,41 @@ class RootSectorTests(unittest.TestCase):
         recipes[-1][0] = "*"
         self.assertEqual(result.chain.values, (1, 2, 3))
         self.assertEqual(result.root, 3)
+
+    def test_four_event_shared_helpers_outside_source_and_roots(self):
+        source = explicit_chain((1, 2, 4, 16, 64, 80, 6400, 409600))
+        menu = four_event_menu(source)
+        self.assertIn(20, menu)
+        self.assertIn(32, menu)
+        result = reduce_square(source)
+        self.assertEqual(result.chain.values, (1, 2, 4, 16, 20, 32, 640))
+        self.assertEqual(result.saved_instructions, 1)
+        for kwargs in ({"max_states": 0}, {"max_pairs": 0}):
+            with self.assertRaises(ResourceLimit):
+                reduce_square(source, **kwargs)
+        with self.assertRaises(ValueError):
+            four_event_menu(explicit_chain((1, 2, 4, 5, 9)))
+        with self.assertRaises(ValueError):
+            reduce_square(source, max_states=True)
+
+    def test_parameterized_exchange_family_and_restricted_menu_gap(self):
+        from math import isqrt
+
+        for j in range(9):
+            values = [1, 2]
+            for _ in range(j + 2):
+                values.append(values[-1] ** 2)
+            A, u = values[-1], values[-2]
+            B = A * u
+            C = B + A
+            values.extend((B, C, C * C, C * C * B))
+            source = explicit_chain(values)
+            root = isqrt(values[-1])
+            bare = set(values) | {isqrt(v) for v in values if isqrt(v) ** 2 == v}
+            bare = tuple(sorted(v for v in bare if v <= root))
+            self.assertIsNone(shortest_from_menu(bare, root, j + 6))
+            restricted = shortest_from_menu(bare, root, j + 7)
+            self.assertEqual(len(restricted.recipes), j + 7)
+            result = reduce_square(source)
+            self.assertEqual(replay(result.chain), root)
+            self.assertEqual(len(result.chain.recipes), j + 6)

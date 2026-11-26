@@ -1,9 +1,11 @@
-# Square-root reconstruction in the extreme two-defect sectors
+# Square-root reconstruction in low-defect sectors
 
 **Status: proof draft; independent mathematical review and novelty assessment
 are pending.** The full defect-two root-closure question remains unresolved
-here. Nine elementary supporting lemmas are checked in Lean; the complete
-sector coverage and program transformations below retain written proofs.
+here. Four-event reconstruction may stop at a configured resource limit;
+such a stop is not an infeasibility claim. Twelve supporting lemmas and
+program identities are checked in Lean; the complete sector coverage and
+program transformations below retain written proofs.
 
 ## Question and result
 
@@ -25,17 +27,17 @@ The [267 counterexample](../square-instability/PROOF.md) already disproves
 root closure at defect three.
 
 **Theorem.** If an increasing chain has exactly two small steps, exactly
-three or seven canonical nonsquares, and an integer-square endpoint N,
+three, four or seven canonical nonsquares, and an integer-square endpoint N,
 then one can construct an increasing chain for √N with at most one fewer
 instruction. Its defect is at most two. Arbitrarily long square runs are
 included.
 
 The [executable reconstruction](../../solved/root_sectors.py) accepts
-precisely those two sectors and supplies every instruction of the new chain.
+precisely those three sectors and supplies every instruction of the new chain.
 Unsupported inputs are rejected, not declared impossible. Every output is
 replayed and its endpoint and instruction saving are checked.
 
-The three-event argument is self-contained. The seven-event part reuses
+The three-event argument is self-contained. The [four-event extension](FOUR-EVENTS.md) supplies a finite candidate menu and an exact solver that counts shared ancestors once. Its exchange family shows why source values and their roots alone need not suffice. The seven-event part reuses
 the existing [twelve-ray classification](../seven-nonsquares/PROOF.md);
 it is not a new independent proof of that classification. The background
 model and bounds are from Tarek, Bahig and Anwar's 2026 study, whose §7
@@ -210,7 +212,7 @@ This part inherits the written-proof status of the seven-event
 classification. Its bounded certificate and the new reconstruction
 checks do not replace an all-length proof of that prerequisite.
 
-## 6. Consequence for a possible counterexample
+## 6. Four events and the remaining counterexample sectors
 
 The published zero/one-small families are root-closed. Therefore a
 counterexample to the defect-two question must have a square of minimum
@@ -219,22 +221,18 @@ three and seven canonical nonsquares: the initial write and both small
 steps give the lower bound, and the published nonsquare bound gives
 the upper bound.
 
-The theorem excludes both extremes. Hence **every shortest chain in
-any remaining counterexample must have four, five or six canonical
-nonsquares**. This is a structural reduction, not a resolution of the
-full root-closure question. No completeness claim for those middle
-sectors is made.
+The [four-event argument](FOUR-EVENTS.md) covers the two intermediate event orders SG and GS, while preserving every required helper. Together these results imply that **every shortest chain in any remaining counterexample must have five or six canonical nonsquares**. This is a structural reduction, not a resolution of the full root-closure question. No completeness claim for those two sectors is made.
 
 ## Verification scope
 
 The [finite checker](../../checks/verify_root_sectors.py) uses the
 independent all-pairs chain enumerator and directly replays every
 returned instruction sequence. Through complete level 12 it checks
-33,216 eligible square chains: 32,810 in the three-event sector and
-406 in the seven-event sector, with 11,849 distinct roots. Savings
-are one write in 32,538 cases, two in 677, and three in one.
+195,487 eligible square chains: 32,810 with three events, 162,271 with four,
+and 406 with seven, covering 27,849 distinct roots. Savings are one write
+in 173,352 cases, two in 19,052, and three in 3,083.
 
-A separate level-8 test checks all 5,595 final-instruction variants,
+A separate level-8 test checks all 31,655 final-instruction variants,
 including operand order, addition/product aliases and all reconstruction
 rules. Other tests cover long runs, roots absent from the original
 history, malformed references, unsupported sectors and frozen inputs.
@@ -243,7 +241,8 @@ history, malformed references, unsupported sectors and frozen inputs.
 
 The [Lean module](../../lean/RootSectorLemmas.lean) proves square gaps,
 the factor-root product identities, the odd-factor power-of-two lemma,
-and the unique solution of y²=2^k+1. It does not yet prove the full
+the unique solution of y²=2^k+1, and the four-event helper-exchange
+identity with its exact suffix cost. It does not yet prove the full
 sector classification or certify the Python implementation universally.
 
     python -m scripts.verify root-closure-sectors

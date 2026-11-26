@@ -1,4 +1,4 @@
-"""Constructive square-root reduction in the three- and seven-nonsquare sectors.
+"""Constructive square-root reduction in selected two-small-step sectors.
 
 This is not a root extractor for arbitrary AM chains. Unsupported chains
 are rejected explicitly. The all-length coverage argument is recorded in
@@ -10,8 +10,10 @@ from functools import lru_cache
 from math import isqrt
 
 from .chains import Chain, level
+from .menu_programs import shortest_from_menu, validate_limits
 from .seven_steps import catalogue as seven_catalogue
 from .square_controls import encode
+from .two_small_forms import square_run
 
 
 @dataclass(frozen=True)
@@ -117,22 +119,63 @@ def _seven_root(target):
     return _from_values(exceptional[base]), "seven_square_base"
 
 
-def reduce_square(chain):
-    """Return a root program saving at least one write in the declared sector."""
+def _four_event_menu(chain, root, events):
+    """The source/root menu plus the helper families in the four-event argument.
+
+    Values in this menu are candidates, not free inputs. The menu solver
+    charges all instructions required to construct them from 1.
+    """
+    first = events[1]
+    A, B = chain.values[first - 1], chain.values[first]
+    offered = {1, 2, 3, 4, 6, root, *chain.values}
+    offered.update(square_run(2, root))
+    offered.update(isqrt(value) for value in chain.values if isqrt(value) ** 2 == value)
+    if root % 2 == 0:
+        offered.add(root // 2)
+    rA = isqrt(A)
+    if rA * rA == A:
+        offered.add(2 * rA)
+    if B % A == 0:
+        factor = B // A
+        offered.add(A + factor)
+        rf = isqrt(factor)
+        if rf * rf == factor:
+            offered.add(A * rf)
+    return tuple(sorted(value for value in offered if value <= root))
+
+
+def _square_source(chain):
     if not isinstance(chain, Chain):
         raise ValueError("an AM chain is required")
     chain = Chain(tuple(chain.values), tuple(tuple(row) for row in chain.recipes))
-    encode(chain)  # Existing full structural and exact-arithmetic validation.
+    encode(chain)
+    if len(chain.recipes) - level(chain.values[-1]) != 2:
+        raise ValueError("exactly two small steps are required")
+    events = tuple(
+        i for i in range(1, len(chain.values)) if chain.values[i] != chain.values[i - 1] ** 2
+    )
+    root = isqrt(chain.values[-1])
+    if root * root != chain.values[-1]:
+        raise ValueError("the endpoint must be an integer square")
+    return chain, events, root
+
+
+def four_event_menu(chain):
+    """Return the candidate families from the four-event reconstruction manuscript."""
+    chain, events, root = _square_source(chain)
+    if len(events) != 4:
+        raise ValueError("exactly four canonical nonsquares are required")
+    return _four_event_menu(chain, root, events)
+
+
+def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
+    """Return a root program saving at least one write in the declared sector."""
+    validate_limits(max_states, max_pairs)
+    chain, events, root = _square_source(chain)
     values, recipes = chain.values, chain.recipes
     source_length = len(recipes)
-    if source_length - level(values[-1]) != 2:
-        raise ValueError("exactly two small steps are required")
-    events = tuple(i for i in range(1, len(values)) if values[i] != values[i - 1] ** 2)
-    if len(events) not in (3, 7):
-        raise ValueError("exactly three or seven canonical nonsquare writes are required")
-    root = isqrt(values[-1])
-    if root * root != values[-1]:
-        raise ValueError("the endpoint must be an integer square")
+    if len(events) not in (3, 4, 7):
+        raise ValueError("exactly three, four or seven canonical nonsquares are required")
 
     def result(output, rule):
         encode(output)
@@ -144,6 +187,19 @@ def reduce_square(chain):
 
     if values[-1] == values[-2] ** 2:
         return result(_prefix(chain, source_length - 1), "trailing_square")
+    if len(events) == 4:
+        if root in values[:-1]:
+            return result(_prefix(chain, values.index(root)), "retained_root")
+        output = shortest_from_menu(
+            _four_event_menu(chain, root, events),
+            root,
+            source_length - 1,
+            max_states=max_states,
+            max_pairs=max_pairs,
+        )
+        if output is None:
+            raise ArithmeticError("the four-event candidate menu has no root certificate")
+        return result(output, "four_event_menu")
     if len(events) == 7:
         output, rule = _seven_root(values[-1])
         return result(output, rule)

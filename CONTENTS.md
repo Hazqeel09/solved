@@ -31,7 +31,7 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 | [Exact computation costs for the integer 255](results/integer-255/PROOF.md) | finite-verification | none |
 | [A counterexample to universal AM squaring stability](results/square-instability/PROOF.md) | finite-verification | complete |
 | [Effective cutoffs for square-run arithmetic controls](results/effective-control-cutoffs/PROOF.md) | proof-draft | complete |
-| [Square-root reconstruction in the extreme two-defect sectors](results/root-closure-sectors/PROOF.md) | proof-draft | supporting-lemmas |
+| [Square-root reconstruction in low-defect sectors](results/root-closure-sectors/PROOF.md) | proof-draft | supporting-lemmas |
 
 ## Arithmetic constraint systems
 

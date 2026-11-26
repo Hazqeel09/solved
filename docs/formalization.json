@@ -338,7 +338,10 @@
         "SolvedRootBlocks.halved_first_product",
         "SolvedRootBlocks.odd_factor_power_two",
         "SolvedRootBlocks.adjacent_power_two_factors",
-        "SolvedRootBlocks.square_one_plus_power_two"
+        "SolvedRootBlocks.square_one_plus_power_two",
+        "SolvedRootBlocks.exchanged_square",
+        "SolvedRootBlocks.exchange_program",
+        "SolvedRootBlocks.exchange_cost"
       ]
     },
     {

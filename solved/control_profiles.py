@@ -10,12 +10,9 @@ from dataclasses import dataclass
 from itertools import zip_longest
 
 from .arithmetic import power_capped
+from .limits import ResourceLimit
 from .square_controls import Description, validate
 from .square_exclusions import compare_tower_minus_one
-
-
-class ResourceLimit(RuntimeError):
-    """Exact materialization was stopped; this is not an infeasibility result."""
 
 
 class Arithmetic:

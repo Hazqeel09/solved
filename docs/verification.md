@@ -54,7 +54,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [FiniteLists](../lean/FiniteLists.lean) | Shared list membership and duplicate-removal facts. |
 | [FiniteBasis](../lean/FiniteBasis.lean) | A total recursive reference search, strict box-rank descent, exact coverage and minimal-generator pruning. |
 | [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Complete basis membership, exact-solution inclusion and safe per-domain cutoffs using the concrete arithmetic oracle. |
-| [RootSectorLemmas](../lean/RootSectorLemmas.lean) | Elementary square gaps and power-of-two factors supporting the partial root-closure result. |
+| [RootSectorLemmas](../lean/RootSectorLemmas.lean) | Elementary square gaps, power-of-two factors and a complete three-operation/four-operation exchange identity supporting the partial root-closure result. |
 | [UniversalCutoff](../lean/UniversalCutoff.lean) | Finite clipping/control coverage and a computable universal threshold for arbitrary AM programs and the additive subtraction gap. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
