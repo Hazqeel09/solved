@@ -53,33 +53,50 @@ def encode(chain):
     return Description(tuple(control), tuple(runs))
 
 
+def validate(description):
+    """Check and freeze a control without materializing any arithmetic values."""
+    if not isinstance(description, Description):
+        raise ValueError("a square-control description is required")
+    control = tuple(tuple(row) for row in description.control)
+    runs = tuple(description.runs)
+    if any(type(k) is not int or k < 1 for k in runs):
+        raise ValueError("positive square-run lengths required")
+    count = 0
+    for position, row in enumerate(control):
+        if len(row) != 3:
+            raise ValueError("invalid marked instruction")
+        op, a, b = row
+        if type(a) is not int or not 0 <= a <= position:
+            raise ValueError("invalid saved operand")
+        if op == "squares":
+            if b is not None:
+                raise ValueError("invalid square block")
+            count += 1
+        elif op not in ("+", "*") or type(b) is not int or not 0 <= b <= position:
+            raise ValueError("invalid marked instruction")
+    if count != len(runs):
+        raise ValueError("square-run count does not match the control")
+    return Description(control, runs)
+
+
 def expand(description):
     """Evaluate positive expressions, including parameter choices that cease to increase."""
-    if any(type(k) is not int or k < 1 for k in description.runs):
-        raise ValueError("positive square-run lengths required")
+    description = validate(description)
     values = [1]
     recipes = []
     marks = [0]
     position = 0
     for op, a, b in description.control:
-        if type(a) is not int or not 0 <= a < len(marks):
-            raise ValueError("invalid saved operand")
         if op == "squares":
-            if b is not None or position >= len(description.runs):
-                raise ValueError("invalid square block")
             index = marks[a]
             for _ in range(description.runs[position]):
                 values.append(values[index] ** 2)
                 recipes.append(("*", index, index))
                 index = len(values) - 1
             position += 1
-        elif op in ("+", "*") and type(b) is int and 0 <= b < len(marks):
+        else:
             x, y = marks[a], marks[b]
             values.append(values[x] + values[y] if op == "+" else values[x] * values[y])
             recipes.append((op, x, y))
-        else:
-            raise ValueError("invalid marked instruction")
         marks.append(len(values) - 1)
-    if position != len(description.runs):
-        raise ValueError("unused square parameters")
     return Chain(tuple(values), tuple(recipes))

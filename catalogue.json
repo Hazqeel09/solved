@@ -868,6 +868,56 @@
       "dependencies": [
         "narrow-products"
       ]
+    },
+    {
+      "id": "effective-control-cutoffs",
+      "title": "Effective cutoffs for square-run arithmetic controls",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Integer diagonal profiles decide ideal intersection for positive square-run controls. A Valk–Jantzen basis computation gives complete control-specific cutoffs and, with bounded marked-code coverage, a computable universal additive-gap threshold. No practical universal threshold or complexity bound is claimed.",
+      "proof": "results/effective-control-cutoffs/PROOF.md",
+      "tests": [
+        "test_control_profiles.py",
+        "test_control_basis.py"
+      ],
+      "implementation": [
+        "solved/control_profiles.py",
+        "solved/control_basis.py",
+        "checks/verify_control_cutoffs.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/EffectiveCutoffs.lean"
+        ],
+        "scope": "Five integer power inequalities check the ratio witness and upper/lower decisions from supplied profile bounds. Profile construction, ideal cofinality, basis termination, complete enumeration and the computable universal cutoff remain written arguments with finite implementation checks."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.1007/BF00289715",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.CALCO.2025.16",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/1603.06122",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2111.00671v6",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.ICALP.2024.153",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "subtraction-gap"
+      ]
     }
   ]
 }

@@ -115,6 +115,16 @@
       ]
     },
     {
+      "file": "lean/EffectiveCutoffs.lean",
+      "theorems": [
+        "SolvedEffective.first_two_terms",
+        "SolvedEffective.integer_ratio_witness",
+        "SolvedEffective.positive_power_strict",
+        "SolvedEffective.profile_upper_witness",
+        "SolvedEffective.profile_lower_excludes"
+      ]
+    },
+    {
       "file": "lean/FiniteControls.lean",
       "theorems": [
         "SolvedControls.suffix_min",

@@ -14,6 +14,7 @@ def canonical(data):
 
 def main():
     cases = [
+        ("verify_control_cutoffs", "control-cutoffs.json", []),
         ("verify_additive_separation", "additive-separation-models.json", []),
         ("verify_nonsquare_bound", "nonsquare-bound.json", []),
         ("verify_square_instability", "square-instability.json", ["--least", "--powers"]),
