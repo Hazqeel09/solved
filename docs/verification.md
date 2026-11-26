@@ -10,7 +10,7 @@
 | `reviewed-proof` | A written proof with a linked independent review record. |
 | `withdrawn` | A claim retained for traceability but no longer asserted. |
 
-Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. The initial entries have no independent-review records and no end-to-end formalization of their main statements.
+Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md) has a complete formalization of its stated counterexample and infinite construction consequence; other main conjecture arguments remain drafts with supporting lemmas.
 
 ## Python checks
 
@@ -25,7 +25,7 @@ python -m scripts.check_certificates
 
 For the pinned formatting and static checks, install `python -m pip install -e ".[dev]"`, then run `ruff check .` and `ruff format --check .`.
 
-The full suite includes exhaustive small assignments, independent operation replay, randomized tests with fixed seeds, empty and inconsistent domains, repeated operands, destructive overwrites, exact-division guards, magnitude boundaries and failed-domain cases. The certificate command independently reproduces all seven stored mathematical records under [checks/expected](../checks/expected/chains.json), including the complete level-12 census. Timing values are excluded from mathematical certificates. Local-link and catalogue validation catch missing evidence paths, inconsistent statuses and dependency cycles. External URLs are not fetched during CI.
+The full suite includes exhaustive small assignments, independent operation replay, randomized tests with fixed seeds, empty and inconsistent domains, repeated operands, destructive overwrites, exact-division guards, magnitude boundaries and failed-domain cases. The certificate command independently reproduces all eight stored mathematical records under [checks/expected](../checks/expected/chains.json), including the complete level-12 census. Timing values are excluded from mathematical certificates. Local-link and catalogue validation catch missing evidence paths, inconsistent statuses and dependency cycles. External URLs are not fetched during CI.
 
 Some algorithms are exhaustive and intentionally exponential in their stated parameters. A finite search has the coverage described by its generator and tests. Unsupported instances and resource limits must not be reported as mathematical impossibility.
 
@@ -41,6 +41,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 
 | Module | What the formal statements cover |
 |---|---|
+| [SquareInstability](../lean/SquareInstability.lean) | Complete chain-search argument, exact eight-write minima for 267 and its square, and the iterated-square construction. See its [statement correspondence](../results/square-instability/FORMALIZATION.md). |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
 | [Compression](../lean/Compression.lean) | Common-power compression of ordinary intervals with local multiplication and square runs. |
 | [MarkedComparison](../lean/MarkedComparison.lean) | Squared domination after one additional square, including saved-history reads. |

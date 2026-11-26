@@ -12,4 +12,6 @@ The catalogue is organized around precise statements. Its initial arithmetic con
 | Does the Scholz–Brauer inequality hold for every exponent? | [Clift's research page](https://www.additionchains.com/ScholzBrauer.html) | [Finite certificates](../results/scholz-finite/PROOF.md) reproduce established cases for exponents 1–59. |
 | Is {0} ∪ {2^a 3^b : a,b≥0} an essential component? | [Erdős problem 1146](https://www.erdosproblems.com/1146) | [Eventually-periodic case](../results/periodic-essential-components/PROOF.md), with no conclusion for arbitrary intermediate-density sets. |
 
+The [squaring counterexample](../results/square-instability/PROOF.md) disproves universal one-write growth and square-root closure of the defect-at-most-three endpoints. Stability for every base of defect three and root closure at defect two remain unresolved here.
+
 Further directions within the current material include quantitative rates for the proposed additive gap, exact endpoint classification beyond witness families, higher-defect squaring stability, and full formalization of the finite-control coverage arguments. Each needs its own statement and literature audit before a new result is claimed.

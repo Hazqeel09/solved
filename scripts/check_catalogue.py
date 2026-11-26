@@ -82,6 +82,25 @@ def validate(data, root):
             raise ValueError(f"{slug}: complete formalization needs a statement correspondence")
         if formal.get("statement_correspondence"):
             local_file(root, formal["statement_correspondence"])
+        if formal["status"] == "complete":
+            named = formal.get("theorems")
+            if (
+                not isinstance(named, list)
+                or not named
+                or any(not isinstance(n, str) for n in named)
+            ):
+                raise ValueError(f"{slug}: complete formalization needs named theorem declarations")
+            registry = json.loads(local_file(root, "docs/formalization.json").read_text())
+            declared = {
+                theorem
+                for module in registry["modules"]
+                if module["file"] in files
+                for theorem in module["theorems"]
+            }
+            if len(set(named)) != len(named) or not set(named) <= declared:
+                raise ValueError(
+                    f"{slug}: named formal statements must belong to the cited modules"
+                )
         if not item["sources"]:
             raise ValueError(f"{slug}: primary references are required")
         for source in item["sources"]:

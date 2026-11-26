@@ -10,7 +10,7 @@ A new entry needs:
 4. Reproducible checks that test meaningful alternatives or boundary cases, where computation applies.
 5. Explicit proof-assistant scope and an independent-review record when either is claimed.
 
-Put the manuscript at `results/<id>/PROOF.md` and add its metadata to `catalogue.json`. Subjects are free-form; add areas as the research expands. Use the existing status vocabulary documented in [the verification guide](docs/verification.md). Dependencies name other catalogue IDs. A full formalization must include a written correspondence between its theorem statement and the manuscript statement. Independent review needs a public, attributable record; an agent's self-review does not qualify.
+Put the manuscript at `results/<id>/PROOF.md` and add its metadata to `catalogue.json`. Subjects are free-form; add areas as the research expands. Use the existing status vocabulary documented in [the verification guide](docs/verification.md). Dependencies name other catalogue IDs. A full formalization must name its actual theorem declarations and include a written correspondence between those statements and the manuscript. The named declarations must belong to the cited modules in the theorem registry. Independent review needs a public, attributable record; an agent's self-review does not qualify.
 
 Run `python -m scripts.check_catalogue --write-index` after changing the catalogue. Run the relevant tests, the complete suite before publishing, and the formal checks whenever a formal module or its dependencies change. Update expected certificates only after explaining and verifying the mathematical reason for a change. Keep withdrawn or corrected claims traceable in Git history and mark their current status clearly.
 

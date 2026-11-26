@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 24 entries, comprising 21 research proof drafts and 3 finite verification records. Nine Lean modules formalize supporting lemmas. No main catalogue statement is currently marked as independently reviewed or fully formalized.
+**Current catalogue:** 25 entries, comprising 21 research proof drafts and 4 finite verification records. Ten Lean modules include supporting lemmas and one complete formalization of a stated counterexample. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -10,6 +10,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 
 | Topic | Precise scope |
 |---|---|
+| [Squaring instability](results/square-instability/PROOF.md) | A fully formalized counterexample: 267 and its square both have minimum cost eight. |
 | [Two-small-step addition–multiplication chains](results/two-small-steps/PROOF.md) | An all-length block classification manuscript, with independent finite enumeration. |
 | [Real arithmetic-chain defects](results/am-defect-order/PROOF.md) | Proposed well-ordering and global ordinal type, with a separate [bounded-slice argument](results/am-defect-slices/PROOF.md). |
 | [Subtraction and computation length](results/subtraction-gap/PROOF.md) | A proposed unbounded **additive** separation. Polynomial equivalence remains a separate question. |

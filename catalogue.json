@@ -764,6 +764,47 @@
       ],
       "dependencies": [],
       "source_digest": "9789504e8f58cc17ff1efe8b6ea9e520cde89d50826e296b491e51cbb524c1fe"
+    },
+    {
+      "id": "square-instability",
+      "title": "A counterexample to universal AM squaring stability",
+      "subject": "Arithmetic complexity",
+      "status": "finite-verification",
+      "review": "independent-review-pending",
+      "statement": "The minimum increasing AM-chain cost from 1 is eight for both 267 and 267 squared, so squaring need not add an instruction. An explicit one-write advantage over base-then-square construction persists along its iterated-square ray.",
+      "proof": "results/square-instability/PROOF.md",
+      "tests": [
+        "test_square_instability.py"
+      ],
+      "implementation": [],
+      "formalization": {
+        "status": "complete",
+        "files": [
+          "lean/SquareInstability.lean"
+        ],
+        "scope": "Exact minima for 267 and 71289, failure of universal one-write growth, and an explicit infinite family saving one write over first constructing 267. The least-exception search and finite power optimality census are outside this formalization.",
+        "statement_correspondence": "results/square-instability/FORMALIZATION.md",
+        "theorems": [
+          "SolvedInstability.exact_pair",
+          "SolvedInstability.no_universal_increment",
+          "SolvedInstability.cheaper_power_family"
+        ]
+      },
+      "sources": [
+        {
+          "url": "https://oeis.org/A230697/internal",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://oeis.org/A230697/b230697.txt",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": []
     }
   ]
 }

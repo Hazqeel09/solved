@@ -44,6 +44,20 @@ class RepositoryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             json.loads('{"a": 1, "a": 2}', object_pairs_hook=unique_object)
 
+    def test_complete_formalization_names_the_actual_statements(self):
+        for names in (
+            None,
+            [],
+            ["SolvedInstability.absent"],
+            ["SolvedControls.no_descending"],
+            [True],
+        ):
+            data = copy.deepcopy(self.data)
+            entry = next(e for e in data["entries"] if e["id"] == "square-instability")
+            entry["formalization"]["theorems"] = names
+            with self.assertRaises(ValueError):
+                validate(data, ROOT)
+
     def test_missing_and_external_local_links(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

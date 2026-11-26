@@ -1,6 +1,6 @@
 {
   "toolchain": "leanprover/lean4:v4.8.0",
-  "scope": "The listed formal statements are supporting lemmas. Consult each catalogue entry for unformalized steps.",
+  "scope": "Consult each catalogue entry and its statement correspondence. Most files prove supporting lemmas; SquareInstability also proves its stated counterexample end to end.",
   "modules": [
     {
       "file": "lean/ChainCoverage.lean",
@@ -96,6 +96,38 @@
         "SolvedTwoSmall.lift_le",
         "SolvedTwoSmall.proper_sum",
         "SolvedTwoSmall.lag_crossing"
+      ]
+    },
+    {
+      "file": "lean/SquareInstability.lean",
+      "theorems": [
+        "SolvedInstability.mem_unique",
+        "SolvedInstability.mem_append",
+        "SolvedInstability.mem_bind",
+        "SolvedInstability.mem_options",
+        "SolvedInstability.head_le_target",
+        "SolvedInstability.cons_bound",
+        "SolvedInstability.peak_mono",
+        "SolvedInstability.le_peak",
+        "SolvedInstability.growth_mono",
+        "SolvedInstability.growth_steps",
+        "SolvedInstability.recipe_bound",
+        "SolvedInstability.reach_bound",
+        "SolvedInstability.oneStep_complete",
+        "SolvedInstability.search_complete",
+        "SolvedInstability.no_seven_for_267",
+        "SolvedInstability.lower_267",
+        "SolvedInstability.no_seven_for_square",
+        "SolvedInstability.lower_square",
+        "SolvedInstability.upper_267",
+        "SolvedInstability.upper_square",
+        "SolvedInstability.exact_pair",
+        "SolvedInstability.square_instability",
+        "SolvedInstability.no_universal_increment",
+        "SolvedInstability.square_extension",
+        "SolvedInstability.iterSq_large",
+        "SolvedInstability.upper_ray",
+        "SolvedInstability.cheaper_power_family"
       ]
     }
   ]

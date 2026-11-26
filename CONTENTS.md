@@ -29,6 +29,7 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 | [Extremal values and optimal simultaneous cancellation](results/signed-growth/PROOF.md) | proof-draft | supporting-lemmas |
 | [A sharp nonsquare bound for positive arithmetic with arbitrary seeds](results/record-defect/PROOF.md) | proof-draft | none |
 | [Exact computation costs for the integer 255](results/integer-255/PROOF.md) | finite-verification | none |
+| [A counterexample to universal AM squaring stability](results/square-instability/PROOF.md) | finite-verification | complete |
 
 ## Arithmetic constraint systems
 
