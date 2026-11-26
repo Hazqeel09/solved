@@ -261,9 +261,10 @@
       "formalization": {
         "status": "supporting-lemmas",
         "files": [
-          "lean/Compression.lean"
+          "lean/Compression.lean",
+          "lean/NonsquareBound.lean"
         ],
-        "scope": "Only the ordinary-interval compression lemma is formalized. The covering, counting bounds, lower-family argument and asymptotic conclusion remain written."
+        "scope": "The canonical nonsquare-count bound and ordinary-interval compression lemma are formalized. The full covering, counting bounds, lower-family argument and asymptotic conclusion remain written."
       },
       "sources": [
         {
@@ -299,9 +300,11 @@
         "files": [
           "lean/MarkedComparison.lean",
           "lean/FiniteControls.lean",
-          "lean/ChainCoverage.lean"
+          "lean/ChainCoverage.lean",
+          "lean/NonsquareBound.lean",
+          "lean/ControlInflation.lean"
         ],
-        "scope": "Local chain coverage, one-extra-square domination and finite-dimensional no-descending-sequence lemmas. Complete chain encoding, logarithmic normalization, finite-control packaging and ordinal conclusions remain written."
+        "scope": "Universal nonsquare-count bound, local chain coverage, comparable-control domination, and finite-dimensional no-descending-sequence lemmas. Complete chain encoding, real logarithmic normalization and ordinal conclusions remain written."
       },
       "sources": [
         {
@@ -364,7 +367,8 @@
       "proof": "results/subtraction-gap/PROOF.md",
       "tests": [
         "test_square_controls.py",
-        "test_square_exclusions.py"
+        "test_square_exclusions.py",
+        "test_nonsquare_bound.py"
       ],
       "implementation": [
         "solved/square_controls.py",
@@ -376,9 +380,11 @@
           "lean/MarkedComparison.lean",
           "lean/FiniteControls.lean",
           "lean/SubtractionGap.lean",
-          "lean/ChainCoverage.lean"
+          "lean/ChainCoverage.lean",
+          "lean/NonsquareBound.lean",
+          "lean/ControlInflation.lean"
         ],
-        "scope": "Local coverage of increasing AM chains, saved-history domination, thinning, strict integer gaps, upward-region exclusion and a finite-family obstruction with a supplied domination hypothesis. Normalization, the nonsquare count bound, finite-control packaging and the full asymptotic theorem remain written."
+        "scope": "Universal canonical nonsquare-count bound and its Mersenne specialization; local chain coverage; comparable-program domination with exact instruction-cost difference; and the Mersenne-program antichain contradiction. Normalization of general programs, complete finite-control extraction and the final end-to-end asymptotic theorem remain written."
       },
       "sources": [
         {

@@ -36,6 +36,27 @@ After the initial write 1→2, pair successive nonsquare positions j<k. Then k�
 
 If p≥6s+3, the right side is at most (3/4)(27/64)^s<2^(−s), a contradiction. Consequently **p≤6s+2**. This elementary coarse bound suffices below. The sharper published nonsquare bound is consistent with it. [Tarek, Bahig and Anwar, Corollary 3.1](https://doi.org/10.3934/Math.2026667)
 
+### A fully checked integer alternative
+
+The following bound supplies the needed finiteness without logarithms:
+
+    p ≤ 4s+4.
+
+It is a coarse consequence of the Fibonacci envelope technique in the cited AM-chain literature. After the mandatory first write 2=1+1, let b=p−1 be the remaining canonical nonsquare count and let d be the square count. Induction on the chain gives
+
+    aᵣ ≤ 2^(2^d F_{b+2}),
+    aᵣ₋₁ ≤ 2^(2^d F_{b+1}),
+
+where F₀=0 and F₁=1. The initial virtual pair is (2,2), an upper bound on the actual pair (2,1). A canonical square squares the first bound; its former head fits the second bound since F_{b+2}≤2F_{b+1}. A nonsquare is bounded by the product of the two current bounds: a noncanonical product must use an earlier operand, and an addition is at most twice the head while the virtual second bound is at least two. The Fibonacci recurrence then advances b.
+
+One has F_{b+6}≤8F_{b+2}, and the four initial cases give
+
+    F_{b+2} ≤ 2^(b−floor(b/4)).
+
+Consequently aᵣ≤2^(2^(d+b−floor(b/4))). Comparing with the growth-level lower bound 2^(2^(L−1)) and using r=1+b+d≤L+s yields floor(b/4)≤s, hence p=b+1≤4s+4.
+
+The Lean development proves the first write, existence of the canonical step count for every increasing chain, the envelope, the Fibonacci estimate and the final count bound. The direct theorem `mersenne_nonsquare_bound` applies to a chain ending at 2^(2^n)−1 with r≤n+C, giving p≤4C+4. It uses only integer powers and inequalities. [Formal proof](../../lean/NonsquareBound.lean) · [Independent finite checker](../../checks/verify_nonsquare_bound.py).
+
 ## 2. Finite controls and their square parameters
 
 Mark the initial value, final value, every nonsquare result and both operands of every nonsquare. There are at most 3p+2 distinct marks. Between consecutive marks, every unmarked instruction is a square.
@@ -60,11 +81,11 @@ Iterating the comparison gives the following. If g≤h coordinatewise and their 
 
     endpoint(h) ≤ endpoint(g)^(2^q).
 
-The existing Lean lemma one_extra_square checks the single insertion comparison for arbitrary saved histories and fixed suffix instructions. The passage to repeated insertions is induction. [Kernel-checked comparison](../../lean/MarkedComparison.lean)
+The earlier Lean lemma one_extra_square checks a single insertion. The new ControlInflation module proves the general comparison directly, including saved-history reads and exact write counts. Its `comparable_domination` theorem takes two programs with the same erased arithmetic control and coordinatewise ordered run lengths, then uses q=cost(new)−cost(old). Programs can have several enlarged runs at once. Additions obey the iterated-square inequality; multiplication commutes with common iterated squaring. [General comparison](../../lean/ControlInflation.lean).
 
 ## 4. The contradiction
 
-Fix an arbitrary integer C≥0. Suppose infinitely many n admit an AM chain for Nₙ of length r≤n+C. Since Nₙ exceeds the maximum attainable in n instructions, r≥n+1. Also λ(Nₙ)=n, so s≤C and p≤6C+2. Choose a witnessing chain for each n.
+Fix an arbitrary integer C≥0. Suppose infinitely many n admit an AM chain for Nₙ of length r≤n+C. Since Nₙ exceeds the maximum attainable in n instructions, r≥n+1. Also λ(Nₙ)=n, so s≤C and the checked integer bound gives p≤4C+4. Choose a witnessing chain for each n.
 
 There are finitely many values of r−n and finitely many controls. On an infinite subsequence both the excess j=r−n and the control are fixed. Sort this subsequence by n. Dickson's lemma supplies two indices n<m whose square-run vectors are coordinatewise ordered. Their length difference is exactly m−n, so the domination inequality gives
 
@@ -74,7 +95,7 @@ But Aₘ=Aₙ^(2^(m−n)), and for any integer A≥2 and exponent q≥2,
 
     A^q−1 > (A−1)^q.
 
-Hence Nₘ>Nₙ^(2^(m−n)), the contradiction. It follows that for every C only finitely many n have τ₊(Nₙ)≤n+C. This proves τ₊(Nₙ)−n→∞. The signed program writes 2, squares n times, and subtracts the saved 1, using n+2 instructions. The Lean theorem finite_descriptions_obstruction now checks the contradiction for any supplied finite family satisfying the coordinate-domination property. It encodes the finite control and excess as a bounded label together with its complement; coordinatewise comparison forces label equality. Padding the run vector with zeros allows a fixed dimension. Connecting every arithmetic chain to that finite-family hypothesis remains part of the written proof. The additive gap therefore tends to infinity. Dickson's lemma also underlies the independently stated [AM-defect well-ordering argument](../am-defect-order/PROOF.md); the direct argument here uses only integer endpoint comparisons after the coarse nonsquare bound.
+Hence Nₘ>Nₙ^(2^(m−n)), the contradiction. It follows that for every C only finitely many n have τ₊(Nₙ)≤n+C. This proves τ₊(Nₙ)−n→∞. The signed program writes 2, squares n times, and subtracts the saved 1, using n+2 instructions. The Lean theorem finite_descriptions_obstruction now checks the contradiction for any supplied finite family satisfying the coordinate-domination property. It encodes the finite control and excess as a bounded label together with its complement; coordinatewise comparison forces label equality. Padding the run vector with zeros allows a fixed dimension. Connecting every arithmetic chain to that finite-family hypothesis remains part of the written proof. The new theorem `mersenne_program_antichain` also checks the concrete contradiction for two comparable control programs with equal length excess, deriving domination from their actual instructions and costs. The additive gap therefore tends to infinity in the written argument. Dickson's lemma also underlies the independently stated [AM-defect well-ordering argument](../am-defect-order/PROOF.md); the direct argument here uses only integer endpoint comparisons after the coarse nonsquare bound.
 
 ## 5. Other explicit families and bounded positive storage
 
@@ -116,4 +137,6 @@ The exclusion certificate is useful even without such a cutoff: any verified bas
 
 The finite-control encoder, reconstruction and one-square inflation are tested on all at-most-two-small-step chains through 10^18 and further small cases. Additional tests compare exclusion certificates against exact small endpoints, preserve an exact base solution, reject incomparable parameters, and test membership with an exponent parameter of 10^100 without expanding that candidate.
 
-Lean checks local chain coverage, the single-insertion comparison, finite-dimensional thinning, the strict tower-minus-one power gap, upward-region exclusion and the finite-family obstruction under its stated domination hypothesis. Chain normalization from general AM programs, the nonsquare count bound, finite-control packaging and the resulting end-to-end asymptotic conclusion remain written arguments. The Python encoder is tested, not formally verified. Independent review is pending. This is a proposed resolution of the additive-gap question; it establishes no polynomial separation and claims no publication priority.
+Lean now checks the universal nonsquare count and its exact tower-minus-one specialization, local chain coverage, comparable-program domination with the true write-count difference, and the Mersenne-program antichain contradiction. The finite-dimensional thinning and general finite-family obstruction are also checked.
+
+The remaining end-to-end bridge is to construct the entire marked program for every original chain and prove its endpoint, cost, operand-address bounds and finite-control encoding. At excess C, the bounds above permit at most 12C+13 marked instructions and 8C+9 square-run parameters. The Python encoder and a separate newest-first marked interpreter agree on the finite checks, but their full correspondence has not been proved in Lean. Normalization from general AM programs to increasing chains also remains a written argument. Independent review is pending. This remains a proposed resolution of the additive-gap question, with no polynomial-separation or publication-priority claim.

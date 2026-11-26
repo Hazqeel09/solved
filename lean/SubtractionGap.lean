@@ -1,6 +1,8 @@
 import Compression
 import TwoSmallBlocks
 import FiniteControls
+import NonsquareBound
+import ControlInflation
 
 namespace SolvedSubtraction
 open SolvedCompression SolvedTwoSmall
@@ -97,6 +99,32 @@ theorem finite_descriptions_obstruction
     rw [eq]
   rw [gap] at bound
   exact incompatible_endpoints large (index j-index i-1) bound tower
+
+-- Comparable square-run programs with the same cost excess cannot reach
+-- two different members of the tower-minus-one family.
+theorem mersenne_program_antichain
+    (old new : List SolvedMarked.Instr) (initial : SolvedMarked.Hist)
+    (n m excess : Nat) (increasing : n < m)
+    (same : SolvedInflation.erase old = SolvedInflation.erase new)
+    (parameters : SolvedInflation.Below (SolvedInflation.parameters old)
+      (SolvedInflation.parameters new))
+    (old_cost : SolvedInflation.cost old = n+excess)
+    (new_cost : SolvedInflation.cost new = m+excess)
+    (old_value : SolvedMarked.eval old initial 0 = 2^(2^n)-1)
+    (new_value : SolvedMarked.eval new initial 0 = 2^(2^m)-1) : False := by
+  have domination := SolvedInflation.comparable_domination same parameters initial
+  have difference : SolvedInflation.cost new-SolvedInflation.cost old=m-n := by omega
+  have gap : m-n=(m-n-1)+1 := by omega
+  rw [difference,old_value,new_value,SolvedGrowth.tower_as_squares n,
+    SolvedGrowth.tower_as_squares m,gap] at domination
+  have large : 2 ≤ iterSq n 2 := by
+    rw [← SolvedGrowth.tower_as_squares]
+    exact SolvedGrowth.tower_large n
+  have identity : iterSq m 2-1=iterSq ((m-n-1)+1) (iterSq n 2)-1 := by
+    rw [← iterSq_add]
+    have indices : n+((m-n-1)+1)=m := by omega
+    rw [indices]
+  exact incompatible_endpoints large (m-n-1) domination identity
 
 #print axioms square_gap
 #print axioms tower_minus_one

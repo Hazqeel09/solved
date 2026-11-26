@@ -9,3 +9,5 @@ import TwoSmallBlocks
 import ChainCoverage
 import SquareInstability
 import DirectedRecovery
+import NonsquareBound
+import ControlInflation

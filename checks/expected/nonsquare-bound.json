@@ -1,0 +1,16 @@
+{
+  "limit": 1000000,
+  "small_step_budget": 3,
+  "chains_by_defect": {
+    "0": 6,
+    "1": 128,
+    "2": 4487,
+    "3": 167478
+  },
+  "maximum_nonsquares_by_defect": {
+    "0": 1,
+    "1": 4,
+    "2": 7,
+    "3": 8
+  }
+}

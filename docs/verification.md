@@ -25,7 +25,7 @@ python -m scripts.check_certificates
 
 For the pinned formatting and static checks, install `python -m pip install -e ".[dev]"`, then run `ruff check .` and `ruff format --check .`.
 
-The full suite includes exhaustive small assignments, independent operation replay, randomized tests with fixed seeds, empty and inconsistent domains, repeated operands, destructive overwrites, exact-division guards, magnitude boundaries and failed-domain cases. The certificate command independently reproduces all eight stored mathematical records under [checks/expected](../checks/expected/chains.json), including the complete level-12 census. Timing values are excluded from mathematical certificates. Local-link and catalogue validation catch missing evidence paths, inconsistent statuses and dependency cycles. External URLs are not fetched during CI.
+The full suite includes exhaustive small assignments, independent operation replay, randomized tests with fixed seeds, empty and inconsistent domains, repeated operands, destructive overwrites, exact-division guards, magnitude boundaries and failed-domain cases. The certificate command independently reproduces every stored mathematical record under [checks/expected](../checks/expected/chains.json), including the complete level-12 census. Timing values are excluded from mathematical certificates. Local-link and catalogue validation catch missing evidence paths, inconsistent statuses and dependency cycles. External URLs are not fetched during CI.
 
 Some algorithms are exhaustive and intentionally exponential in their stated parameters. A finite search has the coverage described by its generator and tests. Unsupported instances and resource limits must not be reported as mathematical impossibility.
 
@@ -42,6 +42,8 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | Module | What the formal statements cover |
 |---|---|
 | [SquareInstability](../lean/SquareInstability.lean) | Complete chain-search argument, exact eight-write minima for 267 and its square, and the iterated-square construction. See its [statement correspondence](../results/square-instability/FORMALIZATION.md). |
+| [NonsquareBound](../lean/NonsquareBound.lean) | Integer Fibonacci envelope, complete canonical step counting, and the bound p≤4s+4, including the tower-minus-one specialization. |
+| [ControlInflation](../lean/ControlInflation.lean) | Comparable control programs, exact cost differences, and domination by the corresponding iterated square. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
 | [Compression](../lean/Compression.lean) | Common-power compression of ordinary intervals with local multiplication and square runs. |
@@ -51,9 +53,9 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [TwoSmallBlocks](../lean/TwoSmallBlocks.lean) | Proper-sum and inner-run lag inequalities. |
 | [SignedEnvelope](../lean/SignedEnvelope.lean) | A nonmaximal-operation estimate and a record-growth bound. |
 | [ProductIntervals](../lean/ProductIntervals.lean) | Narrow-interval transport, unique neighbors and antitone fixed-point uniqueness. |
-| [SubtractionGap](../lean/SubtractionGap.lean) | Strict power inequalities, upward-region exclusion, and the finite-family obstruction under supplied domination. |
+| [SubtractionGap](../lean/SubtractionGap.lean) | Strict power inequalities, upward-region exclusion, a finite-family obstruction, and the concrete Mersenne-program antichain theorem. |
 
-Complete finite-control packaging, the nonsquare count bound, asymptotic estimates, ordinal conclusions and global graph algorithms remain written mathematics. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
+Complete finite-control packaging, asymptotic conclusions, ordinal conclusions and concrete polynomial recovery remain written mathematics. The nonsquare count bound and comparable-program cost domination now have universal integer proofs. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
 
 ## Audit priorities
 

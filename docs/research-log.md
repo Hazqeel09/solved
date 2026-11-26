@@ -41,3 +41,13 @@ The tests recover a one-way triangle, a small factor rejected by the two-sided p
 The new Lean theorem proves uniqueness for arbitrary signed functional paths with certified order and coverage. The concrete polynomial implementation and its complexity analysis retain written-proof status. Unsupported components return undetermined; no finite resource cutoff or incomplete coverage is treated as impossibility.
 
 A related current source is [Talbot's AAAI 2026 GPU constraint solver](https://ojs.aaai.org/index.php/AAAI/article/download/38448/42410), which uses integer interval propagation and a representation chosen for its execution architecture. Its results motivate reviewing representation and evaluation costs together. Our arbitrary-precision polynomial arithmetic has no GPU implementation or claimed GPU speedup. [New manuscript](../results/directed-monotone-recovery/PROOF.md).
+
+## 27 November 2026 — integer growth and full control inflation
+
+**Decision: improve the central subtraction-gap proof.** The previous formal scope left the nonsquare count and multi-insertion comparison as written obligations. The new NonsquareBound module proves an integer Fibonacci envelope, a coarse four-step estimate and the universal canonical count p≤4s+4. Its Mersenne specialization directly matches the endpoint and length budget in the separation argument. The logarithmic proof is retained as an alternative written estimate.
+
+ControlInflation reuses the existing marked-instruction evaluator. It proves that two equal arithmetic structures with coordinatewise ordered run lengths have endpoints related by exactly the number of additional arithmetic writes, even when several runs grow and old values are reused. SubtractionGap now combines that theorem with the strict power inequality to establish the concrete Mersenne-program antichain property.
+
+The finite census checks 172,099 chains including the zero-write seed, through 10^6 with at most three small steps. A separate newest-first interpreter checks the existing chronological-mark encoder and simultaneous run inflations. Invalid operands, operations and run counts are rejected. These samples accompany universal kernel proofs; they are not the basis for the unbounded count statement.
+
+The remaining formal bridge is the complete finite-control extraction from every chain, including bounded operand addresses and exact cost preservation. Normalization of arbitrary positive AM programs and the final asymptotic conclusion retain written-proof status. The conjecture entry has not been upgraded to complete formalization.

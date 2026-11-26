@@ -86,7 +86,8 @@
         "SolvedSubtraction.tower_minus_one",
         "SolvedSubtraction.incompatible_endpoints",
         "SolvedSubtraction.exclusion_by_growth",
-        "SolvedSubtraction.finite_descriptions_obstruction"
+        "SolvedSubtraction.finite_descriptions_obstruction",
+        "SolvedSubtraction.mersenne_program_antichain"
       ]
     },
     {
@@ -139,6 +140,53 @@
         "SolvedDirected.agreement_along_path",
         "SolvedDirected.negative_closed_agreement",
         "SolvedDirected.unique_assignment"
+      ]
+    },
+    {
+      "file": "lean/NonsquareBound.lean",
+      "theorems": [
+        "SolvedGrowth.fib_step",
+        "SolvedGrowth.fib_mono",
+        "SolvedGrowth.fib_positive",
+        "SolvedGrowth.fib_double",
+        "SolvedGrowth.fib_four",
+        "SolvedGrowth.fib_power_bound",
+        "SolvedGrowth.first_two",
+        "SolvedGrowth.counted_length",
+        "SolvedGrowth.counts_exist",
+        "SolvedGrowth.nonsquare_product_bound",
+        "SolvedGrowth.doubled_power",
+        "SolvedGrowth.envelope",
+        "SolvedGrowth.bounded_nonsquares",
+        "SolvedGrowth.counted_canonical",
+        "SolvedGrowth.tower_large",
+        "SolvedGrowth.chain_nonsquare_bound",
+        "SolvedGrowth.tower_step",
+        "SolvedGrowth.mersenne_reaches_level",
+        "SolvedGrowth.mersenne_nonsquare_bound",
+        "SolvedGrowth.tower_as_squares"
+      ]
+    },
+    {
+      "file": "lean/ControlInflation.lean",
+      "theorems": [
+        "SolvedInflation.runs_agree",
+        "SolvedInflation.lift_comp",
+        "SolvedInflation.lift_multiplication",
+        "SolvedInflation.lift_mono",
+        "SolvedInflation.self_le_lift",
+        "SolvedInflation.lift_increase",
+        "SolvedInflation.lift_commute",
+        "SolvedInflation.lift_add",
+        "SolvedInflation.weaken",
+        "SolvedInflation.pushed",
+        "SolvedInflation.unchanged_instruction",
+        "SolvedInflation.expanded_run",
+        "SolvedInflation.inflation_cost",
+        "SolvedInflation.inflation_evaluates",
+        "SolvedInflation.inflation_domination",
+        "SolvedInflation.comparable_inflation",
+        "SolvedInflation.comparable_domination"
       ]
     }
   ]

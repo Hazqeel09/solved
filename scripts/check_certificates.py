@@ -14,6 +14,7 @@ def canonical(data):
 
 def main():
     cases = [
+        ("verify_nonsquare_bound", "nonsquare-bound.json", []),
         ("verify_square_instability", "square-instability.json", ["--least", "--powers"]),
         ("chain_catalogue", "chains.json", []),
         ("classical", "classical.json", []),
@@ -43,7 +44,7 @@ def main():
         raise ValueError("certificate mismatch: seven-steps.json")
     subprocess.run([sys.executable, "-B", "-m", "checks.verify_seven"], cwd=ROOT, check=True)
     subprocess.run([sys.executable, "-B", "-m", "checks.verify_chains"], cwd=ROOT, check=True)
-    print("Matched all eight certificates and independent enumerations.")
+    print(f"Matched all {len(cases) + 1} certificates and independent enumerations.")
 
 
 if __name__ == "__main__":
