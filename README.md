@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 26 entries, comprising 22 research proof drafts and 4 finite verification records. Thirteen Lean modules include supporting lemmas and one complete formalization of a stated counterexample. Independent mathematical review remains pending.
+**Current catalogue:** 26 entries, comprising 22 research proof drafts and 4 finite verification records. Fourteen Lean modules include supporting lemmas and one complete formalization of a stated counterexample. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 

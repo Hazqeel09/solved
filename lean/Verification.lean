@@ -11,3 +11,4 @@ import SquareInstability
 import DirectedRecovery
 import NonsquareBound
 import ControlInflation
+import MarkedEncoding

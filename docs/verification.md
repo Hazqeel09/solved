@@ -42,6 +42,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | Module | What the formal statements cover |
 |---|---|
 | [SquareInstability](../lean/SquareInstability.lean) | Complete chain-search argument, exact eight-write minima for 267 and its square, and the iterated-square construction. See its [statement correspondence](../results/square-instability/FORMALIZATION.md). |
+| [MarkedEncoding](../lean/MarkedEncoding.lean) | Every increasing AM chain has legal marked code preserving its endpoint and exact write count, with bounded size and operand addresses. |
 | [NonsquareBound](../lean/NonsquareBound.lean) | Integer Fibonacci envelope, complete canonical step counting, and the bound p≤4s+4, including the tower-minus-one specialization. |
 | [ControlInflation](../lean/ControlInflation.lean) | Comparable control programs, exact cost differences, and domination by the corresponding iterated square. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
@@ -55,7 +56,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [ProductIntervals](../lean/ProductIntervals.lean) | Narrow-interval transport, unique neighbors and antitone fixed-point uniqueness. |
 | [SubtractionGap](../lean/SubtractionGap.lean) | Strict power inequalities, upward-region exclusion, a finite-family obstruction, and the concrete Mersenne-program antichain theorem. |
 
-Complete finite-control packaging, asymptotic conclusions, ordinal conclusions and concrete polynomial recovery remain written mathematics. The nonsquare count bound and comparable-program cost domination now have universal integer proofs. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
+Finite-family assembly, general-program normalization, asymptotic and ordinal conclusions, and concrete polynomial recovery remain written mathematics. Increasing-chain extraction to bounded marked code is now formalized. The nonsquare count bound and comparable-program cost domination now have universal integer proofs. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
 
 ## Audit priorities
 

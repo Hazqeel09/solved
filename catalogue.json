@@ -302,9 +302,10 @@
           "lean/FiniteControls.lean",
           "lean/ChainCoverage.lean",
           "lean/NonsquareBound.lean",
-          "lean/ControlInflation.lean"
+          "lean/ControlInflation.lean",
+          "lean/MarkedEncoding.lean"
         ],
-        "scope": "Universal nonsquare-count bound, local chain coverage, comparable-control domination, and finite-dimensional no-descending-sequence lemmas. Complete chain encoding, real logarithmic normalization and ordinal conclusions remain written."
+        "scope": "Universal nonsquare-count bound, full increasing-chain extraction to bounded marked code, comparable-control domination and finite-dimensional thinning. Real logarithmic normalization, finite-family assembly and ordinal conclusions remain written."
       },
       "sources": [
         {
@@ -382,9 +383,10 @@
           "lean/SubtractionGap.lean",
           "lean/ChainCoverage.lean",
           "lean/NonsquareBound.lean",
-          "lean/ControlInflation.lean"
+          "lean/ControlInflation.lean",
+          "lean/MarkedEncoding.lean"
         ],
-        "scope": "Universal canonical nonsquare-count bound and its Mersenne specialization; local chain coverage; comparable-program domination with exact instruction-cost difference; and the Mersenne-program antichain contradiction. Normalization of general programs, complete finite-control extraction and the final end-to-end asymptotic theorem remain written."
+        "scope": "Universal nonsquare-count bound; full increasing-chain extraction into legal marked code with exact endpoint, cost and operand-address bounds; comparable-program domination; and the Mersenne-program antichain contradiction. Finite-family assembly, normalization of arbitrary AM programs and the final asymptotic theorem remain written."
       },
       "sources": [
         {

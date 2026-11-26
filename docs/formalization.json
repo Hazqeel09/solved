@@ -188,6 +188,31 @@
         "SolvedInflation.comparable_inflation",
         "SolvedInflation.comparable_domination"
       ]
+    },
+    {
+      "file": "lean/MarkedEncoding.lean",
+      "theorems": [
+        "SolvedEncoding.extras_length",
+        "SolvedEncoding.stock_length",
+        "SolvedEncoding.extras_contains",
+        "SolvedEncoding.stock_contains",
+        "SolvedEncoding.remove_exists",
+        "SolvedEncoding.remove_length",
+        "SolvedEncoding.remove_preserves",
+        "SolvedEncoding.fits_weaken",
+        "SolvedEncoding.allFits_weaken",
+        "SolvedEncoding.allFits_snoc",
+        "SolvedEncoding.eval_snoc",
+        "SolvedEncoding.cost_snoc",
+        "SolvedEncoding.evalI_preserves_tail",
+        "SolvedEncoding.initial_scan",
+        "SolvedEncoding.advance_unmarked",
+        "SolvedEncoding.append_scan",
+        "SolvedEncoding.advance_marked",
+        "SolvedEncoding.scan_exists",
+        "SolvedEncoding.complete_encoding",
+        "SolvedEncoding.mersenne_encoding"
+      ]
     }
   ]
 }
