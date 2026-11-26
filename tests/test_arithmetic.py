@@ -7,10 +7,23 @@ from solved.arithmetic import (
     bounded_divisors,
     calculate,
     missing_operand,
+    power_capped,
 )
 
 
 class ArithmeticTests(unittest.TestCase):
+    def test_capped_powers_match_exact_arithmetic_and_huge_exponents(self):
+        for base in range(9):
+            for exponent in range(9):
+                for cap in (1, 2, 7, 33, 100):
+                    self.assertEqual(power_capped(base, exponent, cap), min(base**exponent, cap))
+        self.assertEqual(power_capped(0, 10**100, 100), 0)
+        self.assertEqual(power_capped(1, 10**100, 100), 1)
+        self.assertEqual(power_capped(2, 10**100, 100), 100)
+        for args in ((True, 2, 3), (2, -1, 3), (-1, 2, 3), (2, 1, 0), (2, 1, True)):
+            with self.assertRaises(ValueError):
+                power_capped(*args)
+
     def test_all_bounded_results_and_inverses(self):
         for cap in range(1, 16):
             for a in range(1, cap + 1):

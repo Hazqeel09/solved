@@ -11,17 +11,7 @@ from dataclasses import dataclass
 
 from sympy.utilities.iterables import strongly_connected_components
 
-
-def _pow_cap(base, exponent, cap):
-    result = 1
-    base = min(base, cap)
-    while exponent:
-        if exponent & 1:
-            result = min(cap, result * base)
-        exponent >>= 1
-        if exponent:
-            base = min(cap, base * base)
-    return min(result, cap)
+from .arithmetic import power_capped
 
 
 def _power_gap(base, exponent, cap):
@@ -59,8 +49,8 @@ class Polynomial:
             raise ValueError("positive integer inputs and cap required")
         result = 0
         for c, p, q in self.terms:
-            term = min(c, cap) * _pow_cap(x, p, cap)
-            term = min(cap, term) * _pow_cap(y, q, cap)
+            term = min(c, cap) * power_capped(x, p, cap)
+            term = min(cap, term) * power_capped(y, q, cap)
             result = min(cap, result + min(cap, term))
             if result == cap:
                 break
@@ -74,8 +64,12 @@ class Polynomial:
         for c, p, q in self.terms:
             # Positive-product formulas preserve truncation; subtracting two
             # independently truncated powers would not preserve their difference.
-            dx = min(cap, dx + min(cap, min(c, cap) * _power_gap(x, p, cap)) * _pow_cap(y, q, cap))
-            dy = min(cap, dy + min(cap, min(c, cap) * _power_gap(y, q, cap)) * _pow_cap(x, p, cap))
+            dx = min(
+                cap, dx + min(cap, min(c, cap) * _power_gap(x, p, cap)) * power_capped(y, q, cap)
+            )
+            dy = min(
+                cap, dy + min(cap, min(c, cap) * _power_gap(y, q, cap)) * power_capped(x, p, cap)
+            )
         return dx, dy
 
 
@@ -226,7 +220,7 @@ def recover(domains, observations):
                 cap = edge.upper + 1
                 for coefficient, p, q in edge.polynomial.terms:
                     source_power, destination_power = (p, q) if arc.source_is_left else (q, p)
-                    term = min(cap, min(coefficient, cap) * _pow_cap(value, source_power, cap))
+                    term = min(cap, min(coefficient, cap) * power_capped(value, source_power, cap))
                     if destination_power:
                         slope = min(cap, slope + term)
                     else:

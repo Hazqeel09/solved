@@ -7,6 +7,26 @@ class DomainError(ValueError):
     """An operation leaves the stated positive exact-integer domain."""
 
 
+def power_capped(base, exponent, cap):
+    """Return min(base**exponent, cap) without materializing a large power."""
+    if (
+        any(type(v) is not int for v in (base, exponent, cap))
+        or base < 0
+        or exponent < 0
+        or cap < 1
+    ):
+        raise ValueError("nonnegative integer base/exponent and positive cap required")
+    result = 1
+    base = min(base, cap)
+    while exponent:
+        if exponent & 1:
+            result = min(cap, result * base)
+        exponent >>= 1
+        if exponent:
+            base = min(cap, base * base)
+    return min(result, cap)
+
+
 def _inputs(a, b, limit):
     if (
         type(limit) is not int
