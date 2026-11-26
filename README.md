@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 27 entries, comprising 23 research proof drafts and 4 finite verification records. Twenty-four Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, and its computable-threshold extension. Independent mathematical review remains pending.
+**Current catalogue:** 28 entries, comprising 24 research proof drafts and 4 finite verification records. Twenty-five Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, and its computable-threshold extension. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -11,6 +11,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 | Topic | Precise scope |
 |---|---|
 | [Squaring instability](results/square-instability/PROOF.md) | A fully formalized counterexample: 267 and its square both have minimum cost eight. |
+| [Square-root reconstruction](results/root-closure-sectors/PROOF.md) | Constructive root reduction in the three- and seven-nonsquare sectors; the full defect-two closure question remains open here. |
 | [Two-small-step addition–multiplication chains](results/two-small-steps/PROOF.md) | An all-length block classification manuscript, with independent finite enumeration. |
 | [Real arithmetic-chain defects](results/am-defect-order/PROOF.md) | Proposed well-ordering and global ordinal type, with a separate [bounded-slice argument](results/am-defect-slices/PROOF.md). |
 | [Subtraction and computation length](results/subtraction-gap/PROOF.md) | An end-to-end Lean proof of unbounded **additive** savings on the tower-minus-one family. Polynomial equivalence remains a separate question. |

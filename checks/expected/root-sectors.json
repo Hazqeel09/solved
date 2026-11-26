@@ -1,0 +1,29 @@
+{
+  "complete_through_level": 12,
+  "source_sector": "exactly two small steps and three or seven canonical nonsquares",
+  "checked_square_chains_or_recipe_variants": 33216,
+  "unique_roots": 11849,
+  "rules": {
+    "exceptional_product": 1,
+    "exceptional_sum": 4,
+    "halve_available_factors": 3785,
+    "halve_first_product": 156,
+    "halve_two_products": 375,
+    "paired_twos": 10,
+    "seven_ray": 116,
+    "seven_square_base": 3,
+    "trailing_square": 28106,
+    "unused_first_event": 660
+  },
+  "canonical_nonsquares": {
+    "3": 32810,
+    "7": 406
+  },
+  "saved_writes": {
+    "1": 32538,
+    "2": 677,
+    "3": 1
+  },
+  "all_final_recipe_variants": null,
+  "source_and_root_values_sha256": "1f8705d574f733a9ae0df89874df23e5da969188dd776b1c60164761675b3cbc"
+}

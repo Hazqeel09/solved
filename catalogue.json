@@ -940,6 +940,38 @@
       "dependencies": [
         "subtraction-gap"
       ]
+    },
+    {
+      "id": "root-closure-sectors",
+      "title": "Square-root reconstruction in the extreme two-defect sectors",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "Every square endpoint of a two-small-step AM chain with three or seven canonical nonsquares has a root witness using at least one fewer instruction. A counterexample to defect-two root closure must therefore have four, five or six canonical nonsquares in every shortest chain for its square. The general root-closure question remains unresolved here.",
+      "proof": "results/root-closure-sectors/PROOF.md",
+      "tests": [
+        "test_root_sectors.py"
+      ],
+      "implementation": [
+        "solved/root_sectors.py",
+        "checks/verify_root_sectors.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/RootSectorLemmas.lean"
+        ],
+        "scope": "Nine elementary square-gap, product-root and power-of-two factor lemmas are checked. The complete three-nonsquare-sector coverage, seven-sector classification dependency and universal correctness of the Python reconstruction remain written arguments with finite checks."
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "seven-nonsquares"
+      ]
     }
   ]
 }

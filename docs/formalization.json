@@ -328,6 +328,20 @@
       ]
     },
     {
+      "file": "lean/RootSectorLemmas.lean",
+      "theorems": [
+        "SolvedRootBlocks.square_gap",
+        "SolvedRootBlocks.between_not_square",
+        "SolvedRootBlocks.proper_additions_not_square",
+        "SolvedRootBlocks.product_roots",
+        "SolvedRootBlocks.halved_run_product",
+        "SolvedRootBlocks.halved_first_product",
+        "SolvedRootBlocks.odd_factor_power_two",
+        "SolvedRootBlocks.adjacent_power_two_factors",
+        "SolvedRootBlocks.square_one_plus_power_two"
+      ]
+    },
+    {
       "file": "lean/SignedEnvelope.lean",
       "theorems": [
         "SolvedSigned.deviation",
