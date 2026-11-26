@@ -1,0 +1,112 @@
+{
+  "normalization": {
+    "programs": 812,
+    "decreasing_write": 595,
+    "duplicate_value": 776,
+    "unused_overshoot": 342
+  },
+  "signed_witnesses": [
+    {
+      "n": 0,
+      "target_bits": 1,
+      "writes": 2
+    },
+    {
+      "n": 1,
+      "target_bits": 2,
+      "writes": 3
+    },
+    {
+      "n": 2,
+      "target_bits": 4,
+      "writes": 4
+    },
+    {
+      "n": 3,
+      "target_bits": 8,
+      "writes": 5
+    },
+    {
+      "n": 4,
+      "target_bits": 16,
+      "writes": 6
+    },
+    {
+      "n": 5,
+      "target_bits": 32,
+      "writes": 7
+    },
+    {
+      "n": 6,
+      "target_bits": 64,
+      "writes": 8
+    },
+    {
+      "n": 7,
+      "target_bits": 128,
+      "writes": 9
+    },
+    {
+      "n": 8,
+      "target_bits": 256,
+      "writes": 10
+    },
+    {
+      "n": 9,
+      "target_bits": 512,
+      "writes": 11
+    },
+    {
+      "n": 10,
+      "target_bits": 1024,
+      "writes": 12
+    }
+  ],
+  "negative_and_zero_trace": [
+    1,
+    0,
+    -1,
+    1
+  ],
+  "small_examples": [
+    {
+      "n": 1,
+      "am_minimum": 2,
+      "signed_witness_length": 3,
+      "shorter_chain_counts": [
+        2
+      ]
+    },
+    {
+      "n": 2,
+      "am_minimum": 4,
+      "signed_witness_length": 4,
+      "shorter_chain_counts": [
+        3,
+        8
+      ]
+    },
+    {
+      "n": 3,
+      "am_minimum": 6,
+      "signed_witness_length": 5,
+      "shorter_chain_counts": [
+        4,
+        29,
+        363
+      ]
+    },
+    {
+      "n": 4,
+      "am_minimum": 8,
+      "signed_witness_length": 6,
+      "shorter_chain_counts": [
+        5,
+        71,
+        1765,
+        46838
+      ]
+    }
+  ],
+  "scope": "Finite model checks; the asymptotic result is proved by Lean."
+}

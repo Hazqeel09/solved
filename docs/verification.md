@@ -10,7 +10,7 @@
 | `reviewed-proof` | A written proof with a linked independent review record. |
 | `withdrawn` | A claim retained for traceability but no longer asserted. |
 
-Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md) has a complete formalization of its stated counterexample and infinite construction consequence; other main conjecture arguments remain drafts with supporting lemmas.
+Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md) and the [main additive subtraction-gap theorem](../results/subtraction-gap/PROOF.md) have complete formalizations of their stated main claims. Their written presentations and publication priority still await independent review.
 
 ## Python checks
 
@@ -42,6 +42,9 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | Module | What the formal statements cover |
 |---|---|
 | [SquareInstability](../lean/SquareInstability.lean) | Complete chain-search argument, exact eight-write minima for 267 and its square, and the iterated-square construction. See its [statement correspondence](../results/square-instability/FORMALIZATION.md). |
+| [BoundedControls](../lean/BoundedControls.lean) | Bounded control fields, Dickson comparison and the eventual Mersenne lower bound for increasing AM chains. |
+| [AMNormalization](../lean/AMNormalization.lean) | Arbitrary AM programs normalize to increasing chains without increasing cost; the lower bound transfers. |
+| [AdditiveSeparation](../lean/AdditiveSeparation.lean) | Integer signed constructions, minimum-cost existence and uniqueness, and the full main additive-gap conclusion. |
 | [MarkedEncoding](../lean/MarkedEncoding.lean) | Every increasing AM chain has legal marked code preserving its endpoint and exact write count, with bounded size and operand addresses. |
 | [NonsquareBound](../lean/NonsquareBound.lean) | Integer Fibonacci envelope, complete canonical step counting, and the bound p≤4s+4, including the tower-minus-one specialization. |
 | [ControlInflation](../lean/ControlInflation.lean) | Comparable control programs, exact cost differences, and domination by the corresponding iterated square. |
@@ -56,7 +59,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [ProductIntervals](../lean/ProductIntervals.lean) | Narrow-interval transport, unique neighbors and antitone fixed-point uniqueness. |
 | [SubtractionGap](../lean/SubtractionGap.lean) | Strict power inequalities, upward-region exclusion, a finite-family obstruction, and the concrete Mersenne-program antichain theorem. |
 
-Finite-family assembly, general-program normalization, asymptotic and ordinal conclusions, and concrete polynomial recovery remain written mathematics. Increasing-chain extraction to bounded marked code is now formalized. The nonsquare count bound and comparable-program cost domination now have universal integer proofs. Read each entry's `formalization.scope` before interpreting its formal evidence. In particular, the subtraction-gap module does not formalize the unbounded additive-separation theorem.
+The main additive-gap dependency chain is now formalized through the asymptotic conclusion. Ordinal-type conclusions, the other separation families and concrete polynomial recovery retain the scopes stated in their entries. The nonsquare count bound and comparable-program cost domination now have universal integer proofs. Read each entry's `formalization.scope` before interpreting its formal evidence. The earlier SubtractionGap module contains intermediate lemmas; the final unbounded theorem is in AdditiveSeparation and is mapped to the mathematical statement in its [correspondence document](../results/subtraction-gap/FORMALIZATION.md).
 
 ## Audit priorities
 

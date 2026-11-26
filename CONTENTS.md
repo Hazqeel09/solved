@@ -24,7 +24,7 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 | [An all-length block classification of two-small-step chains](results/two-small-steps/PROOF.md) | proof-draft | supporting-lemmas |
 | [Sharp counting order for shortest defect-two endpoints](results/two-defect-counting/PROOF.md) | proof-draft | none |
 | [The counting exponent at every fixed AM defect](results/fixed-defect-counting/PROOF.md) | proof-draft | supporting-lemmas |
-| [An unbounded additive advantage for subtraction: proof draft](results/subtraction-gap/PROOF.md) | proof-draft | supporting-lemmas |
+| [An unbounded additive advantage for subtraction](results/subtraction-gap/PROOF.md) | proof-draft | complete |
 | [Sharp completion and increment bounds from an AM prefix](results/prefix-extrema/PROOF.md) | proof-draft | none |
 | [Extremal values and optimal simultaneous cancellation](results/signed-growth/PROOF.md) | proof-draft | supporting-lemmas |
 | [A sharp nonsquare bound for positive arithmetic with arbitrary seeds](results/record-defect/PROOF.md) | proof-draft | none |

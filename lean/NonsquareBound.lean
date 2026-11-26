@@ -245,4 +245,26 @@ theorem tower_as_squares (n : Nat) : 2^(2^n) = SolvedCompression.iterSq n 2 := b
     rw [tower_step,ih]
     rfl
 
+
+
+theorem level_requires_writes {r L : Nat} (c : Chain r)
+    (reaches : 2^(2^(L-1)) ≤ c.value r) : L ≤ r := by
+  have positive : 1 ≤ r := by
+    by_cases zero : r=0
+    · subst r
+      rw [c.initial] at reaches
+      have large := tower_large (L-1)
+      omega
+    · omega
+  obtain ⟨b,d,counts⟩ := counts_exist c r positive (Nat.le_refl _)
+  have head := (envelope counts).1
+  have fibBound := Nat.mul_le_mul_left (2^d) (fib_power_bound b)
+  rw [← Nat.pow_add] at fibBound
+  have upper := Nat.pow_le_pow_of_le (by decide : 1<2) fibBound
+  have compare := Nat.le_trans reaches (Nat.le_trans head upper)
+  have first := (Nat.pow_le_pow_iff_right (by decide : 1<2)).mp compare
+  have second := (Nat.pow_le_pow_iff_right (by decide : 1<2)).mp first
+  have length := counted_length counts
+  omega
+
 end SolvedGrowth

@@ -1,8 +1,8 @@
-# An unbounded additive advantage for subtraction: proof draft
+# An unbounded additive advantage for subtraction
 
-**Status: research proof draft; independent mathematical review pending.** Automated evidence is scoped below and does not certify the complete argument.
+**Status: the main theorem has an end-to-end Lean proof.** Independent mathematical review of the presentation and publication priority remains pending. The [formal statement correspondence](FORMALIZATION.md) identifies the exact models, quantifiers and coverage.
 
-**Research proof draft.** Let τ₊(n) be the minimum number of +,× instructions computing a positive integer n from 1, allowing reuse of previous values. Let τ(n) allow subtraction as well. For
+Let τ₊(n) be the minimum number of +,× instructions computing a positive integer n from 1, allowing reuse of previous values. Let τ(n) allow subtraction as well. For
 
     Aₙ = 2^(2ⁿ),    Nₙ = Aₙ−1,
 
@@ -11,11 +11,11 @@ we derive
     τ₊(Nₙ) − n → ∞,
     τ₊(Nₙ) − τ(Nₙ) → ∞.
 
-The second conclusion follows from the explicit subtraction construction τ(Nₙ)≤n+2. Saranurak and Jindal study this same family, prove an eventual one-instruction advantage, and ask for a growing additive gap in their conclusion. The argument below addresses that additive question. It provides no quantitative growth rate for the gap and leaves their polynomial-equivalence question open. The proof is awaiting independent mathematical review. [Original paper, §3 and conclusion](https://arxiv.org/pdf/1212.2549)
+The second conclusion follows from the explicit subtraction construction τ(Nₙ)≤n+2. Saranurak and Jindal study this same family, prove an eventual one-instruction advantage, and ask for a growing additive gap in their conclusion. The argument below addresses that additive question. It provides no quantitative growth rate for the gap and leaves their polynomial-equivalence question open. The manuscript and its correspondence to the literature await independent review. [Original paper, §3 and conclusion](https://arxiv.org/pdf/1212.2549)
 
 ## 1. A bounded number of nonsquares
 
-A shortest positive AM computation can be put in strictly increasing numerical order. Discard unused writes, remove multiplication by 1 and duplicate values, and sort the remaining nodes by value. Each useful addition or multiplication produces a result strictly greater than both inputs, so every dependency remains earlier in this order.
+Any positive AM program can be normalized without increasing its length. Keep the distinct computed values no greater than its endpoint. Every value beyond 1 has a recipe from strictly smaller values after bypassing identity writes. Constructing these values in increasing order preserves operand availability, reaches the endpoint and uses at most one write per original computed value. AMNormalization proves this for arbitrary programs, including repeated and decreasing writes.
 
 For an increasing chain 1=a₀<a₁<…<aᵣ, call a step a canonical square when aᵢ=aᵢ₋₁². The value 2→4 is normalized as a square even when its written recipe was 2+2. Let p be the number of other steps. Write λ(aᵣ)=L, with
 
@@ -103,7 +103,11 @@ But Aₘ=Aₙ^(2^(m−n)), and for any integer A≥2 and exponent q≥2,
 
     A^q−1 > (A−1)^q.
 
-Hence Nₘ>Nₙ^(2^(m−n)), the contradiction. It follows that for every C only finitely many n have τ₊(Nₙ)≤n+C. This proves τ₊(Nₙ)−n→∞. The signed program writes 2, squares n times, and subtracts the saved 1, using n+2 instructions. The Lean theorem finite_descriptions_obstruction now checks the contradiction for any supplied finite family satisfying the coordinate-domination property. It encodes the finite control and excess as a bounded label together with its complement; coordinatewise comparison forces label equality. Padding the run vector with zeros allows a fixed dimension. Connecting every arithmetic chain to that finite-family hypothesis remains part of the written proof. The new theorem `mersenne_program_antichain` also checks the concrete contradiction for two comparable control programs with equal length excess, deriving domination from their actual instructions and costs. The additive gap therefore tends to infinity in the written argument. Dickson's lemma also underlies the independently stated [AM-defect well-ordering argument](../am-defect-order/PROOF.md); the direct argument here uses only integer endpoint comparisons after the coarse nonsquare bound.
+Hence Nₘ>Nₙ^(2^(m−n)), the contradiction. For every C, only finitely many n therefore have τ₊(Nₙ)≤n+C, proving τ₊(Nₙ)−n→∞. The signed program writes 2, squares n times, and subtracts the saved 1, using n+2 instructions. Hence τ₊(Nₙ)−τ(Nₙ)→∞ as well.
+
+The formal proof assembles this argument without assuming an encoding or domination property. BoundedControls packs operation tags, saved-operand addresses and their bounded complements alongside run lengths and length excess. Dickson comparison forces identical control and excess, with coordinatewise longer runs. The checked `mersenne_program_antichain` theorem then supplies the contradiction.
+
+AMNormalization transfers the lower bound from increasing chains to arbitrary AM programs without increasing cost. AdditiveSeparation combines it with the integer signed construction and proves existence and uniqueness of the minimum costs. The main conclusion is checked end to end; the [statement correspondence](FORMALIZATION.md) records its exact scope.
 
 ## 5. Other explicit families and bounded positive storage
 
@@ -145,6 +149,10 @@ The exclusion certificate is useful even without such a cutoff: any verified bas
 
 The finite-control encoder, reconstruction and one-square inflation are tested on all at-most-two-small-step chains through 10^18 and further small cases. Additional tests compare exclusion certificates against exact small endpoints, preserve an exact base solution, reject incomparable parameters, and test membership with an exponent parameter of 10^100 without expanding that candidate.
 
-Lean now checks the universal nonsquare count and its exact tower-minus-one specialization, local chain coverage, comparable-program domination with the true write-count difference, and the Mersenne-program antichain contradiction. The finite-dimensional thinning and general finite-family obstruction are also checked.
+Lean checks the main conclusion end to end. The final theorem states that for every C there is a threshold after which every minimum AM cost a and minimum integer signed-program cost b for Nₙ satisfy b+C<a. Minimum costs are proved to exist and be unique. The signed model allows zero and negative intermediates, and the normalization theorem covers AM programs whose outputs are not ordered or distinct.
 
-The full increasing-chain extraction is now checked, including endpoint, cost, operand-address bounds and the 3p+1 block limit. The remaining end-to-end bridge is to assemble these bounded codes into the finite-dimensional argument. At excess C, the bounds above permit at most 12C+13 marked instructions and 8C+9 square-run parameters. The Python encoder and a separate newest-first marked interpreter agree on the finite checks; the Lean extraction is an independent existence proof. Normalization from general AM programs to increasing chains also remains a written argument. Independent review is pending. This remains a proposed resolution of the additive-gap question, with no polynomial-separation or publication-priority claim.
+The complete dependency chain includes the integer nonsquare bound, full marked-code extraction, exact-cost control domination, finite-dimensional comparison, arbitrary-program normalization and the explicit signed construction. No ordinal-defect conjecture, finite census or external unproved theorem is assumed. [Statement and model audit](FORMALIZATION.md) · [Final formal theorem](../../lean/AdditiveSeparation.lean).
+
+Independent Python checks cover 812 distinct sampled AM programs, including decreasing writes, identities, duplicates and unused overshoots; signed traces with zero and negative values; and explicit tower witnesses. Two exact enumerators check each listed finite AM minimum. These checks are model-conformance evidence, not the proof of the asymptotic result. [Model checker](../../checks/verify_additive_separation.py) · [Stored checks](../../checks/expected/additive-separation-models.json).
+
+The theorem supplies no quantitative gap-growth rate or effective threshold. It is an additive separation, compatible with the known upper bound τ₊(Nₙ)≤2n from the original paper; it does not resolve polynomial equivalence. The other families, finite-cap/register variants and exact-division consequences above remain outside the complete formalization. Independent mathematical review and publication-priority assessment are pending.

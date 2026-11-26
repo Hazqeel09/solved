@@ -1,7 +1,57 @@
 {
   "toolchain": "leanprover/lean4:v4.8.0",
-  "scope": "Consult each catalogue entry and its statement correspondence. Most files prove supporting lemmas; SquareInstability also proves its stated counterexample end to end.",
+  "scope": "Consult each catalogue entry and its statement correspondence. SquareInstability and AdditiveSeparation prove their declared main claims end to end; other entries may have supporting lemmas only.",
   "modules": [
+    {
+      "file": "lean/AMNormalization.lean",
+      "theorems": [
+        "SolvedNormalization.values_positive",
+        "SolvedNormalization.outputs_length",
+        "SolvedNormalization.outputs_contains",
+        "SolvedNormalization.value_member",
+        "SolvedNormalization.outputs_member",
+        "SolvedNormalization.member_positive",
+        "SolvedNormalization.smaller_recipe",
+        "SolvedNormalization.member_recipe",
+        "SolvedNormalization.extend_old",
+        "SolvedNormalization.extend_head",
+        "SolvedNormalization.nat_min_choice",
+        "SolvedNormalization.least_candidate",
+        "SolvedNormalization.normal_step",
+        "SolvedNormalization.finish_normalization",
+        "SolvedNormalization.normalize",
+        "SolvedNormalization.eventual_program_gap"
+      ]
+    },
+    {
+      "file": "lean/AdditiveSeparation.lean",
+      "theorems": [
+        "SolvedSeparation.append_head",
+        "SolvedSeparation.towerProgram_head",
+        "SolvedSeparation.mersenneProgram_head",
+        "SolvedSeparation.least_cost",
+        "SolvedSeparation.minima_exist",
+        "SolvedSeparation.minima_unique",
+        "SolvedSeparation.eventual_additive_gap",
+        "SolvedSeparation.unbounded_additive_advantage"
+      ]
+    },
+    {
+      "file": "lean/BoundedControls.lean",
+      "theorems": [
+        "SolvedBounded.lookup_outside",
+        "SolvedBounded.tag_bound",
+        "SolvedBounded.address_bounds",
+        "SolvedBounded.erase_length",
+        "SolvedBounded.shape_from_fields",
+        "SolvedBounded.below_from_fields",
+        "SolvedBounded.coordinates_at",
+        "SolvedBounded.packed_comparison",
+        "SolvedBounded.bounded_programs_obstruction",
+        "SolvedBounded.short_chain_sequence_impossible",
+        "SolvedBounded.eventual_chain_gap"
+      ]
+    },
     {
       "file": "lean/ChainCoverage.lean",
       "theorems": [
@@ -32,6 +82,39 @@
       ]
     },
     {
+      "file": "lean/ControlInflation.lean",
+      "theorems": [
+        "SolvedInflation.runs_agree",
+        "SolvedInflation.lift_comp",
+        "SolvedInflation.lift_multiplication",
+        "SolvedInflation.lift_mono",
+        "SolvedInflation.self_le_lift",
+        "SolvedInflation.lift_increase",
+        "SolvedInflation.lift_commute",
+        "SolvedInflation.lift_add",
+        "SolvedInflation.weaken",
+        "SolvedInflation.pushed",
+        "SolvedInflation.unchanged_instruction",
+        "SolvedInflation.expanded_run",
+        "SolvedInflation.inflation_cost",
+        "SolvedInflation.inflation_evaluates",
+        "SolvedInflation.inflation_domination",
+        "SolvedInflation.comparable_inflation",
+        "SolvedInflation.comparable_domination"
+      ]
+    },
+    {
+      "file": "lean/DirectedRecovery.lean",
+      "theorems": [
+        "SolvedDirected.compose_order",
+        "SolvedDirected.run_order",
+        "SolvedDirected.run_realizes",
+        "SolvedDirected.agreement_along_path",
+        "SolvedDirected.negative_closed_agreement",
+        "SolvedDirected.unique_assignment"
+      ]
+    },
+    {
       "file": "lean/FiniteControls.lean",
       "theorems": [
         "SolvedControls.suffix_min",
@@ -57,6 +140,57 @@
       ]
     },
     {
+      "file": "lean/MarkedEncoding.lean",
+      "theorems": [
+        "SolvedEncoding.extras_length",
+        "SolvedEncoding.stock_length",
+        "SolvedEncoding.extras_contains",
+        "SolvedEncoding.stock_contains",
+        "SolvedEncoding.remove_exists",
+        "SolvedEncoding.remove_length",
+        "SolvedEncoding.remove_preserves",
+        "SolvedEncoding.fits_weaken",
+        "SolvedEncoding.allFits_weaken",
+        "SolvedEncoding.allFits_snoc",
+        "SolvedEncoding.eval_snoc",
+        "SolvedEncoding.cost_snoc",
+        "SolvedEncoding.evalI_preserves_tail",
+        "SolvedEncoding.initial_scan",
+        "SolvedEncoding.advance_unmarked",
+        "SolvedEncoding.append_scan",
+        "SolvedEncoding.advance_marked",
+        "SolvedEncoding.scan_exists",
+        "SolvedEncoding.complete_encoding",
+        "SolvedEncoding.mersenne_encoding"
+      ]
+    },
+    {
+      "file": "lean/NonsquareBound.lean",
+      "theorems": [
+        "SolvedGrowth.fib_step",
+        "SolvedGrowth.fib_mono",
+        "SolvedGrowth.fib_positive",
+        "SolvedGrowth.fib_double",
+        "SolvedGrowth.fib_four",
+        "SolvedGrowth.fib_power_bound",
+        "SolvedGrowth.first_two",
+        "SolvedGrowth.counted_length",
+        "SolvedGrowth.counts_exist",
+        "SolvedGrowth.nonsquare_product_bound",
+        "SolvedGrowth.doubled_power",
+        "SolvedGrowth.envelope",
+        "SolvedGrowth.bounded_nonsquares",
+        "SolvedGrowth.counted_canonical",
+        "SolvedGrowth.tower_large",
+        "SolvedGrowth.chain_nonsquare_bound",
+        "SolvedGrowth.tower_step",
+        "SolvedGrowth.mersenne_reaches_level",
+        "SolvedGrowth.mersenne_nonsquare_bound",
+        "SolvedGrowth.tower_as_squares",
+        "SolvedGrowth.level_requires_writes"
+      ]
+    },
+    {
       "file": "lean/PositiveExpressions.lean",
       "theorems": [
         "SolvedPositive.normalized_monotone"
@@ -76,27 +210,6 @@
         "SolvedSigned.deviation",
         "SolvedSigned.monotone",
         "SolvedSigned.records_bound"
-      ]
-    },
-    {
-      "file": "lean/SubtractionGap.lean",
-      "theorems": [
-        "SolvedSubtraction.square_gap",
-        "SolvedSubtraction.one_run",
-        "SolvedSubtraction.tower_minus_one",
-        "SolvedSubtraction.incompatible_endpoints",
-        "SolvedSubtraction.exclusion_by_growth",
-        "SolvedSubtraction.finite_descriptions_obstruction",
-        "SolvedSubtraction.mersenne_program_antichain"
-      ]
-    },
-    {
-      "file": "lean/TwoSmallBlocks.lean",
-      "theorems": [
-        "SolvedTwoSmall.strict_iterSq",
-        "SolvedTwoSmall.lift_le",
-        "SolvedTwoSmall.proper_sum",
-        "SolvedTwoSmall.lag_crossing"
       ]
     },
     {
@@ -132,86 +245,24 @@
       ]
     },
     {
-      "file": "lean/DirectedRecovery.lean",
+      "file": "lean/SubtractionGap.lean",
       "theorems": [
-        "SolvedDirected.compose_order",
-        "SolvedDirected.run_order",
-        "SolvedDirected.run_realizes",
-        "SolvedDirected.agreement_along_path",
-        "SolvedDirected.negative_closed_agreement",
-        "SolvedDirected.unique_assignment"
+        "SolvedSubtraction.square_gap",
+        "SolvedSubtraction.one_run",
+        "SolvedSubtraction.tower_minus_one",
+        "SolvedSubtraction.incompatible_endpoints",
+        "SolvedSubtraction.exclusion_by_growth",
+        "SolvedSubtraction.finite_descriptions_obstruction",
+        "SolvedSubtraction.mersenne_program_antichain"
       ]
     },
     {
-      "file": "lean/NonsquareBound.lean",
+      "file": "lean/TwoSmallBlocks.lean",
       "theorems": [
-        "SolvedGrowth.fib_step",
-        "SolvedGrowth.fib_mono",
-        "SolvedGrowth.fib_positive",
-        "SolvedGrowth.fib_double",
-        "SolvedGrowth.fib_four",
-        "SolvedGrowth.fib_power_bound",
-        "SolvedGrowth.first_two",
-        "SolvedGrowth.counted_length",
-        "SolvedGrowth.counts_exist",
-        "SolvedGrowth.nonsquare_product_bound",
-        "SolvedGrowth.doubled_power",
-        "SolvedGrowth.envelope",
-        "SolvedGrowth.bounded_nonsquares",
-        "SolvedGrowth.counted_canonical",
-        "SolvedGrowth.tower_large",
-        "SolvedGrowth.chain_nonsquare_bound",
-        "SolvedGrowth.tower_step",
-        "SolvedGrowth.mersenne_reaches_level",
-        "SolvedGrowth.mersenne_nonsquare_bound",
-        "SolvedGrowth.tower_as_squares"
-      ]
-    },
-    {
-      "file": "lean/ControlInflation.lean",
-      "theorems": [
-        "SolvedInflation.runs_agree",
-        "SolvedInflation.lift_comp",
-        "SolvedInflation.lift_multiplication",
-        "SolvedInflation.lift_mono",
-        "SolvedInflation.self_le_lift",
-        "SolvedInflation.lift_increase",
-        "SolvedInflation.lift_commute",
-        "SolvedInflation.lift_add",
-        "SolvedInflation.weaken",
-        "SolvedInflation.pushed",
-        "SolvedInflation.unchanged_instruction",
-        "SolvedInflation.expanded_run",
-        "SolvedInflation.inflation_cost",
-        "SolvedInflation.inflation_evaluates",
-        "SolvedInflation.inflation_domination",
-        "SolvedInflation.comparable_inflation",
-        "SolvedInflation.comparable_domination"
-      ]
-    },
-    {
-      "file": "lean/MarkedEncoding.lean",
-      "theorems": [
-        "SolvedEncoding.extras_length",
-        "SolvedEncoding.stock_length",
-        "SolvedEncoding.extras_contains",
-        "SolvedEncoding.stock_contains",
-        "SolvedEncoding.remove_exists",
-        "SolvedEncoding.remove_length",
-        "SolvedEncoding.remove_preserves",
-        "SolvedEncoding.fits_weaken",
-        "SolvedEncoding.allFits_weaken",
-        "SolvedEncoding.allFits_snoc",
-        "SolvedEncoding.eval_snoc",
-        "SolvedEncoding.cost_snoc",
-        "SolvedEncoding.evalI_preserves_tail",
-        "SolvedEncoding.initial_scan",
-        "SolvedEncoding.advance_unmarked",
-        "SolvedEncoding.append_scan",
-        "SolvedEncoding.advance_marked",
-        "SolvedEncoding.scan_exists",
-        "SolvedEncoding.complete_encoding",
-        "SolvedEncoding.mersenne_encoding"
+        "SolvedTwoSmall.strict_iterSq",
+        "SolvedTwoSmall.lift_le",
+        "SolvedTwoSmall.proper_sum",
+        "SolvedTwoSmall.lag_crossing"
       ]
     }
   ]

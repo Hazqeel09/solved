@@ -51,3 +51,17 @@ ControlInflation reuses the existing marked-instruction evaluator. It proves tha
 The finite census checks 172,099 chains including the zero-write seed, through 10^6 with at most three small steps. A separate newest-first interpreter checks the existing chronological-mark encoder and simultaneous run inflations. Invalid operands, operations and run counts are rejected. These samples accompany universal kernel proofs; they are not the basis for the unbounded count statement.
 
 The remaining formal bridge is the complete finite-control extraction from every chain, including bounded operand addresses and exact cost preservation. Normalization of arbitrary positive AM programs and the final asymptotic conclusion retain written-proof status. The conjecture entry has not been upgraded to complete formalization.
+
+## 27 November 2026 — complete formal additive-gap proof
+
+**Decision: finish the main proof dependency chain.** MarkedEncoding proves full extraction by scanning the chain and consuming one stored mark for each emitted block. It preserves the endpoint and exact primitive write count, and proves legal saved-value references and the bounded block count. This avoids relying on an unverified sorting or deduplication routine.
+
+BoundedControls packs each finite operation/operand field together with its bounded complement. Dickson thinning therefore forces identical control and length excess while allowing coordinatewise growth of square-run parameters. The checked program-antichain theorem gives the eventual lower bound for every increasing AM chain.
+
+AMNormalization then handles arbitrary AM programs: first-occurrence identities can be bypassed, every noninitial required value has a recipe from smaller values, and a least-value construction yields an increasing chain without increasing cost. The proof allows repeated values, decreasing writes and unused overshoots in the original program.
+
+AdditiveSeparation supplies the integer-valued signed model, an explicit n+2-write tower-minus-one program, existence and uniqueness of minimum costs, and the final eventual additive-gap theorem. Negative and zero signed intermediates are permitted. The printed final theorem has no unproved encoding, counting or domination premise. Its axiom dependencies are only the standard Lean foundational axioms permitted by the repository audit.
+
+The finite model checker covers 812 distinct sampled AM instruction sequences and explicit signed traces. A mistaken expected cost for 65,535 was corrected to eight after agreement between instruction-count search and an independent defect-bounded enumeration. All listed finite examples now use both methods. Those examples are conformance evidence; the unbounded theorem is proved independently of any table.
+
+The formal statement was checked against the unit-cost program definitions and additive-gap direction in [Saranurak and Jindal](https://arxiv.org/pdf/1212.2549). The result proves unbounded additive savings on their explicit family. It gives no numerical cutoff, growth rate or superpolynomial separation, and no publication-priority claim is made. The main formalization is complete; independent review of the presentation and novelty remains pending. [Exact statement correspondence](../results/subtraction-gap/FORMALIZATION.md).

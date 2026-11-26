@@ -360,23 +360,24 @@
     },
     {
       "id": "subtraction-gap",
-      "title": "An unbounded additive advantage for subtraction: proof draft",
+      "title": "An unbounded additive advantage for subtraction",
       "subject": "Arithmetic complexity",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "For N_n=2^(2^n)−1 the draft derives τ_+(N_n)−n→∞ and hence an unbounded additive gap from subtraction-enabled computation.",
+      "statement": "For N_n=2^(2^n)−1, the minimum cost of +,× programs from 1 exceeds the minimum cost of integer +,−,× programs by a quantity tending to infinity.",
       "proof": "results/subtraction-gap/PROOF.md",
       "tests": [
         "test_square_controls.py",
         "test_square_exclusions.py",
-        "test_nonsquare_bound.py"
+        "test_nonsquare_bound.py",
+        "test_additive_separation.py"
       ],
       "implementation": [
         "solved/square_controls.py",
         "solved/square_exclusions.py"
       ],
       "formalization": {
-        "status": "supporting-lemmas",
+        "status": "complete",
         "files": [
           "lean/MarkedComparison.lean",
           "lean/FiniteControls.lean",
@@ -384,9 +385,24 @@
           "lean/ChainCoverage.lean",
           "lean/NonsquareBound.lean",
           "lean/ControlInflation.lean",
-          "lean/MarkedEncoding.lean"
+          "lean/MarkedEncoding.lean",
+          "lean/BoundedControls.lean",
+          "lean/AMNormalization.lean",
+          "lean/AdditiveSeparation.lean"
         ],
-        "scope": "Universal nonsquare-count bound; full increasing-chain extraction into legal marked code with exact endpoint, cost and operand-address bounds; comparable-program domination; and the Mersenne-program antichain contradiction. Finite-family assembly, normalization of arbitrary AM programs and the final asymptotic theorem remain written."
+        "scope": "The main tower-minus-one additive-gap theorem is fully formalized, including arbitrary AM-program normalization, bounded-control extraction, finite-dimensional comparison, integer signed constructions, and existence and uniqueness of minimum costs. Other families, capped-register corollaries and quantitative cutoffs are outside this formalization.",
+        "statement_correspondence": "results/subtraction-gap/FORMALIZATION.md",
+        "theorems": [
+          "SolvedEncoding.mersenne_encoding",
+          "SolvedBounded.eventual_chain_gap",
+          "SolvedNormalization.normalize",
+          "SolvedNormalization.eventual_program_gap",
+          "SolvedSeparation.mersenneProgram_head",
+          "SolvedSeparation.minima_exist",
+          "SolvedSeparation.minima_unique",
+          "SolvedSeparation.eventual_additive_gap",
+          "SolvedSeparation.unbounded_additive_advantage"
+        ]
       },
       "sources": [
         {
