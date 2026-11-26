@@ -37,7 +37,7 @@ Install the [official Lean toolchain](https://lean-lang.org/lean4/doc/quickstart
 python -m scripts.check_formalization
 ```
 
-This builds the complete import closure and prints the axiom dependencies of every theorem declaration registered in [formalization.json](formalization.json). It rejects missing theorem reports, unfinished proofs and project-specific axioms. Only Lean's standard `propext`, `Classical.choice` and `Quot.sound` are permitted. These are not a claim of axiom-free mathematics. The command also kernel-checks the [Python/Lean profile comparison](../checks/verify_profile_formalization.py) on 779 profiles, 1,558 endpoints and 3,073 box decisions. This finite comparison is separate from the universal arithmetic oracle proof.
+This builds the complete import closure and prints the axiom dependencies of every theorem declaration registered in [formalization.json](formalization.json). It rejects missing theorem reports, unfinished proofs and project-specific axioms. Only Lean's standard `propext`, `Classical.choice` and `Quot.sound` are permitted. These are not a claim of axiom-free mathematics. The command also kernel-checks the [Python/Lean profile comparison](../checks/verify_profile_formalization.py) on 779 profiles, 1,558 endpoints and 3,073 box decisions. This finite comparison is separate from the universal arithmetic oracle proof. A second checker compares compiled execution of the proved Lean basis function against Python on 1,551 cases; its finite outputs are execution evidence, not kernel-evaluated equality proofs.
 
 | Module | What the formal statements cover |
 |---|---|
@@ -50,7 +50,10 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [ControlInflation](../lean/ControlInflation.lean) | Comparable control programs, exact cost differences, and domination by the corresponding iterated square. |
 | [EffectiveCutoffs](../lean/EffectiveCutoffs.lean) | Integer ratio witnesses and leading-profile upper/lower decisions. |
 | [DiagonalProfiles](../lean/DiagonalProfiles.lean) | Whole-program coefficient profiles, saved-history invariants, exact cost correspondence and the complete diagonal criterion. |
-| [IdealOracle](../lean/IdealOracle.lean) | Box cofinality and an end-to-end Boolean ideal-intersection decision theorem. The broader finite-basis algorithm remains unformalized. |
+| [IdealOracle](../lean/IdealOracle.lean) | Box cofinality, Boolean ideal-intersection decisions and computed witnesses. |
+| [FiniteLists](../lean/FiniteLists.lean) | Shared list membership and duplicate-removal facts. |
+| [FiniteBasis](../lean/FiniteBasis.lean) | A total recursive reference search, strict box-rank descent, exact coverage and minimal-generator pruning. |
+| [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Instantiation with the arithmetic oracle and a safe cutoff for every admissible lower-corner domain. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
 | [Compression](../lean/Compression.lean) | Common-power compression of ordinary intervals with local multiplication and square runs. |

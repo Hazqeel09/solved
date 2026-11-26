@@ -1,5 +1,6 @@
 import Lean
 import Compression
+import FiniteLists
 
 namespace SolvedInstability
 
@@ -23,19 +24,10 @@ theorem mem_unique (v : Nat) (xs : List Nat) : v ∈ unique xs ↔ v ∈ xs := b
     · simp only [unique, ha, if_false, List.mem_cons, ih]
 
 theorem mem_append {α : Type} (v : α) (xs ys : List α) :
-    v ∈ xs++ys ↔ v ∈ xs ∨ v ∈ ys := by
-  induction xs with
-  | nil => simp
-  | cons a xs ih => simp [List.append,ih,or_assoc]
+    v ∈ xs++ys ↔ v ∈ xs ∨ v ∈ ys := SolvedLists.mem_append v xs ys
 
 theorem mem_bind {α β : Type} (v : β) (xs : List α) (f : α → List β) :
-    v ∈ xs.bind f ↔ ∃ a, a ∈ xs ∧ v ∈ f a := by
-  induction xs with
-  | nil => simp [List.bind]
-  | cons a xs ih =>
-    change v ∈ f a ++ xs.bind f ↔ ∃ x, x ∈ a::xs ∧ v ∈ f x
-    rw [mem_append,ih]
-    simp [or_and_right,exists_or]
+    v ∈ xs.bind f ↔ ∃ a, a ∈ xs ∧ v ∈ f a := SolvedLists.mem_bind v xs f
 
 def options (target : Nat) (xs : List Nat) : List Nat :=
   unique ((xs.bind fun a => xs.bind fun b => [a+b,a*b]).filter

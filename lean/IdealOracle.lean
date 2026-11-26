@@ -196,4 +196,72 @@ theorem decision_correct (box : List Constraint) (excess : Nat)
   unfold decision
   split <;> simp only [decide_eq_true_eq, Hits]
 
+def witnessBound (box : List Constraint) :=
+  if SolvedProfiles.freeCount (box.map anchor)=0 then 0
+  else SolvedProfiles.witnessShift (box.map anchor)
+
+theorem witness_bound_hits (box : List Constraint) (excess : Nat)
+    (indexValid : excess ≤ cost (diagonal box 0)) (accepted : decision box excess = true) :
+    Hits (diagonal box (witnessBound box)) excess := by
+  unfold decision at accepted
+  unfold witnessBound
+  split
+  · rename_i zero
+    simp only [if_pos zero,decide_eq_true_eq] at accepted
+    exact accepted
+  · rename_i nonzero
+    simp only [if_neg nonzero,decide_eq_true_eq] at accepted
+    apply (hits_diagonal_iff box excess _ indexValid).mpr
+    exact SolvedProfiles.diagonal_witness (box.map anchor) _ (by omega) accepted
+
+-- Search stops at the first successful test and never allocates a list of
+-- all offsets. The last offset is a proved witness, not a numerical guess.
+def scan (test : Nat → Bool) : Nat → Nat → Nat
+  | 0,start => start
+  | fuel+1,start => if test start then start else scan test fuel (start+1)
+
+theorem scan_hits (test : Nat → Bool) (fuel start : Nat)
+    (last : test (start+fuel)=true) : test (scan test fuel start)=true := by
+  induction fuel generalizing start with
+  | zero => simpa only [scan,Nat.add_zero] using last
+  | succ fuel ih =>
+    simp only [scan]
+    split
+    · assumption
+    · apply ih
+      have index : start+1+fuel=start+(fuel+1) := by omega
+      rw [index]
+      exact last
+
+def hitTest (box : List Constraint) (excess t : Nat) : Bool :=
+  decide (excess ≤ cost (diagonal box t) ∧
+    eval (diagonal box t) (fun _ => 1) 0 ≤ 2^(2^(cost (diagonal box t)-excess))-1)
+
+def witness (box : List Constraint) (excess : Nat) : Option (List Instr) :=
+  if decision box excess then
+    some (diagonal box (scan (hitTest box excess) (witnessBound box) 0))
+  else none
+
+theorem witness_sound (box : List Constraint) (excess : Nat)
+    (valid : Nonempty box) (indexValid : excess ≤ cost (diagonal box 0))
+    (code : List Instr) (found : witness box excess=some code) :
+    Inside box code ∧ Hits code excess := by
+  unfold witness at found
+  split at found
+  · rename_i accepted
+    cases found
+    refine ⟨diagonal_inside box _ valid,?_⟩
+    have last := witness_bound_hits box excess indexValid accepted
+    have scanned := scan_hits (hitTest box excess) (witnessBound box) 0
+      (by simpa only [Nat.zero_add,hitTest,decide_eq_true_eq] using last)
+    simpa only [hitTest,decide_eq_true_eq] using scanned
+  · contradiction
+
+theorem witness_empty (box : List Constraint) (excess : Nat)
+    (valid : Nonempty box) (indexValid : excess ≤ cost (diagonal box 0))
+    (empty : witness box excess=none) : ¬Meets box excess := by
+  intro meets
+  have accepted := (decision_correct box excess valid indexValid).mpr meets
+  simp only [witness,accepted,if_true] at empty
+
 end SolvedIdeal

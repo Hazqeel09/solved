@@ -434,6 +434,32 @@ def endpoint (code : List Block) (t : Nat) :=
 def leading (code : List Block) :=
   ((build code initial).history 0).coefficient (freeCount code)
 
+def witnessShift (code : List Block) :=
+  leading code * product (freeCount code) ((build code initial).history 0).coefficient
+
+theorem diagonal_witness (code : List Block) (v : Nat)
+    (free : 0 < freeCount code) (below : leading code < v) :
+    endpoint code (witnessShift code) ≤
+      v^((2^(witnessShift code))^(freeCount code))-1 := by
+  let p := (build code initial).history 0
+  let b := leading code
+  let s := product (freeCount code) p.coefficient
+  let t := b*s
+  have bounds := program_profile code t
+  have bpositive : 0 < b := bounds.shape.positive _
+  have plenty : b*s ≤ 2^t := Nat.le_of_lt (index_below_power t)
+  obtain ⟨k,hk⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt free)
+  have shape : Shape (k+1) p := by simpa only [hk] using bounds.shape
+  have collected := monomial_collect (Nat.two_pow_pos t) shape
+  have upper : endpoint code t ≤ (b^(2^t)*s)^((2^t)^k) := by
+    have first : endpoint code t ≤ monomial (k+1) p (2^t) := by
+      simpa only [hk] using bounds.upper
+    have combined := Nat.le_trans first collected
+    simpa only [b, s, leading, p, hk] using combined
+  have answer := SolvedEffective.profile_upper_witness bpositive below
+    (Nat.two_pow_pos t) plenty upper
+  simpa only [hk] using answer
+
 theorem diagonal_criterion (code : List Block) (v : Nat)
     (positive : 0 < v) (free : 0 < freeCount code) :
     (∃ t, endpoint code t ≤ v^((2^t)^(freeCount code))-1) ↔ leading code < v := by
@@ -447,25 +473,7 @@ theorem diagonal_criterion (code : List Block) (v : Nat)
         change ¬leading code < v at notBelow; exact Nat.le_of_not_gt notBelow) bound.lower
     exact Nat.not_le_of_lt excludes upper
   · intro below
-    let p := (build code initial).history 0
-    let b := leading code
-    let s := product (freeCount code) p.coefficient
-    let t := b*s
-    have bounds := program_profile code t
-    have bpositive : 0 < b := bounds.shape.positive _
-    have plenty : b*s ≤ 2^t := Nat.le_of_lt (index_below_power t)
-    obtain ⟨k,hk⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt free)
-    have shape : Shape (k+1) p := by simpa only [hk] using bounds.shape
-    have collected := monomial_collect (Nat.two_pow_pos t) shape
-    have upper : endpoint code t ≤ (b^(2^t)*s)^((2^t)^k) := by
-      have first : endpoint code t ≤ monomial (k+1) p (2^t) := by
-        simpa only [hk] using bounds.upper
-      have combined := Nat.le_trans first collected
-      simpa only [b, s, leading, p, hk] using combined
-    refine ⟨t,?_⟩
-    have answer := SolvedEffective.profile_upper_witness bpositive below
-      (Nat.two_pow_pos t) plenty upper
-    simpa only [hk] using answer
+    exact ⟨witnessShift code,diagonal_witness code v free below⟩
 
 theorem concrete_cost (code : List Block) (t : Nat) :
     SolvedInflation.cost (code.map (concrete t)) =

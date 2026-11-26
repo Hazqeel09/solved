@@ -1,9 +1,10 @@
 # Formal scope of the effective cutoff construction
 
-The arithmetic ideal-intersection oracle now has an end-to-end Lean proof.
-The complete finite-basis algorithm and the universal computable-cutoff
-corollary remain outside that formalization. The entry therefore retains
-its supporting-lemmas formalization status and proof-draft review status.
+The arithmetic ideal-intersection oracle, constructive witness function,
+terminating reference basis algorithm and safe cutoff for each admissible
+lower-corner domain now have end-to-end Lean proofs. The finite corner cover
+and universal computable-threshold assembly remain outside the formalization.
+The entry therefore retains its supporting-lemmas formalization status and proof-draft review status.
 Independent review and publication-priority assessment remain pending.
 
 ## Exact checked decision
@@ -121,9 +122,67 @@ uses ordinary kernel-checked decide proofs, not native_decide.
 Only Lean's standard propext, Classical.choice and Quot.sound are
 permitted by the audit.
 
-The remaining unformalized steps are residual-box subtraction and
-complete minimal-basis enumeration, its termination and executable
-refinement, and the assembly of finitely many control cutoffs into a
-universal computable threshold. The latter can use the already checked
-normalization, nonsquare-count and marked-encoding theorems; those
-coverage results do not need to be assumed or reconstructed.
+## Complete basis computation for one lower corner
+
+SolvedBasis.explore is an ordinary computable Lean definition. It queries a
+box, keeps a witness if one exists, and recursively processes every slice
+below that witness in one coordinate. SolvedBasis.cut_rank proves that each
+recursive call strictly decreases the lexicographic natural-number pair
+
+    (number of infinite upper bounds, sum of finite upper bounds).
+
+This is the termination measure accepted by Lean, not an assumption about
+a finite search horizon. SolvedBasis.cut_subset, cut_avoids and cut_covers
+establish exact coverage of the complement of the witness's upward orthant.
+search_spec proves soundness and coverage of the recursive search.
+pruning_covers and basis_spec prove that removing duplicates and dominated
+points preserves coverage and leaves minimal generators.
+
+The generic engine takes a sound, complete witness oracle. That interface
+is fully instantiated in SolvedArithmeticBasis.oracle using the proved
+arithmetic oracle. SolvedProfiles.diagonal_witness supplies an explicit
+upper bound on a successful diagonal offset. SolvedIdeal.scan searches
+the offsets lazily, stopping at the first success and using the proved
+upper bound only as its final fallback. witness_sound and witness_empty
+prove both outcomes of that concrete function.
+
+The arithmetic template has one natural-number coordinate per block.
+For a square block its value is an increment above the positive base
+run length. Binary-block coordinates are ignored by execution and
+recorded as zero by witness recovery. request and emit convert these
+vectors to the established arithmetic models. recover_spec proves
+both box membership and exact program reconstruction.
+
+For every template with positive base square counts and base cost at least
+the excess, minimal_basis_correct proves that the computed finite list:
+
+1. Contains only minimal points satisfying the at-or-below-target predicate.
+2. Dominates every point satisfying that predicate in the entire unbounded
+   increment domain.
+
+The safe-cutoff function is also computable. exact_cost_unchanged proves
+that a covered exact-target program must have the same primitive cost as
+its covering basis program: a positive cost increase would make its value
+strictly less than the target. This handles ignored binary coordinates
+without treating an irrelevant coordinate change as an extra instruction.
+exact_below_cutoff proves that every exact-target program in the domain
+has target index strictly below the computed cutoff.
+
+The compiled Lean reference algorithm is compared with Python on 1,551
+basis/cutoff cases. They cover every admissible lower corner generated for
+controls of at most three blocks at excesses 0–3, plus larger shared
+examples, nontrivial lower corners, and finite/mixed/unbounded boxes.
+The compared lists contain 1,350 minimal points in total and have maximum
+cutoff 5. This checker runs compiled Lean functions and compares their
+outputs; it is execution evidence, not a kernel-evaluated finite equality
+proof. Universal correctness and termination come from the formal theorems.
+
+The reference recursion can revisit overlapping slices. Python retains
+coordinate minimization and global box reuse; no universal refinement proof
+equating that optimized implementation with the Lean function is claimed.
+
+The remaining mathematical assembly steps are the finite cover of every
+positive run vector with sufficiently large cost, enumeration of all
+controls under the marked-code bound, and combining their cutoffs into a
+universal computable threshold. Normalization, nonsquare-count bounds and
+complete marked encoding are already formalized and can be reused.

@@ -1,10 +1,11 @@
 # Effective cutoffs for square-run arithmetic controls
 
 **Status: proof draft, awaiting independent review and novelty assessment.**
-The entire arithmetic ideal oracle now has a Lean proof: profile construction,
-diagonal comparison, box cofinality and concrete Boolean decision correctness.
-The complete basis algorithm and universal computability corollary retain
-written proofs. See the [statement correspondence](FORMALIZATION.md).
+The arithmetic ideal oracle, constructive witnesses, a terminating reference
+basis algorithm and a safe cutoff for each admissible lower-corner domain
+now have Lean proofs. The finite cover of all admissible corners and the
+universal threshold assembly remain written arguments. See the
+[statement correspondence](FORMALIZATION.md).
 
 ## 1. Question and scope
 
@@ -216,6 +217,25 @@ Between additions there are only finitely many boxes to delete.
 Thus the procedure terminates with a complete basis M, as in the
 Valk–Jantzen construction.
 
+The formal reference algorithm uses the same box-complement identity in a
+recursive form. It selects any oracle witness p inside a box, recursively
+solves each coordinate slice x_i<p_i, and prunes dominated points afterward.
+Each slice replaces one upper bound with p_i−1. Because p belongs to the
+parent box, this strictly lowers the lexicographic pair
+
+    (number of infinite upper bounds, sum of finite upper bounds).
+
+An infinite bound becoming finite lowers the first component. Otherwise
+the first is unchanged and a finite bound decreases. This gives a concrete
+well-founded recursion over natural-number pairs, including zero-dimensional
+boxes and zero-valued coordinates. Overlapping slices may repeat work; final
+pruning removes duplicate and dominated generators. The generic correctness
+theorem is instantiated with the actual arithmetic witness function, so no
+external witness oracle is assumed in the arithmetic conclusion. The Python
+implementation retains its more efficient coordinate minimization and global
+residual-box reuse. The formal reference covers the same unbounded domains;
+a universal refinement proof for Python is not claimed.
+
 All exact solutions are in M. A safe cutoff is 0 if M is empty, and
 otherwise
 
@@ -299,6 +319,12 @@ positive lower bounds and both finite and unbounded upper bounds. The
 [model-comparison checker](../../checks/verify_profile_formalization.py) additionally
 checks 779 profiles, 1,558 endpoints and 3,073 decisions between Python and Lean.
 Those finite checks support representation agreement; the unrestricted oracle
-result follows from the formal proof. Basis enumeration, its termination,
-Python executable refinement and the computable universal F remain outside
-the complete formalization. See the [formal scope](FORMALIZATION.md).
+result follows from the formal proof. The [reference basis algorithm](../../lean/FiniteBasis.lean) and its
+[arithmetic instantiation and cutoff](../../lean/ArithmeticBasis.lean) now
+complete the proof for every admissible lower-corner domain. Compiled Lean
+execution matches Python on 1,551 basis/cutoff cases, with 1,350 minimal
+points counted across cases and maximum compared cutoff 5. This is finite
+execution evidence, separate from the universal formal theorems. The cover
+of all admissible corners, universal control enumeration, Python refinement
+and the computable universal F assembly remain outside the formalization.
+See the [formal scope](FORMALIZATION.md).

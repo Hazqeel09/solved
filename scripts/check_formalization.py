@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from checks.verify_basis_formalization import verify as verify_basis_models
 from checks.verify_profile_formalization import verify as verify_profile_models
 from scripts.check_catalogue import ROOT, local_file
 
@@ -85,6 +86,8 @@ def main():
     print("This checks the registered statements; catalogue proofs retain their documented scope.")
     comparison = verify_profile_models()
     print("Kernel-checked Python/Lean model comparison: " + json.dumps(comparison, sort_keys=True))
+    basis_comparison = verify_basis_models()
+    print("Compiled Lean/Python basis comparison: " + json.dumps(basis_comparison, sort_keys=True))
 
 
 if __name__ == "__main__":

@@ -885,16 +885,19 @@
         "solved/control_profiles.py",
         "solved/control_basis.py",
         "checks/verify_control_cutoffs.py",
-        "checks/verify_profile_formalization.py"
+        "checks/verify_profile_formalization.py",
+        "checks/verify_basis_formalization.py"
       ],
       "formalization": {
         "status": "supporting-lemmas",
         "files": [
           "lean/EffectiveCutoffs.lean",
           "lean/DiagonalProfiles.lean",
-          "lean/IdealOracle.lean"
+          "lean/IdealOracle.lean",
+          "lean/FiniteBasis.lean",
+          "lean/ArithmeticBasis.lean"
         ],
-        "scope": "The entire arithmetic ideal-intersection oracle is checked: whole-program profile extraction, exact diagonal criterion, cost correspondence, cofinality and Boolean decision correctness. Finite-basis enumeration, its executable refinement and the universal computable threshold remain written arguments. Python/Lean representation agreement is additionally checked on finite cases.",
+        "scope": "Whole-program profiles, the arithmetic ideal oracle, constructive witnesses, a terminating reference basis algorithm and a safe cutoff for each admissible lower corner are proved end to end. The finite cover of all admissible corners, enumeration of all bounded controls, universal threshold assembly and a universal refinement proof for the optimized Python search remain outside the formalization.",
         "statement_correspondence": "results/effective-control-cutoffs/FORMALIZATION.md"
       },
       "sources": [

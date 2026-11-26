@@ -37,6 +37,21 @@
       ]
     },
     {
+      "file": "lean/ArithmeticBasis.lean",
+      "theorems": [
+        "SolvedArithmeticBasis.request_valid",
+        "SolvedArithmeticBasis.emit_inside",
+        "SolvedArithmeticBasis.emit_cost_lower",
+        "SolvedArithmeticBasis.request_cost_lower",
+        "SolvedArithmeticBasis.recover_spec",
+        "SolvedArithmeticBasis.minimal_basis_correct",
+        "SolvedArithmeticBasis.emit_comparable",
+        "SolvedArithmeticBasis.exact_cost_unchanged",
+        "SolvedArithmeticBasis.member_index_bound",
+        "SolvedArithmeticBasis.exact_below_cutoff"
+      ]
+    },
+    {
       "file": "lean/BoundedControls.lean",
       "theorems": [
         "SolvedBounded.lookup_outside",
@@ -143,6 +158,7 @@
         "SolvedProfiles.program_profile",
         "SolvedProfiles.monomial_collect",
         "SolvedProfiles.index_below_power",
+        "SolvedProfiles.diagonal_witness",
         "SolvedProfiles.diagonal_criterion",
         "SolvedProfiles.concrete_cost",
         "SolvedProfiles.diagonal_target"
@@ -170,6 +186,26 @@
       ]
     },
     {
+      "file": "lean/FiniteBasis.lean",
+      "theorems": [
+        "SolvedBasis.mem_indices",
+        "SolvedBasis.total_mono",
+        "SolvedBasis.total_strict",
+        "SolvedBasis.cut_subset",
+        "SolvedBasis.cut_avoids",
+        "SolvedBasis.cut_covers",
+        "SolvedBasis.cut_rank",
+        "SolvedBasis.below_refl",
+        "SolvedBasis.below_trans",
+        "SolvedBasis.fits_downward",
+        "SolvedBasis.search_spec",
+        "SolvedBasis.strict_total",
+        "SolvedBasis.mem_prune",
+        "SolvedBasis.pruning_covers",
+        "SolvedBasis.basis_spec"
+      ]
+    },
+    {
       "file": "lean/FiniteControls.lean",
       "theorems": [
         "SolvedControls.suffix_min",
@@ -179,6 +215,14 @@
         "SolvedControls.rising",
         "SolvedControls.thin",
         "SolvedControls.no_descending"
+      ]
+    },
+    {
+      "file": "lean/FiniteLists.lean",
+      "theorems": [
+        "SolvedLists.mem_append",
+        "SolvedLists.mem_bind",
+        "SolvedLists.mem_unique"
       ]
     },
     {
@@ -193,7 +237,11 @@
         "SolvedIdeal.diagonal_index",
         "SolvedIdeal.hits_diagonal_iff",
         "SolvedIdeal.ideal_criterion",
-        "SolvedIdeal.decision_correct"
+        "SolvedIdeal.decision_correct",
+        "SolvedIdeal.witness_bound_hits",
+        "SolvedIdeal.scan_hits",
+        "SolvedIdeal.witness_sound",
+        "SolvedIdeal.witness_empty"
       ]
     },
     {
