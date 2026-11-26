@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 25 entries, comprising 21 research proof drafts and 4 finite verification records. Ten Lean modules include supporting lemmas and one complete formalization of a stated counterexample. Independent mathematical review remains pending.
+**Current catalogue:** 26 entries, comprising 22 research proof drafts and 4 finite verification records. Eleven Lean modules include supporting lemmas and one complete formalization of a stated counterexample. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -14,7 +14,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 | [Two-small-step addition–multiplication chains](results/two-small-steps/PROOF.md) | An all-length block classification manuscript, with independent finite enumeration. |
 | [Real arithmetic-chain defects](results/am-defect-order/PROOF.md) | Proposed well-ordering and global ordinal type, with a separate [bounded-slice argument](results/am-defect-slices/PROOF.md). |
 | [Subtraction and computation length](results/subtraction-gap/PROOF.md) | A proposed unbounded **additive** separation. Polynomial equivalence remains a separate question. |
-| [Integer factor recovery](results/narrow-products/PROOF.md) | A sharp interval-width condition, exact graph reconstruction, and [finite-palette complexity](results/product-palettes/PROOF.md). |
+| [Integer factor recovery](results/narrow-products/PROOF.md) | A sharp interval-width condition, exact graph reconstruction, [finite-palette complexity](results/product-palettes/PROOF.md), and [directed nonlinear recovery](results/directed-monotone-recovery/PROOF.md). |
 | [Essential components](results/periodic-essential-components/PROOF.md) | An elementary eventually-periodic case; the general problem remains outside this result. |
 
 Each entry has an exact statement, assumptions, manuscript, primary references, executable checks where available, and explicit formalization scope in [catalogue.json](catalogue.json). A successful finite search establishes its stated finite claim. A supporting Lean lemma establishes its formal statement. Neither changes the review status of a broader manuscript.

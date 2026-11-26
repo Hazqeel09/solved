@@ -129,6 +129,17 @@
         "SolvedInstability.upper_ray",
         "SolvedInstability.cheaper_power_family"
       ]
+    },
+    {
+      "file": "lean/DirectedRecovery.lean",
+      "theorems": [
+        "SolvedDirected.compose_order",
+        "SolvedDirected.run_order",
+        "SolvedDirected.run_realizes",
+        "SolvedDirected.agreement_along_path",
+        "SolvedDirected.negative_closed_agreement",
+        "SolvedDirected.unique_assignment"
+      ]
     }
   ]
 }

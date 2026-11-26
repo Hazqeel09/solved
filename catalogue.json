@@ -805,6 +805,45 @@
         }
       ],
       "dependencies": []
+    },
+    {
+      "id": "directed-monotone-recovery",
+      "title": "Directed recovery from monotone polynomial intervals",
+      "subject": "Discrete inverse problems",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "One-sided discrete gaps certify functional directions. When directed paths from fixed or univariate seeds and odd closed walks cover all variables, nonnegative polynomial interval observations admit at most one assignment and allow complete reconstruction in polynomial bit complexity.",
+      "proof": "results/directed-monotone-recovery/PROOF.md",
+      "tests": [
+        "test_monotone_recovery.py"
+      ],
+      "implementation": [
+        "solved/monotone_recovery.py"
+      ],
+      "formalization": {
+        "status": "supporting-lemmas",
+        "files": [
+          "lean/DirectedRecovery.lean"
+        ],
+        "scope": "The abstract signed-transport uniqueness theorem, path realization and order composition are formalized. Polynomial gap certificates, saturated arithmetic, graph coverage detection, reconstruction completeness and bit complexity remain written arguments tested by exact finite checks."
+      },
+      "sources": [
+        {
+          "url": "https://ijcai.org/proceedings/1993/32",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://jmlr.org/papers/volume21/19-359/19-359.pdf",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/1509.07702",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "narrow-products"
+      ]
     }
   ]
 }

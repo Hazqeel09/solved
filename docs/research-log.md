@@ -29,3 +29,15 @@ The construction saves one write over base-then-square for every later power on 
 The [OEIS shortest AM-chain table](https://oeis.org/A230697/b230697.txt) independently records the cost of 267. Related entries A383001 and A383002 concern minimum values by chain length and counts by length, respectively; they are not squaring-stability statements. We do not claim the counterexample is previously unpublished.
 
 A proposed prime-support shortcut was rejected: 89 already divides a two-small-step endpoint. The chain 1,2,3,9,81,729,531441,282429536481,79766443076872509863361,79766443076872509863442 reaches 3^48+81 in nine writes at level seven. Therefore the presence of a factor 89 alone cannot exclude the defect-at-most-two class. Any stronger lower bound must account for the full factor structure.
+
+## 27 November 2026 — directed monotone reconstruction
+
+**Decision: revamp the numerical observation class.** The old product result required narrow spacing in both directions of every edge. A single direction is enough for propagation, and directed odd walks determine roots. The new result uses one-sided discrete increments of nonnegative bivariate polynomials, admitting different nonlinear expressions on different edges. Univariate and diagonal observations supply additional seeds.
+
+The [functional-CSP literature](https://ijcai.org/proceedings/1993/32) already supplies directed root-set reasoning, and [rank-one completion](https://jmlr.org/papers/volume21/19-359/19-359.pdf) supplies related odd-cycle identifiability. The present written result adds an explicit implicit-domain procedure with saturated polynomial evaluation, including binary-encoded degrees. The increment calculation uses positive power-difference identities; subtracting separately capped powers would be unsound.
+
+The tests recover a one-way triangle, a small factor rejected by the two-sided product condition, and large nonlinear systems. In a five-cycle product check, the first generic binary-inversion implementation used 17,624 evaluation calls. Exact affine inversion reduced this to 319, while retaining the old specialized quotient algorithm. These are counts on one stated regression input, not a general speed claim.
+
+The new Lean theorem proves uniqueness for arbitrary signed functional paths with certified order and coverage. The concrete polynomial implementation and its complexity analysis retain written-proof status. Unsupported components return undetermined; no finite resource cutoff or incomplete coverage is treated as impossibility.
+
+A related current source is [Talbot's AAAI 2026 GPU constraint solver](https://ojs.aaai.org/index.php/AAAI/article/download/38448/42410), which uses integer interval propagation and a representation chosen for its execution architecture. Its results motivate reviewing representation and evaluation costs together. Our arbitrary-precision polynomial arithmetic has no GPU implementation or claimed GPU speedup. [New manuscript](../results/directed-monotone-recovery/PROOF.md).

@@ -51,6 +51,7 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 |---|---|---|
 | [Unique integer recovery from narrow product intervals](results/narrow-products/PROOF.md) | proof-draft | supporting-lemmas |
 | [Factor recovery through guarded arithmetic paths](results/guarded-product-paths/PROOF.md) | proof-draft | none |
+| [Directed recovery from monotone polynomial intervals](results/directed-monotone-recovery/PROOF.md) | proof-draft | supporting-lemmas |
 
 ## Graph algorithms
 

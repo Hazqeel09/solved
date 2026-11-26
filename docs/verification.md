@@ -42,6 +42,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | Module | What the formal statements cover |
 |---|---|
 | [SquareInstability](../lean/SquareInstability.lean) | Complete chain-search argument, exact eight-write minima for 267 and its square, and the iterated-square construction. See its [statement correspondence](../results/square-instability/FORMALIZATION.md). |
+| [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |
 | [Compression](../lean/Compression.lean) | Common-power compression of ordinary intervals with local multiplication and square runs. |
 | [MarkedComparison](../lean/MarkedComparison.lean) | Squared domination after one additional square, including saved-history reads. |
