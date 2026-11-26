@@ -1,0 +1,177 @@
+{
+  "description": "Initial mathematical verification import; source files are identified by digest.",
+  "files": {
+    "solved/chains.py": {
+      "source_sha256": "788c72f44d3646799f9d25ccf2fdd809ed2e99be1b9126697e69dbda2ba25e5f"
+    },
+    "solved/counting.py": {
+      "source_sha256": "41a38146095119ba2bde47480a0f285f7602b3dcc325e123c57affaf08bed3a2"
+    },
+    "solved/fixed_defect.py": {
+      "source_sha256": "1299decbd6f57e58529a7d2d3883bfb3c386889afcf0aad9946adf76b14a0040"
+    },
+    "solved/seven_steps.py": {
+      "source_sha256": "a537deae6563832434239086dcbe212bd814563a05d4d67aad4522e2a8e41f60"
+    },
+    "solved/two_small_forms.py": {
+      "source_sha256": "dddcc376728f84f75094451986edc3d077a31d5282d1f9bd36ca5b9d89b4122f"
+    },
+    "solved/normalized_mass.py": {
+      "source_sha256": "32cdd0628699a2b6de3990cb447d237c976495e55951ff778af0ea20c01eca24"
+    },
+    "solved/square_controls.py": {
+      "source_sha256": "1a37cb4d3e997fdb5ad58405b76e2f6202d34b5546cffeadd525109c90cfb8a4"
+    },
+    "solved/growth_gap.py": {
+      "source_sha256": "4732a5d67090796f923062dffbb923cf1ca824ab9d5ca956a67038b60fc660f8"
+    },
+    "solved/prefix_growth.py": {
+      "source_sha256": "e5467101614da2923deb50907e37dd1328f78dc76416ceac20e2784785684a49"
+    },
+    "solved/record_defect.py": {
+      "source_sha256": "6f9afc05d8449c408cbaff7a330a1e1ce8e60e45343597e9b6174821d081ed6e"
+    },
+    "solved/product_intervals.py": {
+      "source_sha256": "409bb8217397ebef9933e6de88922ad19ef9249c7981b3854fa5f84d70c47a3a"
+    },
+    "solved/product_palettes.py": {
+      "source_sha256": "52af0ce55be676886f3720af230e5d6e19d06d597d7752e45be5de7f01219ff5"
+    },
+    "solved/registers.py": {
+      "source_sha256": "2ae9023fcf2364dd9c8b02a9138b37ea78332d2e04099f77f95f3f003f353c09"
+    },
+    "solved/helper_search.py": {
+      "source_sha256": "1d1593b9a08415cb5ce0590db11a47fa1cb2496dd919841cd89afadbd3f2e4c2"
+    },
+    "solved/path_intervals.py": {
+      "source_sha256": "8edf10438b1e57b934239bc8b0c24f81a34f89f3bd9e2bf4e906d842b6f8ea92"
+    },
+    "solved/peak_shell.py": {
+      "source_sha256": "d96c7a4325d3493971ff052d364ff4615f98f8a46c048b3705895d8e4cfb5257"
+    },
+    "solved/cycles.py": {
+      "source_sha256": "29a9cd403b181464094ac2b776b930cca236dfc1886edb2820cb7ac385e2b422"
+    },
+    "solved/affine.py": {
+      "source_sha256": "4a11997a0016c4c9ac357aafbdbb8ecfe4b05febf87ecc9474ddb8d74667d249"
+    },
+    "solved/poles.py": {
+      "source_sha256": "140dcae02f51a1ceebe9a4c0b5a9951244f6fe02326c2435749c6cd9f0557b15"
+    },
+    "solved/triangles.py": {
+      "source_sha256": "f1b7de04780d55f2580f838e4afc33b665b1ff912de6789e87fec6e918d3fdf9"
+    },
+    "solved/rational.py": {
+      "source_sha256": "7f7e13764da02d9479793ffa880932afe43eef614a91c3346c4b94b048bed282",
+      "scope": "projective path primitives"
+    },
+    "checks/classical.py": {
+      "source_sha256": "213aae6cc9ff286a2e3b46697f4549f0375b812d3b7a5e394ed36329d72c9c95"
+    },
+    "checks/verify_chains.py": {
+      "source_sha256": "72a52ee01b0162e83d085b5d1469bf5738a387b889e2378b839b6d7b1df96264"
+    },
+    "checks/verify_two_small.py": {
+      "source_sha256": "37bedf58664d7a148aba9474751ee509dc7a610bbbc2d2c203aacae525065626"
+    },
+    "checks/verify_seven.py": {
+      "source_sha256": "45fe776e1a1489214f116571c2354253b89e2538d5decd34f8523c1475075b22"
+    },
+    "checks/verify_order.py": {
+      "source_sha256": "79ad0857888870ac1e6942a7cc286610646b2b8a6b4ea759fffabc279344089b"
+    },
+    "checks/counting_check.py": {
+      "source_sha256": "0fc4d30907ef0165a6324300e168df15e4d82cee3b534d1bacaaf01fe817cfe1"
+    },
+    "checks/chain_catalogue.py": {
+      "source_sha256": "db2c5ae8b607083b7495b2ea11318d23bc5712605ffd32a96f7412360d9be053"
+    },
+    "checks/verify_prefix_growth.py": {
+      "source_sha256": "c525cdf2dfd7fb71206726f257eab4a4d0dcfde31343166a8455056ece3e67e2"
+    },
+    "tests/test_affine.py": {
+      "source_sha256": "a1dd26b002ce53f7a822053d81918541dbcba73a18d7850380480791d5f6f822"
+    },
+    "tests/test_classical.py": {
+      "source_sha256": "3a6817459f976c2f6cc923e12e60bf0ba238b90202897b543370a708d7ba89c0"
+    },
+    "tests/test_counting.py": {
+      "source_sha256": "dec3e0755b132b08f151644c023f606b93f1e0acd5cab2e67624552ffc4c9014"
+    },
+    "tests/test_fixed_defect.py": {
+      "source_sha256": "c6bfd10a16e3320341f7ca4f3c8867e2bb84b4d57233aac01feba5ead72c61ea"
+    },
+    "tests/test_growth_gap.py": {
+      "source_sha256": "24382414c94e13106cfb35b02f4e820992dc40d9efb4e44f42283417fdcd206a"
+    },
+    "tests/test_helper_search.py": {
+      "source_sha256": "3a8c0973ff08ec509640c7de7c97eaf22e4f4dc1dbe5ca7a335e7a6c80e6b086"
+    },
+    "tests/test_math.py": {
+      "source_sha256": "572201bf9ba09b8c2248e80a6625a28112cbbecdbbea95bb6b60780a6c6e8e04"
+    },
+    "tests/test_normalized_mass.py": {
+      "source_sha256": "9e9cf979d25f39c1e4b807a38bf25ed2e31cb39e2b1440b19f8bed414d8174c9"
+    },
+    "tests/test_peak_shell.py": {
+      "source_sha256": "b5730289a82708b5b014e7b6dd7713cc505ec962c270dc58c685f5afa8b1368b"
+    },
+    "tests/test_poles.py": {
+      "source_sha256": "10bc935b0528e566c5c88d4f2f8d0f9ac41cfc685f85592e151d59b4d77ab48e"
+    },
+    "tests/test_prefix_growth.py": {
+      "source_sha256": "59864bf9cbdc610cf02782a3d618f90bae5ebc6453da124825c0987e5a8cc623"
+    },
+    "tests/test_product_intervals.py": {
+      "source_sha256": "ca8e03010cd83835df16b95ae6aeb9f4cae2393125fe373c88f449b282a0318d"
+    },
+    "tests/test_product_palettes.py": {
+      "source_sha256": "ebff1f0a55ed500a1121b7ff8c7eff3c1410900d9f6854e1f531b9aec6faba42"
+    },
+    "tests/test_record_defect.py": {
+      "source_sha256": "9ada312ba326303aaf7de5a1a4853a4473d192dd403218106abf19f08c6a3f73"
+    },
+    "tests/test_registers.py": {
+      "source_sha256": "4caa301dcd8f20f7a0cf8c85d66ac733c4ac53919648589b291df78df0116b27"
+    },
+    "tests/test_seven_steps.py": {
+      "source_sha256": "108edc4bee65269420b39089b0ee66b1f1cddf0663fa8740aaac49ab5c3ba046"
+    },
+    "tests/test_square_controls.py": {
+      "source_sha256": "89b4b030737911cd4f38ce941005960d51d4dc4f0fc02d2c5fafc146ae5fbee5"
+    },
+    "tests/test_triangles.py": {
+      "source_sha256": "0b15bf33c804b75718a5d832f0c6e5b1d37af3a1868acdb63dcbc3a61dfc1dca"
+    },
+    "tests/test_two_small_forms.py": {
+      "source_sha256": "bdf67ec7c2b99141da7d660c6017dad6872b96da4d9d2b65cf04b7178122d123"
+    },
+    "tests/test_path_intervals.py": {
+      "source_sha256": "97d720206ea67818c2702658a62c12b84ace4660c8df6397db57090f15d662db"
+    },
+    "lean/Compression.lean": {
+      "source_sha256": "e874f77056c096af70c1e8ed3622f38380fcd811749c39be3ea76f6fb8fd5104"
+    },
+    "lean/FiniteControls.lean": {
+      "source_sha256": "54042471b9ee833960b9a8d9bc4528617ba4dcdd5a1de98fb46d453c44d76255"
+    },
+    "lean/MarkedComparison.lean": {
+      "source_sha256": "f974e04d051c292d931a7983a69e1efd96eedad672e465ef839699eb3df3e588"
+    },
+    "lean/PositiveExpressions.lean": {
+      "source_sha256": "d532b5dc14cf2f6a850363f6c9ea6ca13b6b5229a14a16551ec0ffbab407526b"
+    },
+    "lean/SignedEnvelope.lean": {
+      "source_sha256": "cdf5852394851067f39c124f1e39cfc64df46e8b7e93bc223c4e5086bbb9d104"
+    },
+    "lean/TwoSmallBlocks.lean": {
+      "source_sha256": "83f5e693b73c8080564454b6e0cb91cb4fc17244c6a386bc1872542a227d67dc"
+    },
+    "lean/ProductIntervals.lean": {
+      "source_sha256": "a445939976eb7e00c6d566c80e5e3178d9117313f886af8b89d9f85340ba3a99"
+    },
+    "lean/SubtractionGap.lean": {
+      "source_sha256": "c1f5f75e6b4729b3c96d98207755da1cb77c83a5b9ce70dcbdf88ffda7a7ad57"
+    }
+  }
+}

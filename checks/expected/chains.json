@@ -1,0 +1,20 @@
+{
+  "limit": 1000000000000000000,
+  "sequence_counts_by_defect": [
+    7,
+    246,
+    14116
+  ],
+  "endpoint_counts_by_defect": [
+    7,
+    100,
+    2033
+  ],
+  "minimum_defect_histogram": {
+    "0": 7,
+    "1": 95,
+    "2": 1935
+  },
+  "distinct_endpoints": 2037,
+  "max_writes": 8
+}

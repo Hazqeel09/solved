@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solved-research"
+version = "0.1.0"
+description = "Mathematical research statements, proof drafts, and exact verification tools"
+requires-python = ">=3.12"
+dependencies = ["sympy==1.14.0"]
+license = "MIT"
+
+[tool.setuptools]
+packages = ["solved", "checks"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

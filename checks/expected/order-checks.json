@@ -1,0 +1,84 @@
+{
+  "chains_by_defect": {
+    "0": 5,
+    "1": 71,
+    "2": 1715,
+    "3": 43420
+  },
+  "exhaustive_limit": 10000,
+  "low_cap_reset_counts": {
+    "0": 45211
+  },
+  "targeted_controls": [
+    {
+      "end_bits": 65,
+      "resets": 1,
+      "small_steps": 1
+    },
+    {
+      "end_bits": 66,
+      "resets": 1,
+      "small_steps": 1
+    },
+    {
+      "end_bits": 513,
+      "resets": 2,
+      "small_steps": 2
+    },
+    {
+      "end_bits": 514,
+      "resets": 2,
+      "small_steps": 2
+    },
+    {
+      "end_bits": 515,
+      "resets": 2,
+      "small_steps": 2
+    },
+    {
+      "end_bits": 516,
+      "resets": 2,
+      "small_steps": 2
+    },
+    {
+      "end_bits": 2049,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2050,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2051,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2052,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2053,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2054,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2055,
+      "resets": 3,
+      "small_steps": 3
+    },
+    {
+      "end_bits": 2056,
+      "resets": 3,
+      "small_steps": 3
+    }
+  ]
+}

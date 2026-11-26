@@ -1,0 +1,56 @@
+[
+  {
+    "limit": 64,
+    "chains": 291,
+    "distinct_endpoints": 40,
+    "shortest_defect_two_endpoints": 26,
+    "event_words": {
+      "GGS": 6,
+      "GS": 89,
+      "GSG": 60,
+      "S": 56,
+      "SG": 80
+    },
+    "sorted_comma_separated_value_sequences_sha256": "59ef01604c472975a365d3232ebf20e48c440ca47989c07e2d34b7ea5a268bf9"
+  },
+  {
+    "limit": 1000000000000000000,
+    "chains": 14116,
+    "distinct_endpoints": 2033,
+    "shortest_defect_two_endpoints": 1935,
+    "event_words": {
+      "GGS": 200,
+      "GGSG": 203,
+      "GGSGG": 8,
+      "GS": 2854,
+      "GSG": 3440,
+      "GSGG": 378,
+      "GSGGG": 4,
+      "S": 1827,
+      "SG": 4144,
+      "SGG": 1019,
+      "SGGG": 39
+    },
+    "sorted_comma_separated_value_sequences_sha256": "e640e9e97d3ac2938e59dbcbd7785656cf40b2ad45baf6efa051efa27059b0f9"
+  },
+  {
+    "limit": 340282366920938463463374607431768211455,
+    "chains": 30405,
+    "distinct_endpoints": 4146,
+    "shortest_defect_two_endpoints": 3997,
+    "event_words": {
+      "GGS": 385,
+      "GGSG": 455,
+      "GGSGG": 20,
+      "GS": 5936,
+      "GSG": 7815,
+      "GSGG": 888,
+      "GSGGG": 11,
+      "S": 3647,
+      "SG": 8828,
+      "SGG": 2322,
+      "SGGG": 98
+    },
+    "sorted_comma_separated_value_sequences_sha256": "732240460f369dc75dfc864c49fc7f2306b367a9a73e19d5243586c8a5fc4451"
+  }
+]

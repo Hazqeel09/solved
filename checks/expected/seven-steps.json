@@ -1,0 +1,287 @@
+{
+  "canonical_nonsquares": 7,
+  "small_steps": 2,
+  "signatures": {
+    "3": {
+      "compressed_survivors_by_deviation_count": [
+        15,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "maximal_gap_supports": [
+        [],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ]
+      ],
+      "deviation_words": [
+        {
+          "gaps": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "positions": [
+            4
+          ]
+        },
+        {
+          "gaps": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "positions": [
+            1
+          ]
+        }
+      ],
+      "admissible_eight_nonsquare_words": 0
+    },
+    "4": {
+      "compressed_survivors_by_deviation_count": [
+        21,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "maximal_gap_supports": [
+        [],
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ]
+      ],
+      "deviation_words": [],
+      "admissible_eight_nonsquare_words": 0
+    }
+  },
+  "squaring_rays": [
+    {
+      "base": 69984,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        18,
+        108,
+        648,
+        69984
+      ]
+    },
+    {
+      "base": 84375,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        5,
+        15,
+        75,
+        1125,
+        84375
+      ]
+    },
+    {
+      "base": 209952,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        18,
+        108,
+        1944,
+        209952
+      ]
+    },
+    {
+      "base": 7346640384,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        18,
+        108,
+        1944,
+        3779136,
+        7346640384
+      ]
+    },
+    {
+      "base": 10460353203,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        9,
+        27,
+        243,
+        6561,
+        1594323,
+        10460353203
+      ]
+    },
+    {
+      "base": 11019960576,
+      "minimum_defect_on_entire_ray": 1,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        18,
+        324,
+        5832,
+        1889568,
+        11019960576
+      ]
+    },
+    {
+      "base": 13060694016,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        36,
+        216,
+        7776,
+        1679616,
+        13060694016
+      ]
+    },
+    {
+      "base": 14693280768,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        18,
+        108,
+        11664,
+        1259712,
+        14693280768
+      ]
+    },
+    {
+      "base": 17179869184,
+      "minimum_defect_on_entire_ray": 1,
+      "witness": [
+        1,
+        2,
+        4,
+        8,
+        32,
+        256,
+        8192,
+        2097152,
+        17179869184
+      ]
+    },
+    {
+      "base": 18446744073709551616,
+      "minimum_defect_on_entire_ray": 0,
+      "witness": [
+        1,
+        2,
+        4,
+        8,
+        32,
+        256,
+        65536,
+        16777216,
+        1099511627776,
+        18446744073709551616
+      ]
+    },
+    {
+      "base": 28430288029929701376,
+      "minimum_defect_on_entire_ray": 2,
+      "witness": [
+        1,
+        2,
+        3,
+        6,
+        36,
+        216,
+        7776,
+        60466176,
+        470184984576,
+        28430288029929701376
+      ]
+    },
+    {
+      "base": 36893488147419103232,
+      "minimum_defect_on_entire_ray": 1,
+      "witness": [
+        1,
+        2,
+        4,
+        8,
+        32,
+        1024,
+        32768,
+        33554432,
+        1099511627776,
+        36893488147419103232
+      ]
+    }
+  ]
+}
