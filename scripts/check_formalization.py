@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from checks.verify_profile_formalization import verify as verify_profile_models
 from scripts.check_catalogue import ROOT, local_file
 
 ALLOWED_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
@@ -82,6 +83,8 @@ def main():
     )
     print("Only Lean's standard propext, Classical.choice and Quot.sound axioms are permitted.")
     print("This checks the registered statements; catalogue proofs retain their documented scope.")
+    comparison = verify_profile_models()
+    print("Kernel-checked Python/Lean model comparison: " + json.dumps(comparison, sort_keys=True))
 
 
 if __name__ == "__main__":

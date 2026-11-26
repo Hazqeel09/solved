@@ -1,9 +1,10 @@
 # Effective cutoffs for square-run arithmetic controls
 
 **Status: proof draft, awaiting independent review and novelty assessment.**
-Five supporting inequalities are checked in Lean. The profile construction,
-ideal oracle, complete basis algorithm and universal computability corollary
-are written arguments, not a complete formalization.
+The entire arithmetic ideal oracle now has a Lean proof: profile construction,
+diagonal comparison, box cofinality and concrete Boolean decision correctness.
+The complete basis algorithm and universal computability corollary retain
+written proofs. See the [statement correspondence](FORMALIZATION.md).
 
 ## 1. Question and scope
 
@@ -290,9 +291,14 @@ unrestricted profile or basis theorems.
     python -m scripts.check_certificates
     python -m scripts.check_formalization
 
-The Lean module [EffectiveCutoffs](../../lean/EffectiveCutoffs.lean) proves
-first_two_terms, integer_ratio_witness, positive_power_strict,
-profile_upper_witness and profile_lower_excludes. The last two take
-their profile bounds as explicit hypotheses. No end-to-end formal proof
-of profile extraction, ideal cofinality, basis enumeration or the
-computable universal F is claimed.
+The initial [EffectiveCutoffs inequalities](../../lean/EffectiveCutoffs.lean) are now
+connected to [complete profile extraction](../../lean/DiagonalProfiles.lean) and
+the [full ideal oracle](../../lean/IdealOracle.lean). The final decision theorem
+takes no supplied profile bounds or oracle hypothesis. It covers arbitrary
+positive lower bounds and both finite and unbounded upper bounds. The
+[model-comparison checker](../../checks/verify_profile_formalization.py) additionally
+checks 779 profiles, 1,558 endpoints and 3,073 decisions between Python and Lean.
+Those finite checks support representation agreement; the unrestricted oracle
+result follows from the formal proof. Basis enumeration, its termination,
+Python executable refinement and the computable universal F remain outside
+the complete formalization. See the [formal scope](FORMALIZATION.md).

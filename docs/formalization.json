@@ -104,6 +104,51 @@
       ]
     },
     {
+      "file": "lean/DiagonalProfiles.lean",
+      "theorems": [
+        "SolvedProfiles.product_congr",
+        "SolvedProfiles.product_mono",
+        "SolvedProfiles.product_one",
+        "SolvedProfiles.product_positive",
+        "SolvedProfiles.product_mul",
+        "SolvedProfiles.product_power",
+        "SolvedProfiles.product_head",
+        "SolvedProfiles.monomial_fixed",
+        "SolvedProfiles.monomial_multiply",
+        "SolvedProfiles.monomial_power",
+        "SolvedProfiles.monomial_shift",
+        "SolvedProfiles.monomial_double",
+        "SolvedProfiles.monomial_mono",
+        "SolvedProfiles.value_positive",
+        "SolvedProfiles.constant_value",
+        "SolvedProfiles.shape_fixed",
+        "SolvedProfiles.shape_multiply",
+        "SolvedProfiles.shape_power",
+        "SolvedProfiles.shape_shift",
+        "SolvedProfiles.shape_add",
+        "SolvedProfiles.bound_fixed",
+        "SolvedProfiles.bound_multiply",
+        "SolvedProfiles.bound_power",
+        "SolvedProfiles.bound_shift",
+        "SolvedProfiles.monomial_extend",
+        "SolvedProfiles.bound_promote",
+        "SolvedProfiles.bound_add",
+        "SolvedProfiles.squares_power",
+        "SolvedProfiles.history_push",
+        "SolvedProfiles.history_promote",
+        "SolvedProfiles.step_bound",
+        "SolvedProfiles.build_bound",
+        "SolvedProfiles.step_dimension",
+        "SolvedProfiles.build_dimension",
+        "SolvedProfiles.program_profile",
+        "SolvedProfiles.monomial_collect",
+        "SolvedProfiles.index_below_power",
+        "SolvedProfiles.diagonal_criterion",
+        "SolvedProfiles.concrete_cost",
+        "SolvedProfiles.diagonal_target"
+      ]
+    },
+    {
       "file": "lean/DirectedRecovery.lean",
       "theorems": [
         "SolvedDirected.compose_order",
@@ -134,6 +179,21 @@
         "SolvedControls.rising",
         "SolvedControls.thin",
         "SolvedControls.no_descending"
+      ]
+    },
+    {
+      "file": "lean/IdealOracle.lean",
+      "theorems": [
+        "SolvedIdeal.diagonal_inside",
+        "SolvedIdeal.inside_erasure",
+        "SolvedIdeal.inside_below",
+        "SolvedIdeal.hits_upward",
+        "SolvedIdeal.meets_iff_diagonal",
+        "SolvedIdeal.zero_free_diagonal",
+        "SolvedIdeal.diagonal_index",
+        "SolvedIdeal.hits_diagonal_iff",
+        "SolvedIdeal.ideal_criterion",
+        "SolvedIdeal.decision_correct"
       ]
     },
     {
