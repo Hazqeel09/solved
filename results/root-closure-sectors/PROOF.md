@@ -225,6 +225,14 @@ the upper bound.
 
 The [four-event argument](FOUR-EVENTS.md) covers the two intermediate event orders SG and GS, while preserving every required helper. The [late-small argument](LATE-SMALL.md) additionally eliminates GGS and GGSG, and the [one-big argument](ONE-BIG.md) eliminates GSG. Thus **every shortest chain in any remaining counterexample must have event word SGG, SGGG or GSGG**, with five or six canonical nonsquares. This is a structural reduction, not a resolution of the full root-closure question. The [power-only argument](POWER-HISTORIES.md) also requires every shortest chain of a remaining counterexample to contain a non-power-of-two value. The other three orders remain unresolved for such histories; a power-of-two endpoint alone does not put a chain in the supported class.
 
+A stronger composition shortcut has been disproved: a shortest defect-two
+source cannot always be shortened while retaining the roots of earlier
+square values. The [marked-root obstruction](../root-retention-obstruction/PROOF.md)
+formalizes exact costs 6,7,7 for 2000, its square, and the joint requirement
+{10,2000}. The endpoint-only constructions above do not require that stronger
+property. Subsequent root-sector proofs must preserve their actual operand
+requirements explicitly.
+
 ## Verification scope
 
 The [finite checker](../../checks/verify_root_sectors.py) uses the

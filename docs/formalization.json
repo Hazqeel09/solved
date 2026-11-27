@@ -1,6 +1,6 @@
 {
   "toolchain": "leanprover/lean4:v4.8.0",
-  "scope": "Consult each catalogue entry and its statement correspondence. SquareInstability, AdditiveSeparation and UniversalCutoff prove their declared main claims end to end; other entries may have supporting lemmas only.",
+  "scope": "Consult each catalogue entry and its statement correspondence. SquareInstability, AdditiveSeparation, UniversalCutoff and RootRetention prove their declared main claims end to end; other entries may have supporting lemmas only.",
   "modules": [
     {
       "file": "lean/AMNormalization.lean",
@@ -333,6 +333,27 @@
         "SolvedPowerLift.values_increasing",
         "SolvedPowerLift.lift_endpoint",
         "SolvedPowerLift.lift_root"
+      ]
+    },
+    {
+      "file": "lean/RootRetention.lean",
+      "theorems": [
+        "SolvedRootRetention.forget",
+        "SolvedRootRetention.future_mark",
+        "SolvedRootRetention.marked_search_complete",
+        "SolvedRootRetention.initial_head_bound",
+        "SolvedRootRetention.no_five_for_root",
+        "SolvedRootRetention.no_six_for_source",
+        "SolvedRootRetention.no_six_with_mark",
+        "SolvedRootRetention.root_lower",
+        "SolvedRootRetention.source_lower",
+        "SolvedRootRetention.marked_lower",
+        "SolvedRootRetention.root_upper",
+        "SolvedRootRetention.source_upper",
+        "SolvedRootRetention.marked_upper",
+        "SolvedRootRetention.exact_costs",
+        "SolvedRootRetention.source_level",
+        "SolvedRootRetention.no_uniform_root_retention"
       ]
     },
     {

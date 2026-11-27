@@ -32,6 +32,7 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 | [A counterexample to universal AM squaring stability](results/square-instability/PROOF.md) | finite-verification | complete |
 | [Effective cutoffs for square-run arithmetic controls](results/effective-control-cutoffs/PROOF.md) | proof-draft | complete |
 | [Square-root reconstruction in low-defect sectors](results/root-closure-sectors/PROOF.md) | proof-draft | supporting-lemmas |
+| [An obstruction to simultaneous square-root retention](results/root-retention-obstruction/PROOF.md) | proof-draft | complete |
 
 ## Arithmetic constraint systems
 

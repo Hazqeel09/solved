@@ -24,3 +24,4 @@ import ArithmeticBasis
 import UniversalCutoff
 import RootSectorLemmas
 import PowerChainLift
+import RootRetention

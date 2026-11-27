@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 28 entries, comprising 24 research proof drafts and 4 finite verification records. Twenty-six Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, and its computable-threshold extension. Independent mathematical review remains pending.
+**Current catalogue:** 29 entries, comprising 25 research proof drafts and 4 finite verification records. Twenty-seven Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, its computable-threshold extension, and the obstruction to marked-root reconstruction. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -17,6 +17,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 | [An unbounded additive advantage for subtraction](results/subtraction-gap/PROOF.md) | [✅ Complete](results/subtraction-gap/FORMALIZATION.md) |
 | [A counterexample to universal AM squaring stability](results/square-instability/PROOF.md) | [✅ Complete](results/square-instability/FORMALIZATION.md) |
 | [Effective cutoffs for square-run arithmetic controls](results/effective-control-cutoffs/PROOF.md) | [✅ Complete](results/effective-control-cutoffs/FORMALIZATION.md) |
+| [An obstruction to simultaneous square-root retention](results/root-retention-obstruction/PROOF.md) | [✅ Complete](results/root-retention-obstruction/FORMALIZATION.md) |
 | [An all-length block classification of two-small-step chains](results/two-small-steps/PROOF.md) | 🟡 Supporting lemmas |
 | [The counting exponent at every fixed AM defect](results/fixed-defect-counting/PROOF.md) | 🟡 Supporting lemmas |
 | [Well-ordering and global order type of real AM defects](results/am-defect-order/PROOF.md) | 🟡 Supporting lemmas |

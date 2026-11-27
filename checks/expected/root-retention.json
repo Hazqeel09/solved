@@ -1,0 +1,98 @@
+{
+  "model": "increasing addition-multiplication chains from 1, unrestricted retention",
+  "source": [
+    1,
+    2,
+    4,
+    5,
+    20,
+    100,
+    2000,
+    4000000
+  ],
+  "source_level": 5,
+  "source_defect": 2,
+  "root": 2000,
+  "required_earlier_root": 10,
+  "endpoint_minima": [
+    {
+      "target": 2000,
+      "minimum": 6,
+      "excluded_budget": 5,
+      "lower_bound_census": {
+        "0": 5,
+        "1": 67
+      }
+    },
+    {
+      "target": 4000000,
+      "minimum": 7,
+      "excluded_budget": 6,
+      "lower_bound_census": {
+        "0": 6,
+        "1": 136
+      }
+    }
+  ],
+  "joint_minimum": 7,
+  "joint_witness": [
+    1,
+    2,
+    3,
+    5,
+    10,
+    20,
+    100,
+    2000
+  ],
+  "joint_excluded_budget": 6,
+  "independent_census_sequences": 1548,
+  "all_six_write_root_histories": [
+    [
+      1,
+      2,
+      4,
+      5,
+      20,
+      100,
+      2000
+    ],
+    [
+      1,
+      2,
+      4,
+      5,
+      20,
+      400,
+      2000
+    ]
+  ],
+  "alternative_optimal_source": [
+    1,
+    2,
+    4,
+    5,
+    20,
+    400,
+    2000,
+    4000000
+  ],
+  "alternative_root_witness": [
+    1,
+    2,
+    4,
+    5,
+    20,
+    400,
+    2000
+  ],
+  "menu_gap_control_witness": [
+    1,
+    2,
+    4,
+    8,
+    10,
+    80,
+    640
+  ]
+}

@@ -994,6 +994,55 @@
         "seven-nonsquares",
         "two-small-steps"
       ]
+    },
+    {
+      "id": "root-retention-obstruction",
+      "title": "An obstruction to simultaneous square-root retention",
+      "subject": "Arithmetic complexity",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "In increasing AM chains from 1, the minimum costs for 2000, 4,000,000, and the joint requirement {10,2000} are respectively 6,7,7. An optimal defect-two source for 4,000,000 visits 100, so requiring its square root 10 prevents a shorter root program. This refutes uniform marked-root reconstruction, not unmarked root closure.",
+      "proof": "results/root-retention-obstruction/PROOF.md",
+      "tests": [
+        "test_root_retention.py",
+        "test_menu_programs.py"
+      ],
+      "implementation": [
+        "checks/verify_root_retention.py",
+        "solved/menu_programs.py"
+      ],
+      "formalization": {
+        "status": "complete",
+        "files": [
+          "lean/RootRetention.lean",
+          "lean/SquareInstability.lean"
+        ],
+        "scope": "Complete Lean proofs of the exact increasing-AM costs 6,7,7 and the counterexample to uniform root retention for shortest sources of defect at most two. Generic finite-menu joint optimality and the separate 640 menu-gap control remain outside this formalization; unmarked root closure remains open.",
+        "statement_correspondence": "results/root-retention-obstruction/FORMALIZATION.md",
+        "theorems": [
+          "SolvedRootRetention.exact_costs",
+          "SolvedRootRetention.source_level",
+          "SolvedRootRetention.no_uniform_root_retention"
+        ]
+      },
+      "sources": [
+        {
+          "url": "https://doi.org/10.3934/Math.2026667",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2011.11767",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://doi.org/10.4230/LIPIcs.CP.2026.11",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "square-instability",
+        "bounded-am-chains"
+      ]
     }
   ]
 }

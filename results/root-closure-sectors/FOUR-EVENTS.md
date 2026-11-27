@@ -322,3 +322,10 @@ cases; other cases have trailing or retained roots. The exchange family
 is independently tested for j=0,…,8, including the exact bare-menu optimum.
 These finite checks exercise the implementation. They do not establish
 the unrestricted coverage argument above.
+
+The same implementation now supports an explicit `required` output set.
+Ancestor supports are joined across those outputs, with every shared value
+counted once. The [joint-support proof and obstruction](../root-retention-obstruction/PROOF.md)
+state its exact scope. The menu-completeness theorem in this manuscript
+concerns the endpoint root; it does not assert that the same menu is
+complete for arbitrary additional required values.

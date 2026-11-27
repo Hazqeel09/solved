@@ -12,7 +12,7 @@
 
 The README displays ✅ for a completely formalized main claim, 🟡 for checked supporting lemmas, and ⬜ when there is no Lean formalization. Its table is generated from `catalogue.json`; `python -m scripts.check_catalogue --write-index` refreshes it, and CI rejects stale labels. Complete ticks link to the statement correspondence.
 
-Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md), the [main additive subtraction-gap theorem](../results/subtraction-gap/PROOF.md), and its [computable-threshold extension](../results/effective-control-cutoffs/PROOF.md) have complete formalizations of their stated main claims. Their written presentations and publication priority still await independent review.
+Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md), the [main additive subtraction-gap theorem](../results/subtraction-gap/PROOF.md), its [computable-threshold extension](../results/effective-control-cutoffs/PROOF.md), and the [marked-root obstruction](../results/root-retention-obstruction/PROOF.md) have complete formalizations of their stated main claims. Their written presentations and publication priority still await independent review.
 
 ## Python checks
 
@@ -57,6 +57,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [FiniteBasis](../lean/FiniteBasis.lean) | A total recursive reference search, strict box-rank descent, exact coverage and minimal-generator pruning. |
 | [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Complete basis membership, exact-solution inclusion and safe per-domain cutoffs using the concrete arithmetic oracle. |
 | [RootSectorLemmas](../lean/RootSectorLemmas.lean) | Elementary square gaps, power-of-two factors, a complete three-operation/four-operation exchange identity, and paired-cofactor/boundary-square identities and universal first-big-prefix growth inequalities supporting the partial root-closure result. |
+| [RootRetention](../lean/RootRetention.lean) | Complete marked-search argument, exact costs 6/7/7 for 2000, its square, and the joint requirement {10,2000}; a shortest defect-two source refutes uniform marked-root reconstruction. |
 | [PowerChainLift](../lean/PowerChainLift.lean) | A valid AM chain from any increasing addition-only chain, with the initial 2 write charged and the endpoint/root identity proved. The low-step classification and exponent extraction remain outside this formalization. |
 | [UniversalCutoff](../lean/UniversalCutoff.lean) | Finite clipping/control coverage and a computable universal threshold for arbitrary AM programs and the additive subtraction gap. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
