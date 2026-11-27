@@ -46,7 +46,7 @@ The engine reproduces every known case exactly:
 
 - [JY26a]'s energy $\tfrac12[n+d_a(p)d_b(q)]$ for odd total exponent, symbolically, with the even-Ω maximiser;
 - [JY26b]'s energy $\tfrac12[n+d_ad_b-2g_ag_b]$ and both same-parity maximisers;
-- Sander–Sander's $E_{\max}(3\cdot5\cdot7)=520$ with unique maximiser $\{1,15,21,35\}$ [SS11, introduction];
+- Sander–Sander's $E_{\max}(3\cdot5\cdot7)=520$ with unique maximiser $\{1,15,21,35\}$, and the even-order value $E_{\max}(2\cdot3\cdot5\cdot7)=1414$ with unique maximiser $\{1,2,3,30,35,42,70,105\}$ [SS11, introduction];
 - the definitional energy for every divisor set of several orders.
 
 A fast incremental implementation is differentially tested against a direct reference implementation, and wrong claimed maximisers are rejected. See [`tests/test_icg_families.py`](../../tests/test_icg_families.py).
@@ -149,11 +149,13 @@ For example, $B$ wins at $(p,q)=(103,101)$ and $(127,109)$, and $A$ wins at $(13
 
 ## Conjectures
 
-**Conjecture 1 (parity law at all odd orders).** Let $n>1$ be odd. If $\sum a_\nu$ is odd, the even-Ω set is the unique maximiser. If $\sum a_\nu\ge2$ is even and $n$ is not a prime power, the maximisers are exactly the even-Ω and odd-Ω sets.
+On 27 November 2026 we found no earlier statement of Conjectures 1 or 2. We checked the sources below, whose own text says that no structural conjecture existed for composite orders [SS11, introduction], and searched the web. The conjectures are named at the request of the repository owner.
+
+**Conjecture 1 — the Hazqeel conjecture (parity law at all odd orders).** Let $n>1$ be odd. If $\sum a_\nu$ is odd, the even-Ω set is the unique maximiser. If $\sum a_\nu\ge2$ is even and $n$ is not a prime power, the maximisers are exactly the even-Ω and odd-Ω sets.
 
 This is [JY26a, JY26b] without the hypothesis that the primes are at least 5. It holds in every certified row with the prime 3 above. It also holds for $3^ap^b$ with up to 19 cells, computed with the same code: $(a,b)=(3,4),(4,3),(2,5),(5,2)$, all for every prime $p\ge5$. It holds at $3\cdot5\cdot7$, and in the four-prime even-total orders above.
 
-**Conjecture 2 (2-adic tensor structure).** Let $a\ge2$, $b\ge1$, and let $p$ be an odd prime, with finitely many exceptions such as $2^3\cdot3$. Let $\mathcal S$ be the family of maximal-energy exponent sets of $\mathrm{ICG}(2^a)$ [SS11, Thm 1.1]. Then the maximisers of $\mathrm{ICG}(2^ap^b)$ are exactly
+**Conjecture 2 — the Afyq conjecture (2-adic tensor structure of even orders).** Let $a\ge2$, $b\ge1$, and let $p$ be an odd prime, with finitely many exceptions such as $2^3\cdot3$. Let $\mathcal S$ be the family of maximal-energy exponent sets of $\mathrm{ICG}(2^a)$ [SS11, Thm 1.1]. Then the maximisers of $\mathrm{ICG}(2^ap^b)$ are exactly
 $$\mathcal D_S=\{2^ip^j\ne n:\ j\equiv[i\in T_S]\pmod 2\},\qquad T_S=\begin{cases}S\setminus\{0\},& b\ \text{odd},\\ (S\setminus\{0,a-1\})\cup\{a\},& b\ \text{even},\end{cases}$$
 for $S\in\mathcal S$.
 

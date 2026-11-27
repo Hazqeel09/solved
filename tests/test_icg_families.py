@@ -110,6 +110,15 @@ class LiteratureTests(unittest.TestCase):
             [[1, 15, 21, 35]],
         )
 
+    def test_sander_sander_even_order_example(self):
+        """E_max(2*3*5*7) = 1414 with unique maximiser {1,2,3,30,35,42,70,105} (Sander-Sander)."""
+        order = Order(((2, 1), (3, 1), (5, 1), (7, 1)))
+        best, sets = maximisers(order, {})
+        self.assertEqual(best, 1414)
+        self.assertEqual(
+            [sorted(order.divisors(s, {})) for s in sets], [[1, 2, 3, 30, 35, 42, 70, 105]]
+        )
+
     def test_jiang_yang_odd_total_exponent(self):
         """arXiv:2608.29523 Thm A: checkerboard maximiser, E = (n + d_a(p) d_b(q))/2."""
         for a, b in ((2, 1), (2, 3), (1, 2), (4, 1)):
