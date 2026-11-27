@@ -1161,7 +1161,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "For 49 order families (45 outside the known theorems) (2^a p^b and 3^a p^b with at most 15 divisor cells, and orders 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic odd primes), exact certificates determine every maximal-energy divisor set of ICG(n, D) for all admissible primes. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. Three conjectures, including the Hazqeel conjecture (the parity law at all odd orders) and the Afyq conjecture (even orders 2^a p^b through the Sander-Sander maximisers of 2^a), predict ratio-dependent maximisers.",
+      "statement": "For 49 order families (45 outside the known theorems) (2^a p^b and 3^a p^b with at most 15 divisor cells, and orders 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic odd primes), exact certificates determine every maximal-energy divisor set of ICG(n, D) for all admissible primes. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. Three conjectures are stated: the Hazqeel conjecture (the parity law at every odd order), the Afyq conjecture (even orders 2^a p^b follow the Sander-Sander maximisers of 2^a), and a conjecture that the maximiser of even orders can change arbitrarily often with the prime ratio.",
       "proof": "results/icg-energy-exceptional-orders/PROOF.md",
       "tests": [
         "test_icg_families.py",
