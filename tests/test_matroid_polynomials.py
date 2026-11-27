@@ -303,3 +303,56 @@ class ReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NativeAndPublishedLargeTests(unittest.TestCase):
+    def test_native_backend_matches_reference(self):
+        from solved import native_lattice
+
+        cases = [ml.uniform(k, n) for n in range(1, 8) for k in range(n + 1)]
+        cases += [ml.complete_graph(n) for n in range(1, 7)]
+        cases += [
+            ml.projective_deletion(4, 2, [(1, 0, 0, 0), (0, 1, 0, 0)])[0],
+            ml.projective_deletion(3, 3)[0],
+            ml.paving(8, 4, [(0, 1, 2, 3), (4, 5, 6, 7)]),
+            ml.direct_sum(ml.uniform(2, 3), ml.complete_graph(4)),
+        ]
+        for lattice in cases:
+            self.assertEqual(
+                native_lattice.interval_characteristic(lattice),
+                ml.interval_characteristic(lattice),
+            )
+
+    def test_bose_burton_geometries(self):
+        """Cheng-Liu Remark 2.7: PG(r-1,q) minus a (k-1)-dimensional subspace."""
+        for r, p in ((4, 2), (5, 2), (4, 3)):
+            for k in range(0, r):
+                w_points = [v for v in ml.projective_points(r, p) if not any(v[k:])] if k else []
+                lattice, _ = ml.projective_deletion(r, p, w_points)
+                polys = polynomials(lattice)
+                expected = [
+                    gaussian_binomial(k, i, p) - gaussian_binomial(k, r - i, p)
+                    for i in range((r + 1) // 2)
+                ]
+                self.assertEqual(polys.kl, ip.trim(expected))
+                if 2 * k < r:
+                    self.assertEqual(
+                        polys.z, tuple(gaussian_binomial(r, j, p) for j in range(r + 1))
+                    )
+
+    def test_cheng_liu_rank_seven_counterexample(self):
+        """Cheng-Liu Theorem A.4 / Prop. 2.6: P = 1 + 13t + 7t^2 + t^3 is not real-rooted."""
+        from solved import native_lattice
+
+        def vec(*ones):
+            return tuple(1 if i + 1 in ones else 0 for i in range(7))
+
+        w0 = [v for v in ml.projective_points(7, 2) if not any(v[3:])]
+        s = [vec(4), vec(4, 5), vec(4, 6), vec(4, 7), vec(4, 5, 6), vec(4, 5, 7)]
+        lattice, points = ml.projective_deletion(7, 2, w0 + s)
+        self.assertEqual(len(points), 114)
+        polys = polynomials(lattice, native_lattice.interval_characteristic(lattice))
+        self.assertEqual(polys.kl, (1, 13, 7, 1))
+        self.assertFalse(ip.is_real_rooted(polys.kl))
+        self.assertEqual(polys.z, tuple(gaussian_binomial(7, j, 2) for j in range(8)))
+        self.assertEqual(report(polys).open_conjecture_failures(), [])
