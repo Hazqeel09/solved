@@ -13,3 +13,11 @@ rev = "v4.34.1"
 
 [[lean_lib]]
 name = "Formal"
+
+# H. Dong, ai4math-results (Apache-2.0): spectral bridge from ICG graph energy to
+# Ramanujan sums for orders p^a q^b (Research.ICGGeneralBridge). Pinned for reproducibility.
+[[require]]
+name = "ai4math_research"
+git = "https://github.com/Horace-Maxwell/ai4math-results.git"
+rev = "6334a95f2e0c2396f492f3476c1d4ce80e4106ab"
+subDir = "lean"
