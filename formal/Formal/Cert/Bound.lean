@@ -66,3 +66,73 @@ def neg (p : UPoly) : UPoly := scale (-1) p
   simp [neg]
 
 end Solved.Cert.UPoly
+
+namespace Solved.Cert.UPoly
+
+/-! ## Interval bounds from coefficientwise sign splitting -/
+
+/-- Coefficientwise positive part `max cᵢ 0`. -/
+def posPart (p : UPoly) : UPoly := p.map (max · 0)
+
+/-- Coefficientwise negative part `min cᵢ 0`. -/
+def negPart (p : UPoly) : UPoly := p.map (min · 0)
+
+theorem eval_posPart_add_negPart (p : UPoly) (x : ℤ) :
+    eval (posPart p) x + eval (negPart p) x = eval p x := by
+  induction p with
+  | nil => simp [posPart, negPart]
+  | cons c cs ih =>
+    simp only [posPart, negPart, List.map_cons, eval_cons] at *
+    calc max c 0 + x * eval (List.map (max · 0) cs) x + (min c 0 + x * eval (List.map (min · 0) cs) x)
+        = (max c 0 + min c 0) + x * (eval (List.map (max · 0) cs) x +
+            eval (List.map (min · 0) cs) x) := by ring
+      _ = c + x * eval cs x := by rw [max_add_min, ih, add_zero]
+
+theorem eval_posPart_nonneg (p : UPoly) {x : ℤ} (hx : 0 ≤ x) : 0 ≤ eval (posPart p) x := by
+  refine eval_nonneg_of_allNonneg ?_ hx
+  simp [posPart, allNonneg]
+
+theorem eval_negPart_nonpos (p : UPoly) {x : ℤ} (hx : 0 ≤ x) : eval (negPart p) x ≤ 0 := by
+  refine eval_nonpos_of_allNonpos ?_ hx
+  simp [negPart, allNonpos]
+
+theorem eval_le_posPart (p : UPoly) {x : ℤ} (hx : 0 ≤ x) : eval p x ≤ eval (posPart p) x := by
+  have := eval_posPart_add_negPart p x
+  have := eval_negPart_nonpos p hx
+  linarith
+
+theorem negPart_le_eval (p : UPoly) {x : ℤ} (hx : 0 ≤ x) : eval (negPart p) x ≤ eval p x := by
+  have := eval_posPart_add_negPart p x
+  have := eval_posPart_nonneg p hx
+  linarith
+
+/-- Coefficientwise maximum, missing coefficients read as `0`. -/
+def cmax : UPoly → UPoly → UPoly
+  | [], q => posPart q
+  | a :: p, [] => posPart (a :: p)
+  | a :: p, b :: q => max a b :: cmax p q
+
+theorem eval_le_cmax_left (p q : UPoly) {x : ℤ} (hx : 0 ≤ x) : eval p x ≤ eval (cmax p q) x := by
+  induction p generalizing q with
+  | nil => exact eval_posPart_nonneg q hx
+  | cons a p ih =>
+    cases q with
+    | nil => exact eval_le_posPart _ hx
+    | cons b q =>
+      simp only [cmax, eval_cons]
+      exact add_le_add (le_max_left a b) (mul_le_mul_of_nonneg_left (ih q) hx)
+
+theorem eval_le_cmax_right (p q : UPoly) {x : ℤ} (hx : 0 ≤ x) : eval q x ≤ eval (cmax p q) x := by
+  induction p generalizing q with
+  | nil => exact eval_le_posPart q hx
+  | cons a p ih =>
+    cases q with
+    | nil => exact eval_posPart_nonneg _ hx
+    | cons b q =>
+      simp only [cmax, eval_cons]
+      exact add_le_add (le_max_right a b) (mul_le_mul_of_nonneg_left (ih q) hx)
+
+theorem eval_absC_nonneg (p : UPoly) {x : ℤ} (hx : 0 ≤ x) : 0 ≤ eval (absC p) x :=
+  (abs_nonneg _).trans (abs_eval_le_absC p hx)
+
+end Solved.Cert.UPoly

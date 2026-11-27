@@ -1,6 +1,6 @@
 name = "solved_formal"
 version = "0.1.0"
-defaultTargets = ["Formal"]
+defaultTargets = ["Formal", "FormalTests"]
 
 [leanOptions]
 autoImplicit = false
@@ -13,6 +13,10 @@ rev = "v4.34.1"
 
 [[lean_lib]]
 name = "Formal"
+
+# Kernel-checked regression tests, including certificates that must be rejected.
+[[lean_lib]]
+name = "FormalTests"
 
 # H. Dong, ai4math-results (Apache-2.0): spectral bridge from ICG graph energy to
 # Ramanujan sums for orders p^a q^b (Research.ICGGeneralBridge). Pinned for reproducibility.

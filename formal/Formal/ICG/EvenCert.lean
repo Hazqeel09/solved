@@ -1,4 +1,4 @@
-import Formal.Cert.Bound
+import Formal.Cert.BranchBound
 import Formal.ICG.LocalPoly
 import Research.ICGGeneralThm5
 
@@ -6,11 +6,14 @@ import Research.ICGGeneralThm5
 # A reflective certificate for `ICGGeneral.L1mat 2 p a b`
 
 For orders `2^a p^b` the reused bridge identifies the graph energy with `L1mat 2 p a b Y`,
-where `Y` is the indicator of the divisor set on the exponent box. Every entry of `L1mat` is
-an integer polynomial in `p`. `check` verifies, by integer polynomial arithmetic that the kernel
-evaluates, that a claimed set of maximisers has one common energy and that every other
-nonempty mask has strictly smaller energy for all integers `p ≥ p₀`. `check_sound` turns a
-successful check into that statement about `L1mat`.
+where `Y` is the indicator of the divisor set on the exponent box `[0,a] × [0,b]`. Every entry
+of `L1mat` is an integer polynomial in `p`, linear in the cells of the mask.
+
+`certify` checks, by integer polynomial arithmetic that the kernel evaluates, that a claimed
+list of maximising masks all have energy `E(p)` and that every other mask of the box without
+its top cell (the order itself) has strictly smaller energy, for every integer `p ≥ p₀`. The
+search over masks is `Solved.Cert.bnb`. `certify_sound` turns a successful check into that
+statement about `L1mat`.
 -/
 
 namespace Solved.ICG
@@ -27,9 +30,6 @@ def sumRange : ℕ → (ℕ → UPoly) → UPoly
   induction n with
   | zero => simp [sumRange]
   | succ n ih => simp [sumRange, ih, sum_range_succ]
-
-/-- Bit `k` of a mask (missing bits are `false`). -/
-def bit (L : List Bool) (k : ℕ) : Bool := L.getD k false
 
 /-- The indicator on the exponent box `[0,a] × [0,b]`, cell `(i,l)` at index `i(b+1)+l`. -/
 def ind (b : ℕ) (L : List Bool) (i l : ℕ) : ℝ := if bit L (i * (b + 1) + l) then 1 else 0
@@ -59,43 +59,149 @@ theorem L1mat_eq (a b : ℕ) (L : List Bool) (p : ℤ) :
   refine sum_congr rfl fun u _ => sum_congr rfl fun v _ => ?_
   rw [eval_entryP]
 
-/-! ## The checker -/
+/-! ## Flat indices on the exponent box -/
 
-/-- Shifted entry `(u,v)` of a mask: a polynomial in `x = p - p₀`. -/
-def sentry (a b p0 : ℕ) (L : List Bool) (u v : ℕ) : UPoly := UPoly.shift p0 (entryP a b L u v)
+theorem sum_range_mul_flat {M : Type*} [AddCommMonoid M] (A B : ℕ) (f : ℕ → M) :
+    ∑ k ∈ range (A * B), f k = ∑ i ∈ range A, ∑ l ∈ range B, f (i * B + l) := by
+  induction A with
+  | zero => simp
+  | succ A ih => rw [add_one_mul, sum_range_add, ih, sum_range_succ]
 
-/-- Upper bound for the energy of any mask on `p ≥ p₀`. -/
-def upperE (a b p0 : ℕ) (L : List Bool) : UPoly :=
-  sumRange (a + 1) fun u => sumRange (b + 1) fun v => UPoly.absC (sentry a b p0 L u v)
+theorem cell_div {B : ℕ} (i : ℕ) {l : ℕ} (hl : l < B) : (i * B + l) / B = i := by
+  rw [Nat.mul_comm, Nat.mul_add_div (by omega), Nat.div_eq_of_lt hl, Nat.add_zero]
 
-/-- Every shifted entry has coefficients of one sign. -/
-def signsOK (a b p0 : ℕ) (L : List Bool) : Bool :=
-  (List.range (a + 1)).all fun u => (List.range (b + 1)).all fun v =>
-    UPoly.allNonneg (sentry a b p0 L u v) || UPoly.allNonpos (sentry a b p0 L u v)
+theorem cell_mod {B : ℕ} (i : ℕ) {l : ℕ} (hl : l < B) : (i * B + l) % B = l := by
+  rw [Nat.mul_comm, Nat.mul_add_mod, Nat.mod_eq_of_lt hl]
 
-/-- The shifted polynomial with constant sign, made nonnegative. -/
+/-- Contribution of cell `k = i(b+1)+l` to entry `e = u(b+1)+v`, a polynomial in `p`. -/
+def cellP (a b k e : ℕ) : UPoly :=
+  UPoly.scale (UPoly.eval (tentP a (e / (b + 1)) (k / (b + 1))) 2)
+    (tentP b (e % (b + 1)) (k % (b + 1)))
+
+/-- The contributions of cell `k` to every entry, as polynomials in `x = p - p₀`. -/
+def cellTable (a b p0 k : ℕ) : Table :=
+  (List.range ((a + 1) * (b + 1))).map fun e => UPoly.shift p0 (cellP a b k e)
+
+theorem eval_entryP_flat (a b : ℕ) (L : List Bool) (e : ℕ) (p : ℤ) :
+    UPoly.eval (entryP a b L (e / (b + 1)) (e % (b + 1))) p =
+      ∑ k ∈ range ((a + 1) * (b + 1)), if bit L k then UPoly.eval (cellP a b k e) p else 0 := by
+  rw [sum_range_mul_flat]
+  unfold entryP
+  simp only [eval_sumRange]
+  refine sum_congr rfl fun i _ => sum_congr rfl fun l hl => ?_
+  have hl' : l < b + 1 := mem_range.1 hl
+  unfold cellP
+  rw [cell_div i hl', cell_mod i hl']
+  split_ifs <;> simp
+
+theorem L1mat_flat (a b : ℕ) (L : List Bool) (p : ℤ) :
+    ICGGeneral.L1mat 2 (p : ℝ) a b (ind b L) =
+      ∑ e ∈ range ((a + 1) * (b + 1)),
+        |((UPoly.eval (entryP a b L (e / (b + 1)) (e % (b + 1))) p : ℤ) : ℝ)| := by
+  rw [L1mat_eq, sum_range_mul_flat]
+  refine sum_congr rfl fun u _ => sum_congr rfl fun v hv => ?_
+  rw [cell_div u (mem_range.1 hv), cell_mod u (mem_range.1 hv)]
+
+/-! ## Exact energies of sign-certified masks -/
+
+/-- Every entry below `m` has coefficients of one sign. -/
+def signsOK (m : ℕ) (t : Table) : Bool :=
+  (List.range m).all fun e => UPoly.allNonneg (t.get e) || UPoly.allNonpos (t.get e)
+
+/-- A polynomial of certified constant sign, made nonnegative. -/
 def signed (f : UPoly) : UPoly := if UPoly.allNonneg f then f else UPoly.neg f
 
-/-- Exact energy of a mask whose entries have certified signs. -/
-def exactE (a b p0 : ℕ) (L : List Bool) : UPoly :=
-  sumRange (a + 1) fun u => sumRange (b + 1) fun v => signed (sentry a b p0 L u v)
+theorem eval_signed {f : UPoly} (h : (UPoly.allNonneg f || UPoly.allNonpos f) = true) {x : ℤ}
+    (hx : 0 ≤ x) : UPoly.eval (signed f) x = |UPoly.eval f x| := by
+  unfold signed
+  split_ifs with h₀
+  · exact (abs_of_nonneg (UPoly.eval_nonneg_of_allNonneg h₀ hx)).symm
+  · simp only [h₀, Bool.false_or] at h
+    rw [UPoly.eval_neg, abs_of_nonpos (UPoly.eval_nonpos_of_allNonpos h hx)]
 
-/-- All Boolean lists of length `n`. -/
-def allMasks : ℕ → List (List Bool)
-  | 0 => [[]]
-  | n + 1 => (allMasks n).flatMap fun L => [false :: L, true :: L]
+/-- `∑_{e < m} |tₑ|` for a sign-certified table. -/
+def absSum (m : ℕ) (t : Table) : UPoly := sumRange m fun e => signed (t.get e)
 
-/-- A mask for a nonempty set of proper divisors: some bit set, top cell `(a,b)` unset. -/
-def valid (a b : ℕ) (L : List Bool) : Bool := L.any id && !bit L (a * (b + 1) + b)
+theorem sum_abs_eq_absSum {m : ℕ} {t : Table} (h : signsOK m t = true) {x : ℤ} (hx : 0 ≤ x) :
+    ∑ e ∈ range m, |UPoly.eval (t.get e) x| = UPoly.eval (absSum m t) x := by
+  unfold absSum
+  rw [eval_sumRange]
+  refine sum_congr rfl fun e he => (eval_signed ?_ hx).symm
+  exact List.all_eq_true.1 h e (by simpa using he)
 
-/-- The certificate: `star` and `others` share one exact energy, and every other valid mask of
-the box has strictly smaller energy, for all `p ≥ p₀`. -/
-def check (a b p0 : ℕ) (star : List Bool) (others : List (List Bool)) : Bool :=
-  signsOK a b p0 star &&
-  others.all (fun L => signsOK a b p0 L &&
-    UPoly.allZero (UPoly.add (exactE a b p0 L) (UPoly.neg (exactE a b p0 star)))) &&
-  (allMasks ((a + 1) * (b + 1))).all fun L =>
-    !valid a b L || L == star || others.contains L ||
-      UPoly.posCert (UPoly.add (exactE a b p0 star) (UPoly.neg (upperE a b p0 L)))
+/-! ## The certificate -/
+
+/-- The decision steps for the cells `ks`, in that order. -/
+def steps (a b p0 : ℕ) (ks : List ℕ) : List Step :=
+  build (ks.map fun k => (k, cellTable a b p0 k))
+
+/-- The certificate: `ks` orders the `(a+1)(b+1) - 1` cells below the top one; each mask in
+`star :: others` (masks of that length) has energy `E(p)` exactly; every other mask has
+energy below `E(p)`; all for `p ≥ p₀`. -/
+def certify (a b p0 : ℕ) (E : UPoly) (ks : List ℕ) (star : List Bool)
+    (others : List (List Bool)) : Bool :=
+  let m := (a + 1) * (b + 1)
+  let ss := steps a b p0 ks
+  let target := UPoly.shift p0 E
+  ks.isPerm (List.range (m - 1)) &&
+    (star :: others).all (fun L => L.length == m - 1 && signsOK m (runAcc L ss []) &&
+      UPoly.allZero (UPoly.add (absSum m (runAcc L ss [])) (UPoly.neg target))) &&
+    bnb target (star :: others) ss (List.replicate (m - 1) false) []
+
+theorem eval_runAcc_steps (a b p0 : ℕ) {ks : List ℕ}
+    (hperm : ks.Perm (List.range ((a + 1) * (b + 1) - 1))) {L : List Bool}
+    (hL : L.length = (a + 1) * (b + 1) - 1) {e : ℕ} (he : e < (a + 1) * (b + 1)) (p : ℤ) :
+    UPoly.eval ((runAcc L (steps a b p0 ks) []).get e) (p - p0) =
+      UPoly.eval (entryP a b L (e / (b + 1)) (e % (b + 1))) p := by
+  have hm : (a + 1) * (b + 1) = ((a + 1) * (b + 1) - 1) + 1 :=
+    (Nat.sub_add_cancel (Nat.mul_pos (Nat.succ_pos a) (Nat.succ_pos b))).symm
+  rw [steps, eval_runAcc_build L ks _ hperm, eval_entryP_flat, hm, sum_range_succ,
+    bit_of_length_le hL.le, ← hm]
+  simp only [Bool.false_eq_true, ↓reduceIte, add_zero]
+  refine sum_congr rfl fun k _ => ?_
+  rw [cellTable, Table.get_map_range _ _ he, UPoly.eval_shift, sub_add_cancel]
+
+theorem L1mat_eq_runAcc (a b p0 : ℕ) {ks : List ℕ}
+    (hperm : ks.Perm (List.range ((a + 1) * (b + 1) - 1))) {L : List Bool}
+    (hL : L.length = (a + 1) * (b + 1) - 1) (p : ℤ) :
+    ICGGeneral.L1mat 2 (p : ℝ) a b (ind b L) =
+      ((∑ e ∈ range ((a + 1) * (b + 1)),
+        |UPoly.eval ((runAcc L (steps a b p0 ks) []).get e) (p - p0)| : ℤ) : ℝ) := by
+  rw [L1mat_flat]
+  push_cast
+  refine sum_congr rfl fun e he => ?_
+  rw [eval_runAcc_steps a b p0 hperm hL (mem_range.1 he)]
+
+/-- What a successful certificate proves about `ICGGeneral.L1mat 2 p a b`. -/
+theorem certify_sound {a b p0 : ℕ} {E : UPoly} {ks : List ℕ} {star : List Bool}
+    {others : List (List Bool)} (h : certify a b p0 E ks star others = true) {p : ℤ}
+    (hp : (p0 : ℤ) ≤ p) :
+    (∀ L ∈ star :: others, L.length = (a + 1) * (b + 1) - 1 ∧
+      ICGGeneral.L1mat 2 (p : ℝ) a b (ind b L) = ((UPoly.eval E p : ℤ) : ℝ)) ∧
+    (∀ L : List Bool, L.length = (a + 1) * (b + 1) - 1 → L ∉ star :: others →
+      ICGGeneral.L1mat 2 (p : ℝ) a b (ind b L) < ((UPoly.eval E p : ℤ) : ℝ)) := by
+  unfold certify at h
+  simp only [Bool.and_eq_true, List.all_eq_true, beq_iff_eq] at h
+  obtain ⟨⟨hperm, hall⟩, hbnb⟩ := h
+  have hperm' := List.isPerm_iff.1 hperm
+  have hx : (0 : ℤ) ≤ p - p0 := sub_nonneg.2 hp
+  have htarget : UPoly.eval (UPoly.shift p0 E) (p - p0) = UPoly.eval E p := by
+    rw [UPoly.eval_shift, sub_add_cancel]
+  refine ⟨fun L hL => ?_, fun L hL hnot => ?_⟩
+  · obtain ⟨⟨hlen, hsigns⟩, hzero⟩ := hall L hL
+    refine ⟨hlen, ?_⟩
+    rw [L1mat_eq_runAcc a b p0 hperm' hlen, sum_abs_eq_absSum hsigns hx, ← htarget]
+    have := UPoly.eval_eq_zero_of_allZero hzero (p - p0)
+    simp only [UPoly.eval_add, UPoly.eval_neg] at this
+    exact_mod_cast (sub_eq_zero.1 (by linarith))
+  · have hsound := bnb_sound _ _ _ _ _ hbnb L hx ((a + 1) * (b + 1))
+    have hpath : runPath L (build (ks.map fun k => (k, cellTable a b p0 k)))
+        (List.replicate ((a + 1) * (b + 1) - 1) false) = L :=
+      runPath_build _ (by simpa [Function.comp_def] using hperm') hL
+    rw [hpath] at hsound
+    rcases hsound with hmem | hlt
+    · exact absurd hmem hnot
+    · rw [L1mat_eq_runAcc a b p0 hperm' hL, ← htarget]
+      exact_mod_cast hlt
 
 end Solved.ICG
