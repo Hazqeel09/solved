@@ -300,6 +300,7 @@
         "SolvedGrowth.counted_length",
         "SolvedGrowth.counts_exist",
         "SolvedGrowth.nonsquare_product_bound",
+        "SolvedGrowth.doubled_base_power",
         "SolvedGrowth.doubled_power",
         "SolvedGrowth.envelope",
         "SolvedGrowth.bounded_nonsquares",
@@ -310,7 +311,11 @@
         "SolvedGrowth.mersenne_reaches_level",
         "SolvedGrowth.mersenne_nonsquare_bound",
         "SolvedGrowth.tower_as_squares",
-        "SolvedGrowth.level_requires_writes"
+        "SolvedGrowth.level_requires_writes",
+        "SolvedGrowth.tail_length",
+        "SolvedGrowth.tail_start_le",
+        "SolvedGrowth.tail_envelope",
+        "SolvedGrowth.two_event_cubic_barrier"
       ]
     },
     {
@@ -375,7 +380,11 @@
         "SolvedRootBlocks.square_at_boundary",
         "SolvedRootBlocks.scalar_cubic_gap",
         "SolvedRootBlocks.one_big_sum_cube",
-        "SolvedRootBlocks.one_big_head_gap"
+        "SolvedRootBlocks.one_big_head_gap",
+        "SolvedRootBlocks.thirteen_program",
+        "SolvedRootBlocks.thirteen_cost",
+        "SolvedRootBlocks.twenty_one_program",
+        "SolvedRootBlocks.twenty_one_cost"
       ]
     },
     {

@@ -947,7 +947,7 @@
       "subject": "Arithmetic complexity",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "Square endpoints of two-small-step AM chains in the three-, four- and seven-nonsquare sectors, the GGS/GGSG/GSG event orders, or power-only histories have root witnesses using at least one fewer instruction. Power-only reconstruction uses classical two-small-step addition-chain halving, and supplies endpoint normal forms with at most four canonical nonsquares without increasing cost. Remaining counterexamples must have event order SGG, SGGG or GSGG and a non-power-of-two value in every shortest chain for their square.",
+      "statement": "Square endpoints of two-small-step AM chains in the three-, four- and seven-nonsquare sectors, the GGS/GGSG/GSG/GSGG event orders, or power-only histories have root witnesses using at least one fewer instruction. Power-only reconstruction uses classical two-small-step addition-chain halving, and supplies endpoint normal forms with at most four canonical nonsquares without increasing cost. Remaining counterexamples must have event order SGG or SGGG and a non-power-of-two value in every shortest chain for their square.",
       "proof": "results/root-closure-sectors/PROOF.md",
       "tests": [
         "test_root_sectors.py",
@@ -964,9 +964,10 @@
         "status": "supporting-lemmas",
         "files": [
           "lean/RootSectorLemmas.lean",
-          "lean/PowerChainLift.lean"
+          "lean/PowerChainLift.lean",
+          "lean/NonsquareBound.lean"
         ],
-        "scope": "Seventeen square-gap, factor-root, power-of-two and growth lemmas include the shared-helper exchange, late-small identities and first-big-prefix cubic bounds. A separate module constructs valid AM programs from arbitrary addition-only chains, charging the initial write of 2, with three audited statements. The classical low-step addition classification, exponent extraction and full sector coverage retain written proofs and cited dependencies; the full root-closure question remains unresolved."
+        "scope": "Checked program identities, exact suffix costs, power lifting and an arbitrary-prefix Fibonacci envelope support the root constructions. The cubic barrier excludes two later big nonsquares under its precise growth hypothesis. The full sector classification, classical low-step addition dependency and program case coverage retain written proofs; unmarked root closure remains unresolved."
       },
       "sources": [
         {

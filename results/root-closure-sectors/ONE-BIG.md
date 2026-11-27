@@ -325,9 +325,10 @@ one write relative to their sources and use M. The finite palette test
 checks the table independently, including sums, products and old-only recipes.
 
 This completes GSG for arbitrary A,e,g,h and trailing square runs. The
-remaining event orders are SGG, SGGG and GSGG, and every shortest chain
+remaining event orders at this stage are SGG, SGGG and GSGG; the later
+[two-big extension](TWO-BIG.md) also eliminates GSGG. Every shortest chain
 of a remaining counterexample must contain a non-power-of-two value.
-No closure claim is made for those mixed-history orders.
+No closure claim is made for the remaining mixed SGG and SGGG histories.
 
 The implementation reuses the shared candidate-menu solver and the power
 constructor. A resource stop remains `ResourceLimit`, not an impossibility

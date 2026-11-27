@@ -230,7 +230,8 @@ uses only the shared menu.
 This exhausts GGS and GGSG. Every remaining defect-two root-closure
 counterexample must have shortest square chains with event order SGG,
 GSG, SGGG or GSGG. The later [GSG argument](ONE-BIG.md) eliminates
-one of these four orders; the other three remain unresolved.
+one of these four orders, and [GSGG](TWO-BIG.md) eliminates another;
+SGG and SGGG remain unresolved.
 
 ## 7. Verification and limits
 
@@ -238,7 +239,8 @@ The existing shared-support solver is reused, without a second synthesis
 implementation. The API admits the two new event words. The later
 [power-only extension](POWER-HISTORIES.md) also admits other event words
 when every source value is a power of two. GSG is now covered by the
-[one-big extension](ONE-BIG.md); the remaining mixed histories are rejected. Configured resource exhaustion raises
+[one-big extension](ONE-BIG.md) and GSGG by the
+[two-big extension](TWO-BIG.md); the remaining mixed histories are rejected. Configured resource exhaustion raises
 `ResourceLimit`; it does not report mathematical infeasibility.
 
 The complete finite checker independently enumerates legal chains and

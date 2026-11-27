@@ -34,7 +34,7 @@ def eligible(chain, defect):
         defect == 2
         and (
             len(events) in (3, 4, 7)
-            or word in ("GGS", "GGSG", "GSG")
+            or word in ("GGS", "GGSG", "GSG", "GSGG")
             or all(v & (v - 1) == 0 for v in chain.values)
         )
         and isqrt(chain.values[-1]) ** 2 == chain.values[-1]
@@ -85,7 +85,7 @@ def verify(max_level=12, *, aliases=False):
             digest.update(reduction.rule.encode("ascii") + b"\0")
     return {
         "complete_through_level": max_level,
-        "source_sector": "exactly two small steps; three, four or seven nonsquares, GGS/GGSG/GSG, or power-only histories",
+        "source_sector": "exactly two small steps; three, four or seven nonsquares, GGS/GGSG/GSG/GSGG, or power-only histories",
         "checked_square_chains_or_recipe_variants": sum(counts.values()),
         "unique_roots": len(square_roots),
         "rules": dict(sorted(counts.items())),

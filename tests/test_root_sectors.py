@@ -49,6 +49,11 @@ class RootSectorTests(unittest.TestCase):
                 "late_small_menu",
                 "power_exponents",
                 "one_big_menu",
+                "two_big_menu",
+                "two_big_available",
+                "two_big_prefix_root",
+                "two_big_six_family",
+                "two_big_three_family",
             },
         )
 
@@ -194,7 +199,6 @@ class RootSectorTests(unittest.TestCase):
 
     def test_remaining_event_orders_stay_explicitly_unsupported(self):
         for values in (
-            (1, 2, 3, 4, 8, 32, 256),
             (1, 2, 3, 9, 10, 27, 270, 72900),
             (1, 2, 3, 9, 10, 81, 810, 65610, 4304672100),
         ):
@@ -351,3 +355,191 @@ class RootSectorTests(unittest.TestCase):
             self.assertEqual(result.saved_instructions, 1)
             with self.assertRaises(ResourceLimit):
                 reduce_square(source, max_states=0)
+
+    def test_two_big_final_gap_exceptional_programs_at_large_parameters(self):
+        for gap in (2, 3, 6, 10):
+            six = [1, 2, 3, 6]
+            for _ in range(gap):
+                six.append(six[-1] ** 2)
+            H = six[-1]
+            D, E = H * six[-2], H * H * six[-2]
+            six.extend((D, E, E * E, E * E * D))
+            result = reduce_square(explicit_chain(six), max_states=0, max_pairs=0)
+            self.assertEqual(result.rule, "two_big_six_family")
+            self.assertEqual(result.saved_instructions, 1)
+            self.assertEqual(replay(result.chain) ** 2, six[-1])
+
+            three = [1, 2, 3]
+            for _ in range(gap):
+                three.append(three[-1] ** 2)
+            Q, X = three[-1], three[-2]
+            C = Q * X
+            D, E = C * Q, C * C * Q
+            three.extend((C, D, E, E * E, E * E * D))
+            result = reduce_square(explicit_chain(three), max_states=0, max_pairs=0)
+            self.assertEqual(result.rule, "two_big_three_family")
+            self.assertEqual(result.saved_instructions, 1)
+            self.assertEqual(replay(result.chain) ** 2, three[-1])
+
+    def test_two_big_final_gap_reuses_only_the_needed_root(self):
+        for gap in (2, 5, 12):
+            values = [1, 2, 3, 6, 8, 48]
+            for _ in range(gap):
+                values.append(values[-1] ** 2)
+            values.append(values[-1] * values[-2])
+            result = reduce_square(explicit_chain(values), max_states=0, max_pairs=0)
+            self.assertEqual(result.rule, "two_big_available")
+            self.assertEqual(result.saved_instructions, 1)
+            self.assertEqual(replay(result.chain) ** 2, values[-1])
+        source = explicit_chain(
+            (1, 2, 3, 4, 12, 144, 20736, 2985984, 8916100448256, 26623333280885243904)
+        )
+        result = reduce_square(source)
+        self.assertEqual(result.rule, "two_big_prefix_root")
+        self.assertEqual(replay(result.chain), 5159780352)
+        for limits in ({"max_states": 0}, {"max_pairs": 0}):
+            with self.assertRaises(ResourceLimit):
+                reduce_square(source, **limits)
+
+    def test_two_big_adjacent_endings_and_targeted_cubic_enrichment(self):
+        for k in (1, 2, 5, 9):
+            tower = [1, 2]
+            for _ in range(k):
+                tower.append(tower[-1] ** 2)
+            A = tower[-1]
+            for B in (A + 1, A + tower[-2]):
+                C = A * A
+                for D in (C * A, C * B):
+                    E = D * C
+                    source = explicit_chain((*tower, B, C, D, E, E * D))
+                    result = reduce_square(source)
+                    self.assertEqual(result.rule, "two_big_menu")
+                    self.assertEqual(replay(result.chain) ** 2, source.values[-1])
+                    self.assertGreaterEqual(result.saved_instructions, 1)
+        for e in (2, 4, 8):
+            prefix = [1, 2, 3]
+            for _ in range(e):
+                prefix.append(prefix[-1] ** 2)
+            C = prefix[-1] * prefix[-2]
+            D = C * prefix[-1]
+            for h in (1, 4):
+                values = [*prefix, C, D]
+                for _ in range(h):
+                    values.append(values[-1] ** 2)
+                K = values[-1]
+                for v in (C, D):
+                    E = K * v
+                    source = explicit_chain((*values, E, E * K))
+                    result = reduce_square(source)
+                    self.assertEqual(replay(result.chain) ** 2, source.values[-1])
+                    self.assertGreaterEqual(result.saved_instructions, 1)
+        for base in ((1, 2, 3, 5), (1, 2, 4, 6, 24), (1, 2, 3, 9, 81, 729)):
+            for gap in (2, 5):
+                values = list(base)
+                for _ in range(gap):
+                    values.append(values[-1] ** 2)
+                H = values[-1]
+                D = H * values[-2]
+                for E in (H * H, D * H):
+                    source = explicit_chain((*values, D, E, H * H * D))
+                    result = reduce_square(source)
+                    self.assertEqual(replay(result.chain) ** 2, source.values[-1])
+                    self.assertGreaterEqual(result.saved_instructions, 1)
+
+    def test_two_big_fixed_zero_gap_palettes(self):
+        cases = (
+            ((1, 2, 3, 4), 16, {(8, 32, 256), (9, 36, 324), (12, 48, 576)}),
+            ((1, 2, 3, 5), 16, set()),
+            ((1, 2, 3, 6), 16, {(9, 36, 324), (9, 54, 324)}),
+            ((1, 2, 3, 9, 18), 256, {(162, 1458, 236196)}),
+            ((1, 2, 3, 9, 27), 256, {(243, 2187, 531441)}),
+        )
+
+        def choices(values):
+            return {
+                v
+                for x, y in combinations_with_replacement(values, 2)
+                for v in (x + y, x * y)
+                if v > values[-1]
+            }
+
+        for prefix, U, expected in cases:
+            found = set()
+            for D in choices(prefix):
+                if D >= U:
+                    continue
+                for E in choices((*prefix, D)):
+                    if E < U or E == D * D:
+                        continue
+                    for N in choices((*prefix, D, E)):
+                        if N < U * U or N == E * E or isqrt(N) ** 2 != N:
+                            continue
+                        found.add((D, E, N))
+                        result = reduce_square(explicit_chain((*prefix, D, E, N)))
+                        self.assertEqual(replay(result.chain) ** 2, N)
+                        self.assertGreaterEqual(result.saved_instructions, 1)
+            self.assertEqual(found, expected)
+
+    def test_two_big_structural_claims_on_independently_enumerated_histories(self):
+        checked = 0
+        for defect, chain in chains((1 << 512) - 1, 2):
+            ev = tuple(
+                i
+                for i in range(1, len(chain.values))
+                if chain.values[i] != chain.values[i - 1] ** 2
+            )
+            word = "".join(
+                "S" if level(chain.values[i]) == level(chain.values[i - 1]) else "G" for i in ev[2:]
+            )
+            if defect != 2 or word != "GSGG":
+                continue
+            B, C, D, E = (chain.values[i] for i in ev[1:5])
+            A = chain.values[ev[1] - 1]
+            g, h, j = (ev[i + 1] - ev[i] - 1 for i in (2, 3, 4))
+            V = 1 << (1 << level(D))
+            self.assertGreaterEqual(D**3, V**2)
+            if B & (B - 1) == 0:
+                self.assertTrue(all(v & (v - 1) == 0 for v in chain.values))
+            N = chain.values[-1]
+            if ev[-1] != len(chain.values) - 1 or isqrt(N) ** 2 != N or j:
+                continue
+            checked += 1
+            if h:
+                K = chain.values[ev[4] - 1]
+                self.assertEqual(N, E * K)
+                self.assertEqual(E % K, 0)
+                self.assertEqual(isqrt(E // K) ** 2, E // K)
+            elif g:
+                H = chain.values[ev[3] - 1]
+                self.assertTrue(
+                    (E % D == 0 and N == D * E and isqrt(E // D) ** 2 == E // D)
+                    or (N == H * H * D and isqrt(D) ** 2 == D)
+                )
+            elif B & (B - 1):
+                if A >= 4 and C == A * B:
+                    self.assertEqual((A, B, N), (4, 6, 82944))
+                elif A >= 4 and C == A * A:
+                    self.assertEqual(N, D * D * C)
+                elif C not in (4, 5, 6, 18, 27):
+                    self.assertEqual(isqrt(D) ** 2, D)
+                    self.assertEqual(isqrt(E) ** 2, E)
+        self.assertGreater(checked, 100)
+
+    def test_arbitrary_prefix_fibonacci_envelope(self):
+        fib = [0, 1]
+        for _ in range(10):
+            fib.append(fib[-1] + fib[-2])
+        checked = 0
+        for _, chain in chains(4096, 2):
+            for start in range(1, len(chain.values)):
+                suffix = chain.values[start:]
+                b = sum(y != x * x for x, y in zip(suffix, suffix[1:]))
+                d = len(suffix) - 1 - b
+                D = suffix[0]
+                self.assertLessEqual(suffix[-1], D ** ((1 << d) * fib[b + 2]))
+                if b == 2:
+                    U = 1 << (1 << level(D))
+                    if D**3 < U**2:
+                        self.assertLess(suffix[-1], U ** (1 << (d + 1)))
+                checked += 1
+        self.assertGreater(checked, 1000)

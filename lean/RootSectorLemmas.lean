@@ -214,4 +214,38 @@ theorem one_big_head_gap {s C : Nat} (large : 2≤s) (head : C≤s^5) :
     _ ≤ s*s^15 := Nat.mul_le_mul_right _ large
     _ = (s^8)^2 := by rw [← Nat.pow_mul]; simp only [Nat.pow_succ]; ac_rfl
 
+def thirteenSource : List SolvedMarked.Instr :=
+  [.mul 0 0,.mul 0 1,.mul 0 1,.mul 0 0,.mul 0 2]
+
+def thirteenRoot : List SolvedMarked.Instr :=
+  [.mul 0 1,.mul 0 1,.mul 0 0,.mul 0 2]
+
+theorem thirteen_program (history : SolvedMarked.Hist)
+    (rooted : history 0=history 1*history 1) :
+    SolvedMarked.eval thirteenSource history 0 =
+      SolvedMarked.eval thirteenRoot history 0 * SolvedMarked.eval thirteenRoot history 0 := by
+  simp only [thirteenSource,thirteenRoot,SolvedMarked.eval,SolvedMarked.evalI,SolvedMarked.push]
+  rw [rooted]
+  ac_rfl
+
+theorem thirteen_cost :
+    SolvedInflation.cost thirteenRoot+1=SolvedInflation.cost thirteenSource := by decide
+
+def twentyOneSource : List SolvedMarked.Instr :=
+  [.mul 0 0,.mul 0 1,.mul 0 1,.mul 0 1,.mul 0 0,.mul 0 2]
+
+def twentyOneRoot : List SolvedMarked.Instr :=
+  [.mul 0 1,.mul 0 1,.mul 0 1,.mul 0 0,.mul 0 2]
+
+theorem twenty_one_program (history : SolvedMarked.Hist)
+    (rooted : history 0=history 1*history 1) :
+    SolvedMarked.eval twentyOneSource history 0 =
+      SolvedMarked.eval twentyOneRoot history 0 * SolvedMarked.eval twentyOneRoot history 0 := by
+  simp only [twentyOneSource,twentyOneRoot,SolvedMarked.eval,SolvedMarked.evalI,SolvedMarked.push]
+  rw [rooted]
+  ac_rfl
+
+theorem twenty_one_cost :
+    SolvedInflation.cost twentyOneRoot+1=SolvedInflation.cost twentyOneSource := by decide
+
 end SolvedRootBlocks

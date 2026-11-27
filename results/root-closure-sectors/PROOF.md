@@ -3,8 +3,8 @@
 **Status: proof draft; independent mathematical review and novelty assessment
 are pending.** The full defect-two root-closure question remains unresolved
 here. Menu-based reconstruction may stop at a configured resource limit;
-such a stop is not an infeasibility claim. Twenty supporting statements and
-program identities across two modules are checked in Lean; the complete sector coverage and
+such a stop is not an infeasibility claim. Supporting program identities, power lifting and suffix growth bounds
+are checked in Lean; the complete sector coverage and
 program transformations below retain written proofs.
 
 ## Question and result
@@ -28,7 +28,7 @@ root closure at defect three.
 
 **Theorem.** Suppose an increasing chain has exactly two small steps and
 an integer-square endpoint N. If it has three, four or seven canonical
-nonsquares, event order GGS, GGSG or GSG after the first small step, or only
+nonsquares, event order GGS, GGSG, GSG or GSGG after the first small step, or only
 powers of two throughout its history, one can
 construct an increasing chain for √N using at least one fewer instruction.
 Its defect is at most two. Arbitrarily long square runs are included. Here
@@ -39,7 +39,7 @@ precisely these sectors and supplies every instruction of the new chain.
 Unsupported inputs are rejected, not declared impossible. Every output is
 replayed and its endpoint and instruction saving are checked.
 
-The three-event argument is self-contained. The [four-event extension](FOUR-EVENTS.md) supplies a finite candidate menu and an exact solver that counts shared ancestors once. Its exchange family shows why source values and their roots alone need not suffice. The [late-small extension](LATE-SMALL.md) covers GGS and GGSG using the published one-small-step prefix classification, with explicit treatment of the exceptional history 1,2,4,8,32,256. The [one-big extension](ONE-BIG.md) covers GSG using uniform prefix-growth bounds and the shared-helper exception at root 288. The [power-only extension](POWER-HISTORIES.md) instead works on the exponent chain and uses Knuth’s classical low-step classification. The seven-event part reuses
+The three-event argument is self-contained. The [four-event extension](FOUR-EVENTS.md) supplies a finite candidate menu and an exact solver that counts shared ancestors once. Its exchange family shows why source values and their roots alone need not suffice. The [late-small extension](LATE-SMALL.md) covers GGS and GGSG using the published one-small-step prefix classification, with explicit treatment of the exceptional history 1,2,4,8,32,256. The [one-big extension](ONE-BIG.md) covers GSG using uniform prefix-growth bounds and the shared-helper exception at root 288. The [two-big extension](TWO-BIG.md) covers GSGG with targeted root contracts, a suffix growth barrier and two explicit product rewrites. The [power-only extension](POWER-HISTORIES.md) instead works on the exponent chain and uses Knuth’s classical low-step classification. The seven-event part reuses
 the existing [twelve-ray classification](../seven-nonsquares/PROOF.md);
 it is not a new independent proof of that classification. The background
 model and bounds are from Tarek, Bahig and Anwar's 2026 study, whose §7
@@ -223,7 +223,7 @@ three and seven canonical nonsquares: the initial write and both small
 steps give the lower bound, and the published nonsquare bound gives
 the upper bound.
 
-The [four-event argument](FOUR-EVENTS.md) covers the two intermediate event orders SG and GS, while preserving every required helper. The [late-small argument](LATE-SMALL.md) additionally eliminates GGS and GGSG, and the [one-big argument](ONE-BIG.md) eliminates GSG. Thus **every shortest chain in any remaining counterexample must have event word SGG, SGGG or GSGG**, with five or six canonical nonsquares. This is a structural reduction, not a resolution of the full root-closure question. The [power-only argument](POWER-HISTORIES.md) also requires every shortest chain of a remaining counterexample to contain a non-power-of-two value. The other three orders remain unresolved for such histories; a power-of-two endpoint alone does not put a chain in the supported class.
+The [four-event argument](FOUR-EVENTS.md) covers the two intermediate event orders SG and GS, while preserving every required helper. The [late-small argument](LATE-SMALL.md) additionally eliminates GGS and GGSG, and the [one-big argument](ONE-BIG.md) eliminates GSG. The [two-big argument](TWO-BIG.md) eliminates GSGG. Thus **every shortest chain in any remaining counterexample must have event word SGG or SGGG**, with five or six canonical nonsquares. This is a structural reduction, not a resolution of the full root-closure question. The [power-only argument](POWER-HISTORIES.md) also requires every shortest chain of a remaining counterexample to contain a non-power-of-two value. The other two orders remain unresolved for such histories; a power-of-two endpoint alone does not put a chain in the supported class.
 
 A stronger composition shortcut has been disproved: a shortest defect-two
 source cannot always be shortened while retaining the roots of earlier
@@ -238,18 +238,19 @@ requirements explicitly.
 The [finite checker](../../checks/verify_root_sectors.py) uses the
 independent all-pairs chain enumerator and directly replays every
 returned instruction sequence. Through complete level 12 it checks
-335,275 eligible square chains: 32,810 with three events, 162,271 with four,
-128,449 with five, 11,339 with six and 406 with seven, restricted to the
-proved subclasses. They cover 31,706 distinct roots. Savings are one write
-in 283,220 cases, two in 45,895, and three in 6,160.
+342,158 eligible square chains: 32,810 with three events, 162,271 with four,
+128,449 with five, 18,222 with six and 406 with seven, restricted to the
+proved subclasses. They cover 31,713 distinct roots. Savings are one write
+in 289,756 cases, two in 46,077, and three in 6,325.
 
-The GSG extension adds 80,888 histories and 3,616 distinct roots to the
-previous certificate, including 6,566 new nontrivial menu reconstructions.
-The three-/four-/seven-event counts and prior menu/exponent branch counts
-are unchanged. The certificate changes because of this declared scope
-extension, not a new numerical interpretation of earlier cases.
+The GSGG extension adds 6,883 histories and seven distinct roots. Of its
+nontrailing mixed histories, 1,179 use the menu, 562 delete a final square
+with an available cofactor root, 200 reconstruct the GSG prefix root, and
+six each use the two exceptional product programs. Existing sector and
+power-constructor branch counts are unchanged. The certificate changes
+because of this declared coverage extension.
 
-A separate level-8 test checks all 51,566 final-instruction variants,
+A separate level-8 test checks all 52,988 final-instruction variants,
 including operand order, addition/product aliases and all reconstruction
 rules. Other tests cover long runs, roots absent from the original
 history, malformed references, unsupported histories and frozen inputs.
@@ -265,7 +266,11 @@ the factor-root product identities, the odd-factor power-of-two lemma,
 the unique solution of y²=2^k+1, and the four-event helper-exchange
 identity with its exact suffix cost, the paired-cofactor identity and the
 late-small boundary-square argument and three universal first-big-prefix
-growth inequalities used in GSG. It does not yet prove the full
+growth inequalities used in GSG. It also checks the two GSGG exceptional
+source/root programs and their one-write savings. The
+[general growth module](../../lean/NonsquareBound.lean) now anchors its
+Fibonacci envelope at any retained prefix and proves the two-event cubic
+barrier. It does not yet prove the full
 sector classification or certify the Python implementation universally. The
 [power-lifting module](../../lean/PowerChainLift.lean) additionally constructs
 a valid increasing AM chain from any addition-only chain, with its extra

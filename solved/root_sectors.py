@@ -148,6 +148,65 @@ def four_event_menu(chain):
     return _candidate_menu(chain, root, events)
 
 
+def _two_big_final_gap(chain, events, *, max_states, max_pairs):
+    """Use the actual final cofactor, without requiring every earlier root."""
+    values = chain.values
+    first, first_big, second, next_big, final = events[1:]
+    e = first_big - first - 1
+    g = second - first_big - 1
+    h = next_big - second - 1
+    j = final - next_big - 1
+    B, C, D, E = (values[i] for i in (first, first_big, second, next_big))
+    K, N = values[-2:]
+    w, remainder = divmod(N, K)
+    rw = isqrt(w)
+    if j < 1 or remainder or rw * rw != w:
+        raise ArithmeticError("the two-big final-gap factor invariant failed")
+    if rw in values[:-2]:
+        builder = _Builder(_prefix(chain, len(chain.recipes) - 2))
+        builder.append("*", values[-3], rw)
+        return builder.finish(), "two_big_available"
+    if w == E:
+        prefix_root = reduce_square(
+            _prefix(chain, next_big), max_states=max_states, max_pairs=max_pairs
+        )
+        builder = _Builder(prefix_root.chain)
+        for _ in range(j):
+            head = builder.values[-1]
+            builder.append("*", head, head)
+        builder.append("*", builder.values[-1], prefix_root.root)
+        return builder.finish(), "two_big_prefix_root"
+    if w != D or h or j != 1:
+        raise ArithmeticError("unclassified two-big cofactor-root requirement")
+    H = values[second - 1]
+    if C == 6 and g >= 2 and D == H * isqrt(H) and E == D * H:
+        X, Y = values[second - 2], values[second - 3]
+        builder = _Builder(_prefix(chain, second - 2))
+        root_D = builder.append("*", X, Y)
+        root_E = builder.append("*", root_D, X)
+        restored_E = builder.append("*", root_E, root_E)
+        builder.append("*", restored_E, root_D)
+        return builder.finish(), "two_big_six_family"
+    Q = values[first_big - 1]
+    if (
+        B == 3
+        and e >= 2
+        and g == 0
+        and C == Q * values[first_big - 2]
+        and D == C * Q
+        and E == D * C
+    ):
+        X, Y = values[first_big - 2], values[first_big - 3]
+        builder = _Builder(_prefix(chain, first_big - 2))
+        root_C = builder.append("*", X, Y)
+        root_D = builder.append("*", root_C, X)
+        root_E = builder.append("*", root_D, root_C)
+        restored_E = builder.append("*", root_E, root_E)
+        builder.append("*", restored_E, root_D)
+        return builder.finish(), "two_big_three_family"
+    raise ArithmeticError("unclassified two-big exceptional prefix")
+
+
 def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
     """Return a root program saving at least one write in the declared sector."""
     validate_limits(max_states, max_pairs)
@@ -157,10 +216,11 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
     word = "".join("S" if level(values[i]) == level(values[i - 1]) else "G" for i in events[2:])
     late_small = word in ("GGS", "GGSG")
     one_big = word == "GSG"
-    known_sector = len(events) in (3, 4, 7) or late_small or one_big
+    two_big = word == "GSGG"
+    known_sector = len(events) in (3, 4, 7) or late_small or one_big or two_big
     if not known_sector and not all(_power_of_two(v) for v in values):
         raise ValueError(
-            "supported sectors are three, four, seven, GGS, GGSG, GSG and power-only histories"
+            "supported sectors are three, four, seven, GGS, GGSG, GSG, GSGG and power-only histories"
         )
 
     def result(output, rule):
@@ -173,9 +233,12 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
 
     if values[-1] == values[-2] ** 2:
         return result(_prefix(chain, source_length - 1), "trailing_square")
-    if not known_sector or one_big and all(_power_of_two(v) for v in values):
+    if not known_sector or (one_big or two_big) and all(_power_of_two(v) for v in values):
         return result(reduce_power_square(chain), "power_exponents")
-    if len(events) == 4 or late_small or one_big:
+    if two_big and events[-1] - events[-2] > 1:
+        output, rule = _two_big_final_gap(chain, events, max_states=max_states, max_pairs=max_pairs)
+        return result(output, rule)
+    if len(events) == 4 or late_small or one_big or two_big:
         if root in values[:-1]:
             return result(_prefix(chain, values.index(root)), "retained_root")
         output = shortest_from_menu(
@@ -187,7 +250,14 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
         )
         if output is None:
             raise ArithmeticError("the proved candidate menu has no root certificate")
-        rule = "one_big_menu" if one_big else "late_small_menu" if late_small else "four_event_menu"
+        if two_big:
+            rule = "two_big_menu"
+        elif one_big:
+            rule = "one_big_menu"
+        elif late_small:
+            rule = "late_small_menu"
+        else:
+            rule = "four_event_menu"
         return result(output, rule)
     if len(events) == 7:
         output, rule = _seven_root(values[-1])

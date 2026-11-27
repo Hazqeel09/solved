@@ -48,7 +48,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [AMNormalization](../lean/AMNormalization.lean) | Arbitrary AM programs normalize to increasing chains without increasing cost; the lower bound transfers. |
 | [AdditiveSeparation](../lean/AdditiveSeparation.lean) | Integer signed constructions, minimum-cost existence and uniqueness, and the full main additive-gap conclusion. |
 | [MarkedEncoding](../lean/MarkedEncoding.lean) | Every increasing AM chain has legal marked code preserving its endpoint and exact write count, with bounded size and operand addresses. |
-| [NonsquareBound](../lean/NonsquareBound.lean) | Integer Fibonacci envelope, complete canonical step counting, and the bound p≤4s+4, including the tower-minus-one specialization. |
+| [NonsquareBound](../lean/NonsquareBound.lean) | Integer Fibonacci envelopes from the initial seed or an arbitrary prefix, canonical step counting, the bound p≤4s+4 and a two-nonsquare cubic barrier. |
 | [ControlInflation](../lean/ControlInflation.lean) | Comparable control programs, exact cost differences, and domination by the corresponding iterated square. |
 | [EffectiveCutoffs](../lean/EffectiveCutoffs.lean) | Integer ratio witnesses and leading-profile upper/lower decisions. |
 | [DiagonalProfiles](../lean/DiagonalProfiles.lean) | Whole-program coefficient profiles, saved-history invariants, exact cost correspondence and the complete diagonal criterion. |
@@ -56,7 +56,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [FiniteLists](../lean/FiniteLists.lean) | Shared list membership and duplicate-removal facts. |
 | [FiniteBasis](../lean/FiniteBasis.lean) | A total recursive reference search, strict box-rank descent, exact coverage and minimal-generator pruning. |
 | [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Complete basis membership, exact-solution inclusion and safe per-domain cutoffs using the concrete arithmetic oracle. |
-| [RootSectorLemmas](../lean/RootSectorLemmas.lean) | Elementary square gaps, power-of-two factors, a complete three-operation/four-operation exchange identity, and paired-cofactor/boundary-square identities and universal first-big-prefix growth inequalities supporting the partial root-closure result. |
+| [RootSectorLemmas](../lean/RootSectorLemmas.lean) | Elementary square gaps, power-of-two factors, a complete three-operation/four-operation exchange identity, and paired-cofactor/boundary-square identities and universal first-big-prefix growth inequalities and two explicit GSGG source/root programs supporting the partial root-closure result. |
 | [RootRetention](../lean/RootRetention.lean) | Complete marked-search argument, exact costs 6/7/7 for 2000, its square, and the joint requirement {10,2000}; a shortest defect-two source refutes uniform marked-root reconstruction. |
 | [PowerChainLift](../lean/PowerChainLift.lean) | A valid AM chain from any increasing addition-only chain, with the initial 2 write charged and the endpoint/root identity proved. The low-step classification and exponent extraction remain outside this formalization. |
 | [UniversalCutoff](../lean/UniversalCutoff.lean) | Finite clipping/control coverage and a computable universal threshold for arbitrary AM programs and the additive subtraction gap. |

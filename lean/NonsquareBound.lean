@@ -122,9 +122,12 @@ theorem nonsquare_product_bound {r i X Y : Nat} (c : Chain r)
       have product := Nat.mul_le_mul left earlier
       omega
 
-theorem doubled_power (d t : Nat) :
-    2^(2^(d+1)*t) = 2^(2^d*t)*2^(2^d*t) := by
+theorem doubled_base_power (base d t : Nat) :
+    base^(2^(d+1)*t) = base^(2^d*t)*base^(2^d*t) := by
   rw [Nat.pow_succ, Nat.mul_two, Nat.add_mul, Nat.pow_add]
+
+theorem doubled_power (d t : Nat) :
+    2^(2^(d+1)*t) = 2^(2^d*t)*2^(2^d*t) := doubled_base_power 2 d t
 
 theorem envelope {r i b d : Nat} {c : Chain r} (h : Counted c i b d) :
     c.value i ≤ 2^(2^d*fib (b+2)) ∧
@@ -265,6 +268,78 @@ theorem level_requires_writes {r L : Nat} (c : Chain r)
   have first := (Nat.pow_le_pow_iff_right (by decide : 1<2)).mp compare
   have second := (Nat.pow_le_pow_iff_right (by decide : 1<2)).mp first
   have length := counted_length counts
+  omega
+
+-- The same Fibonacci bound, anchored at an arbitrary retained prefix.
+inductive TailCounted {r : Nat} (c : Chain r) (start : Nat) : Nat → Nat → Nat → Prop
+  | initial (bound : start≤r) : TailCounted c start start 0 0
+  | square {i b d : Nat} (previous : TailCounted c start i b d)
+      (bound : i+1≤r) (sq : Square c (i+1)) : TailCounted c start (i+1) b (d+1)
+  | other {i b d : Nat} (previous : TailCounted c start i b d)
+      (bound : i+1≤r) (non : ¬ Square c (i+1)) : TailCounted c start (i+1) (b+1) d
+
+theorem tail_length {r start i b d : Nat} {c : Chain r}
+    (h : TailCounted c start i b d) : i=start+b+d := by
+  induction h <;> omega
+
+theorem tail_start_le {r start i b d : Nat} {c : Chain r}
+    (h : TailCounted c start i b d) : start≤i := by
+  have length := tail_length h
+  omega
+
+theorem tail_envelope {r start i b d D : Nat} {c : Chain r}
+    (h : TailCounted c start i b d) (positive : 1≤start)
+    (large : 2≤D) (seed : c.value start≤D) :
+    c.value i≤D^(2^d*fib (b+2)) ∧ c.value (i-1)≤D^(2^d*fib (b+1)) := by
+  induction h with
+  | initial bound =>
+    have old := Nat.le_trans (monotone c (show start-1≤start by omega) bound) seed
+    simpa [fib] using And.intro seed old
+  | @square i b d _previous _bound sq ih =>
+    have next : c.value (i+1)=c.value i*c.value i := by
+      simpa only [Square,Nat.add_sub_cancel] using sq
+    constructor
+    · rw [next,doubled_base_power]
+      exact Nat.mul_le_mul ih.1 ih.1
+    · simp only [Nat.add_sub_cancel]
+      have exponents := Nat.mul_le_mul_left (2^d) (fib_double b)
+      have powers := Nat.pow_le_pow_of_le (by omega : 1<D) exponents
+      have target : 2^d*(2*fib (b+1))=2^(d+1)*fib (b+1) := by
+        rw [Nat.pow_succ,Nat.mul_assoc]
+      rw [target] at powers
+      exact Nat.le_trans ih.1 powers
+  | @other i b d previous bound non ih =>
+    have position := tail_start_le previous
+    have exponentPositive : 1≤2^d*fib (b+1) :=
+      Nat.mul_le_mul Nat.one_le_two_pow (fib_positive b)
+    have power : D≤D^(2^d*fib (b+1)) := by
+      simpa only [Nat.pow_one] using
+        Nat.pow_le_pow_of_le (by omega : 1<D) exponentPositive
+    have two : 2≤D^(2^d*fib (b+1)) := Nat.le_trans large power
+    have product := nonsquare_product_bound c (by omega) bound ih.1 ih.2 two non
+    constructor
+    · have sum : fib (b+1+2)=fib (b+2)+fib (b+1) := fib_step (b+1)
+      rw [sum,Nat.mul_add,Nat.pow_add]
+      exact product
+    · simpa only [Nat.add_sub_cancel] using ih.1
+
+theorem two_event_cubic_barrier {r start i d D U : Nat} {c : Chain r}
+    (h : TailCounted c start i 2 d) (positive : 1≤start)
+    (large : 2≤D) (seed : c.value start≤D) (cubic : D^3<U^2) :
+    ¬ U^(2^(d+1))≤c.value i := by
+  have upper : c.value i≤D^(2^d*3) := by
+    simpa [fib] using (tail_envelope h positive large seed).1
+  have lifted : ∀ k, D^(2^k*3)<U^(2^k*2) := by
+    intro k
+    induction k with
+    | zero => simpa using cubic
+    | succ d ih =>
+      rw [doubled_base_power,doubled_base_power]
+      exact Nat.lt_of_le_of_lt (Nat.mul_le_mul_left _ (Nat.le_of_lt ih))
+        (Nat.mul_lt_mul_of_pos_right ih (by omega))
+  intro reaches
+  rw [Nat.pow_succ] at reaches
+  have strict := lifted d
   omega
 
 end SolvedGrowth
