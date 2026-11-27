@@ -28,4 +28,10 @@ theorem col_le_total {A B : ℕ} {g : ℕ → ℤ} (hg : ∀ k < A * B, 0 ≤ g 
   have := mem_range.1 hl'
   nlinarith
 
+theorem sum_map_range {M : Type*} [AddCommMonoid M] (f : ℕ → M) (N : ℕ) :
+    ((List.range N).map f).sum = ∑ i ∈ range N, f i := by
+  induction N with
+  | zero => simp
+  | succ N ih => rw [List.range_succ, List.map_append, List.sum_append, ih, sum_range_succ]; simp
+
 end Solved.Cert

@@ -433,12 +433,6 @@ theorem runMask_eq (L : List Bool) (ks : List ℕ) (path : ℕ) :
 /-- The bitmask of `L` on cells `0, …, N-1`. -/
 def maskOf (N : ℕ) (L : List Bool) : ℕ := pack 1 N fun k => if bit L k then 1 else 0
 
-theorem sum_map_range (f : ℕ → ℕ) (N : ℕ) :
-    ((List.range N).map f).sum = ∑ i ∈ range N, f i := by
-  induction N with
-  | zero => simp
-  | succ N ih => rw [List.range_succ, List.map_append, List.sum_append, ih, sum_range_succ]; simp
-
 theorem runMask_perm {ks : List ℕ} {N : ℕ} (hperm : ks.Perm (List.range N)) (L : List Bool) :
     runMask L ks 0 = maskOf N L := by
   rw [runMask_eq, Nat.zero_add, (hperm.map _).sum_eq, sum_map_range, maskOf, pack]

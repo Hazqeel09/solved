@@ -125,5 +125,27 @@ theorem eval_eq_sum (P : BPoly) {Dx Dy : ℕ} (hx : P.length ≤ Dx) (hy : ∀ Q
     rw [mul_sum]
     exact sum_congr rfl fun j _ => by ring
 
+/-! ## Substituting two affine forms -/
+
+/-- `E (a₀ + a₁ x + a₂ y, b₀ + b₁ x + b₂ y)`, by Horner's scheme in the first variable. -/
+def subst : BPoly → ℤ → ℤ → ℤ → ℤ → ℤ → ℤ → BPoly
+  | [], _, _, _, _, _, _ => []
+  | Q :: E, a0, a1, a2, b0, b1, b2 =>
+    add (compose Q b0 b1 b2) (mulLin a0 a1 a2 (subst E a0 a1 a2 b0 b1 b2))
+
+@[simp] theorem eval_subst (E : BPoly) (a0 a1 a2 b0 b1 b2 x y : ℤ) :
+    eval (subst E a0 a1 a2 b0 b1 b2) x y = eval E (a0 + a1 * x + a2 * y) (b0 + b1 * x + b2 * y) := by
+  induction E with
+  | nil => simp [subst]
+  | cons Q E ih => simp [subst, ih]
+
+/-- At most `Dx` rows, each of length at most `Dy`. -/
+def bounded (Dx Dy : ℕ) (P : BPoly) : Bool := Nat.ble P.length Dx && P.all fun Q => Nat.ble Q.length Dy
+
+theorem bounded_spec {Dx Dy : ℕ} {P : BPoly} (h : bounded Dx Dy P = true) :
+    P.length ≤ Dx ∧ ∀ Q ∈ P, Q.length ≤ Dy := by
+  simp only [bounded, Bool.and_eq_true, Nat.ble_eq, List.all_eq_true] at h
+  exact ⟨h.1, h.2⟩
+
 end BPoly
 end Solved.Cert

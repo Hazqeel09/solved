@@ -18,3 +18,5 @@ import Formal.ICG.EvenAt
 import Formal.ICG.EvenFamilies
 import Formal.ICG.MultiBridge
 import Formal.ICG.Box
+import Formal.ICG.MultiCell
+import Formal.ICG.MultiPacked

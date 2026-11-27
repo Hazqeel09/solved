@@ -483,6 +483,7 @@ GENERAL = {
         "Solved.ICG.energy_le_of_certifyAt",
     ],
     "formal/Formal/ICG/MultiBridge.lean": ["Solved.ICG.Multi.energy_icgAdj_multi"],
+    "formal/Formal/ICG/MultiPacked.lean": ["Solved.ICG.Multi.certifyM_sound"],
 }
 FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"
 

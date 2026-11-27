@@ -36,6 +36,12 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/MultiPacked.lean",
+      "theorems": [
+        "Solved.ICG.Multi.certifyM_sound"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

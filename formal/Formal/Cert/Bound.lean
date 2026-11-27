@@ -143,4 +143,44 @@ theorem coeff_negPart (f : UPoly) (d : ℕ) : coeff (negPart f) d = min (coeff f
     | zero => rfl
     | succ d => exact ih d
 
+theorem coeff_scale (c : ℤ) (f : UPoly) (d : ℕ) : coeff (scale c f) d = c * coeff f d := by
+  induction f generalizing d with
+  | nil => simp [scale]
+  | cons a f ih =>
+    cases d with
+    | zero => rfl
+    | succ d => exact ih d
+
+theorem coeff_neg (f : UPoly) (d : ℕ) : coeff (neg f) d = -coeff f d := by
+  rw [neg, coeff_scale]; ring
+
+theorem coeff_nonneg_of_allNonneg {f : UPoly} (h : allNonneg f = true) (d : ℕ) :
+    0 ≤ coeff f d := by
+  induction f generalizing d with
+  | nil => simp
+  | cons a f ih =>
+    simp only [allNonneg, List.all_cons, Bool.and_eq_true, decide_eq_true_eq] at h
+    cases d with
+    | zero => exact h.1
+    | succ d => exact ih h.2 d
+
+theorem coeff_nonpos_of_allNonpos {f : UPoly} (h : allNonpos f = true) (d : ℕ) :
+    coeff f d ≤ 0 := by
+  induction f generalizing d with
+  | nil => simp
+  | cons a f ih =>
+    simp only [allNonpos, List.all_cons, Bool.and_eq_true, decide_eq_true_eq] at h
+    cases d with
+    | zero => exact h.1
+    | succ d => exact ih h.2 d
+
+theorem coeff_eq_zero_of_allZero {f : UPoly} (h : allZero f = true) (d : ℕ) : coeff f d = 0 := by
+  induction f generalizing d with
+  | nil => simp
+  | cons a f ih =>
+    simp only [allZero, List.all_cons, Bool.and_eq_true, decide_eq_true_eq] at h
+    cases d with
+    | zero => exact h.1
+    | succ d => exact ih h.2 d
+
 end Solved.Cert.UPoly
