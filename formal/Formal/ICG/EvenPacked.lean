@@ -310,7 +310,7 @@ theorem mem_cellTable (a b p0 k : ℕ) {e : ℕ} (he : e < (a + 1) * (b + 1)) :
 
 theorem energy_cellT (a b p0 D : ℕ) {ks : List ℕ}
     (hlen : ∀ k ∈ ks, ∀ f ∈ cellTable a b p0 k, f.length ≤ D) (L : List Bool) (x : ℤ) :
-    energy ((a + 1) * (b + 1)) D (fun i => 0 + chosenT (cellT a b p0 D) L ks i) x =
+    energy ((a + 1) * (b + 1)) D (fun i => 0 + chosenT (cellT a b p0 D) L ks i) (fun d => x ^ d) =
       ∑ e ∈ range ((a + 1) * (b + 1)), |UPoly.eval ((runAcc L (steps a b p0 ks) []).get e) x| := by
   unfold energy
   refine sum_congr rfl fun e he => ?_
@@ -393,7 +393,7 @@ theorem certifyP_sound {a b p0 w D : ℕ} {E : UPoly} {ks : List ℕ} {star : Li
   have hb := hbnb
   rw [List.map_map] at hb
   have hsound := bnbP_sound hc hsize hleafS hleafC ks _ hok 0 (fun _ => 0) hroot
-    (by rw [hacc, haccS]; simpa [Function.comp_def] using hb) L hx
+    (by rw [hacc, haccS]; simpa [Function.comp_def] using hb) L (weights_pow hx)
   rcases hsound with hmem | hlt
   · exfalso
     rw [runMask_perm hperm' L, ← List.map_cons] at hmem

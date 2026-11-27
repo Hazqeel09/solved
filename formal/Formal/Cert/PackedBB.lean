@@ -7,13 +7,14 @@ import Formal.Cert.Sums
 
 Cell `k` contributes the integer table `T k`: `m` polynomials with `D` coefficients each,
 coefficient `d` of polynomial `e` at flat index `e * D + d`. The energy of a mask at `x` is
-`∑ₑ |∑_d (∑_{k ∈ L} T k (eD+d)) xᵈ|`.
+`∑ₑ |∑_d (∑_{k ∈ L} T k (eD+d)) ω_d|` for monomial values `ω_d ≥ 0` with `ω_0 > 0`, such as
+`ω_d = xᵈ` at `x ≥ 0` (one variable) or `xⁱyʲ` at `x, y ≥ 0` (two variables).
 
 At a node with accumulated table `a` and undecided cells `rem`, every completion's coefficient
 lies between `a + lo` and `a + hi`, where `lo` and `hi` sum the negative and positive parts of
 the contributions of `rem`; `hi - lo` is their absolute sum and `hi + lo = S` their sum. Hence
 its absolute value is at most `max (a + hi) (-(a + lo)) = -a - lo + max (2a + S) 0`, and the
-energy is at most `∑_d βd xᵈ` with `βd = ∑ₑ (-a - lo + max (2a + S) 0)` (`energy_le`).
+energy is at most `∑_d βd ω_d` with `βd = ∑ₑ (-a - lo + max (2a + S) 0)` (`energy_le`).
 
 `nodeTest` decides `target - β` has a positive constant and nonnegative coefficients using a
 fixed number of operations on packed numbers (`Solved.Cert.Pack`): the accumulated table, the
@@ -28,9 +29,18 @@ open Finset Pack
 
 /-! ## Semantics -/
 
-/-- `∑_{e<m} |∑_{d<D} f(eD+d) xᵈ|`. -/
-def energy (m D : ℕ) (f : ℕ → ℤ) (x : ℤ) : ℤ :=
-  ∑ e ∈ range m, |∑ d ∈ range D, f (e * D + d) * x ^ d|
+/-- `∑_{e<m} |∑_{d<D} f(eD+d) ω_d|` for monomial values `ω`, such as `ω_d = xᵈ` or
+`ω_{iD'+j} = xⁱ yʲ`. -/
+def energy (m D : ℕ) (f : ℕ → ℤ) (ω : ℕ → ℤ) : ℤ :=
+  ∑ e ∈ range m, |∑ d ∈ range D, f (e * D + d) * ω d|
+
+/-- Monomial values at a point of the region: all nonnegative, the constant one positive. -/
+structure Weights (ω : ℕ → ℤ) : Prop where
+  nonneg : ∀ d, 0 ≤ ω d
+  pos : 0 < ω 0
+
+theorem weights_pow {x : ℤ} (hx : 0 ≤ x) : Weights fun d => x ^ d :=
+  ⟨fun d => pow_nonneg hx d, by simp⟩
 
 /-- `∑_{k ∈ ks} T k i`. -/
 def sumT (T : ℕ → ℕ → ℤ) (ks : List ℕ) (i : ℕ) : ℤ := (ks.map fun k => T k i).sum
@@ -106,25 +116,24 @@ theorem abs_add_le_field {a c lo S : ℤ} (h₁ : lo ≤ c) (h₂ : c ≤ S - lo
 def beta (m D : ℕ) (a S lo : ℕ → ℤ) (d : ℕ) : ℤ :=
   ∑ e ∈ range m, (-a (e * D + d) - lo (e * D + d) + max (2 * a (e * D + d) + S (e * D + d)) 0)
 
-theorem energy_le (m D : ℕ) (T : ℕ → ℕ → ℤ) (L : List Bool) (ks : List ℕ) (a : ℕ → ℤ) {x : ℤ}
-    (hx : 0 ≤ x) :
-    energy m D (fun i => a i + chosenT T L ks i) x ≤
-      ∑ d ∈ range D, beta m D a (sumT T ks) (loT T ks) d * x ^ d := by
+theorem energy_le (m D : ℕ) (T : ℕ → ℕ → ℤ) (L : List Bool) (ks : List ℕ) (a : ℕ → ℤ)
+    {ω : ℕ → ℤ} (hω : Weights ω) :
+    energy m D (fun i => a i + chosenT T L ks i) ω ≤
+      ∑ d ∈ range D, beta m D a (sumT T ks) (loT T ks) d * ω d := by
   unfold energy beta
   simp only [sum_mul]
   rw [sum_comm]
   refine sum_le_sum fun e _ => (abs_sum_le_sum_abs _ _).trans (sum_le_sum fun d _ => ?_)
-  rw [abs_mul, abs_of_nonneg (pow_nonneg hx d)]
+  rw [abs_mul, abs_of_nonneg (hω.nonneg d)]
   obtain ⟨h₁, h₂⟩ := chosenT_bounds T L ks (e * D + d)
-  exact mul_le_mul_of_nonneg_right (abs_add_le_field h₁ h₂) (pow_nonneg hx d)
+  exact mul_le_mul_of_nonneg_right (abs_add_le_field h₁ h₂) (hω.nonneg d)
 
 theorem sum_pos_of_coeffs {D : ℕ} (hD : 0 < D) {z : ℕ → ℤ} (h0 : 0 < z 0)
-    (h : ∀ d < D, 0 ≤ z d) {x : ℤ} (hx : 0 ≤ x) : 0 < ∑ d ∈ range D, z d * x ^ d := by
+    (h : ∀ d < D, 0 ≤ z d) {ω : ℕ → ℤ} (hω : Weights ω) : 0 < ∑ d ∈ range D, z d * ω d := by
   obtain ⟨D, rfl⟩ : ∃ D', D = D' + 1 := ⟨D - 1, by omega⟩
   rw [sum_range_succ']
-  simp only [pow_zero, mul_one]
-  refine add_pos_of_nonneg_of_pos (sum_nonneg fun d hd => ?_) h0
-  exact mul_nonneg (h (d + 1) (by simpa using hd)) (pow_nonneg hx _)
+  refine add_pos_of_nonneg_of_pos (sum_nonneg fun d hd => ?_) (mul_pos h0 hω.pos)
+  exact mul_nonneg (h (d + 1) (by simpa using hd)) (hω.nonneg _)
 
 /-! ## The packed node test -/
 
@@ -496,11 +505,11 @@ theorem energy_lt_of_nodeTest {c : Cfg} (hc : c.OK) {T : ℕ → ℕ → ℤ} {t
     (h : nodeTest c (enc c.w (c.m * c.D) (sumT T rem))
       (enc c.w c.D (fun d => t d + colSum c.m c.D (loT T rem) d))
       (enc c.w (c.m * c.D) a) (enc c.w c.D (colSum c.m c.D a)) = true)
-    (L : List Bool) {x : ℤ} (hx : 0 ≤ x) :
-    energy c.m c.D (fun i => a i + chosenT T L rem i) x < ∑ d ∈ range c.D, t d * x ^ d := by
+    (L : List Bool) {ω : ℕ → ℤ} (hω : Weights ω) :
+    energy c.m c.D (fun i => a i + chosenT T L rem i) ω < ∑ d ∈ range c.D, t d * ω d := by
   obtain ⟨ha, hS, hX, hA, hC, hCA, hZ, F, hXF, hmF⟩ := fits_of_inv hc.hm hsize hinv
   obtain ⟨hz, hz0⟩ := nodeTest_spec hc ha hS hX hC hA hCA hZ hXF hmF h
-  refine (energy_le c.m c.D T L rem a hx).trans_lt ?_
+  refine (energy_le c.m c.D T L rem a hω).trans_lt ?_
   rw [← sub_pos, ← sum_sub_distrib]
   simp only [← sub_mul]
   have key : ∀ d, t d - beta c.m c.D a (sumT T rem) (loT T rem) d =
@@ -509,7 +518,7 @@ theorem energy_lt_of_nodeTest {c : Cfg} (hc : c.OK) {T : ℕ → ℕ → ℤ} {t
     simp only [beta, colSum, hPos, sum_add_distrib, sum_sub_distrib, sum_neg_distrib]
     ring
   simp only [key]
-  exact sum_pos_of_coeffs hc.hD hz0 hz hx
+  exact sum_pos_of_coeffs hc.hD hz0 hz hω
 
 theorem bnbP_sound {c : Cfg} (hc : c.OK) {T : ℕ → ℕ → ℤ} {t Bf : ℕ → ℤ}
     (hsize : SizeOK c Bf t) {allowed : List ℕ} {leafS leafC : ℕ}
@@ -518,25 +527,25 @@ theorem bnbP_sound {c : Cfg} (hc : c.OK) {T : ℕ → ℕ → ℤ} {t Bf : ℕ �
     ∀ (path : ℕ) (a : ℕ → ℤ), (∀ i < c.m * c.D, |a i| + absT T rem i ≤ Bf i) →
     bnbP c allowed leafS leafC ss path (enc c.w (c.m * c.D) a)
       (enc c.w c.D (colSum c.m c.D a)) = true →
-    ∀ (L : List Bool) {x : ℤ}, 0 ≤ x →
+    ∀ (L : List Bool) {ω : ℕ → ℤ}, Weights ω →
       runMask L rem path ∈ allowed ∨
-        energy c.m c.D (fun i => a i + chosenT T L rem i) x < ∑ d ∈ range c.D, t d * x ^ d := by
+        energy c.m c.D (fun i => a i + chosenT T L rem i) ω < ∑ d ∈ range c.D, t d * ω d := by
   intro rem
   induction rem with
   | nil =>
-    intro ss hss path a hinv h L x hx
+    intro ss hss path a hinv h L ω hω
     cases ss with
     | cons _ _ => exact absurd hss (by simp [StepsOK])
     | nil =>
       simp only [bnbP, Bool.or_eq_true, List.contains_iff_mem] at h
       rcases h with h | h
-      · refine Or.inr (energy_lt_of_nodeTest hc hsize hinv ?_ L hx)
+      · refine Or.inr (energy_lt_of_nodeTest hc hsize hinv ?_ L hω)
         have hlc : leafC = enc c.w c.D (fun d => t d + colSum c.m c.D (loT T []) d) := by
           rw [hleafC]; simp [colSum]
         rwa [hleafS, hlc] at h
       · exact Or.inl h
   | cons k rem ih =>
-    intro ss hss path a hinv h L x hx
+    intro ss hss path a hinv h L ω hω
     cases ss with
     | nil => exact absurd hss (by simp [StepsOK])
     | cons st ss =>
@@ -544,11 +553,11 @@ theorem bnbP_sound {c : Cfg} (hc : c.OK) {T : ℕ → ℕ → ℤ} {t Bf : ℕ �
       simp only [bnbP, Bool.or_eq_true, Bool.and_eq_true] at h
       rcases h with h | ⟨h₀, h₁⟩
       · rw [hs, hcc] at h
-        exact Or.inr (energy_lt_of_nodeTest hc hsize hinv h L hx)
+        exact Or.inr (energy_lt_of_nodeTest hc hsize hinv h L hω)
       · have hinv' : ∀ i < c.m * c.D, |a i| + absT T rem i ≤ Bf i := fun i hi => by
           have := hinv i hi; rw [absT_cons] at this; linarith [abs_nonneg (T k i)]
         cases hb : bit L k
-        · have := ih ss hss' path a hinv' h₀ L hx
+        · have := ih ss hss' path a hinv' h₀ L hω
           simpa [runMask, chosenT_cons, hb] using this
         · -- the packed state after selecting `k`
           have hinv'' : ∀ i < c.m * c.D, |a i + T k i| + absT T rem i ≤ Bf i := fun i hi => by
@@ -579,7 +588,7 @@ theorem bnbP_sound {c : Cfg} (hc : c.OK) {T : ℕ → ℕ → ℤ} {t Bf : ℕ �
             rw [cast_enc hA, cast_enc hTkc, cast_rep, packZ_add]
             push_cast; ring
           rw [hcell, htab, htsum, hacc, haccS] at h₁
-          have := ih ss hss' (path + 2 ^ k) (fun i => a i + T k i) hinv'' h₁ L hx
+          have := ih ss hss' (path + 2 ^ k) (fun i => a i + T k i) hinv'' h₁ L hω
           simpa [runMask, chosenT_cons, hb, add_assoc] using this
 
 end Solved.Cert.Packed
