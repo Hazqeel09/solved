@@ -126,6 +126,17 @@ The last column counts the competing divisor sets and the polynomial inequalitie
 | $2·3·p·q$ | $p>q$, primes $\ge 5$ | {1, p·q, 3, 3·p·q, 2, 2·p·q, 2·3·q, 2·3·p} | 32,766 / 34,851 |
 
 
+
+### Four prime factors with even total exponent
+
+These are not covered by any published theorem. The certificate also proves, with the maximisers exactly the even-Ω and odd-Ω sets:
+
+| Order | Range | Maximal-energy divisor sets | Competitors / inequalities |
+|---|---|---|---|
+| $3\cdot5\cdot7\cdot p$ | $p\ge 11$ | even-Ω; odd-Ω | 32,765 |
+| $3\cdot5\cdot p\cdot q$ | $p\ne q$, primes $\ge 7$ | even-Ω; odd-Ω | 32,765 per ordering |
+| $5\cdot7\cdot p\cdot q$ | $p\ne q$ odd primes $\notin\{5,7\}$ | even-Ω; odd-Ω | 32,765 per ordering |
+
 ### A ratio-dependent maximiser
 
 **Theorem.** Let $p,q$ be distinct odd primes and $n=2p^2q$. Put
@@ -140,7 +151,7 @@ For example, $B$ wins at $(p,q)=(103,101)$ and $(127,109)$, and $A$ wins at $(13
 
 **Conjecture 1 (parity law at all odd orders).** Let $n>1$ be odd. If $\sum a_\nu$ is odd, the even-Ω set is the unique maximiser. If $\sum a_\nu\ge2$ is even and $n$ is not a prime power, the maximisers are exactly the even-Ω and odd-Ω sets.
 
-This is [JY26a, JY26b] without the hypothesis that the primes are at least 5. It holds in every certified row with the prime 3 above. It also holds for $3^ap^b$ with up to 19 cells, computed with the same code: $(a,b)=(3,4),(4,3),(2,5),(5,2)$, all for every prime $p\ge5$. It holds at $3\cdot5\cdot7$.
+This is [JY26a, JY26b] without the hypothesis that the primes are at least 5. It holds in every certified row with the prime 3 above. It also holds for $3^ap^b$ with up to 19 cells, computed with the same code: $(a,b)=(3,4),(4,3),(2,5),(5,2)$, all for every prime $p\ge5$. It holds at $3\cdot5\cdot7$, and in the four-prime even-total orders above.
 
 **Conjecture 2 (2-adic tensor structure).** Let $a\ge2$, $b\ge1$, and let $p$ be an odd prime, with finitely many exceptions such as $2^3\cdot3$. Let $\mathcal S$ be the family of maximal-energy exponent sets of $\mathrm{ICG}(2^a)$ [SS11, Thm 1.1]. Then the maximisers of $\mathrm{ICG}(2^ap^b)$ are exactly
 $$\mathcal D_S=\{2^ip^j\ne n:\ j\equiv[i\in T_S]\pmod 2\},\qquad T_S=\begin{cases}S\setminus\{0\},& b\ \text{odd},\\ (S\setminus\{0,a-1\})\cup\{a\},& b\ \text{even},\end{cases}$$
@@ -154,7 +165,7 @@ The orders $2p^2q$ and $2p^3q$ give one change each.
 
 ## Limitations
 
-- The certificate covers the 46 listed orders, plus the stated residual enumerations.
+- The certificate covers the 49 listed orders, plus the stated residual enumerations.
 - The 17- and 19-cell cases cited under the conjectures came from exploratory runs of the same functions. They are not in the registered certificate.
 - The conjectures are supported by these finite families only.
 - The convex certificates show that the maximisers lie among the listed candidates. Which candidate wins at a given pair is decided by the explicit candidate energy polynomials stored in the certificate. For $2p^3q$ with $p>q$, those boundaries are not worked out in closed form here.
