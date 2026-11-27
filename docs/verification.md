@@ -10,6 +10,8 @@
 | `reviewed-proof` | A written proof with a linked independent review record. |
 | `withdrawn` | A claim retained for traceability but no longer asserted. |
 
+The README displays ✅ for a completely formalized main claim, 🟡 for checked supporting lemmas, and ⬜ when there is no Lean formalization. Its table is generated from `catalogue.json`; `python -m scripts.check_catalogue --write-index` refreshes it, and CI rejects stale labels. Complete ticks link to the statement correspondence.
+
 Formalization is a separate field: `none`, `supporting-lemmas`, or `complete`. Complete formalization requires an explicit statement correspondence. Independent-review records are pending. The [squaring-instability entry](../results/square-instability/PROOF.md), the [main additive subtraction-gap theorem](../results/subtraction-gap/PROOF.md), and its [computable-threshold extension](../results/effective-control-cutoffs/PROOF.md) have complete formalizations of their stated main claims. Their written presentations and publication priority still await independent review.
 
 ## Python checks

@@ -8,6 +8,8 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 STATUSES = {"open", "proof-draft", "finite-verification", "reviewed-proof", "withdrawn"}
+LEAN_BEGIN = "<!-- BEGIN GENERATED LEAN STATUS -->"
+LEAN_END = "<!-- END GENERATED LEAN STATUS -->"
 
 
 def local_file(root, name):
@@ -163,6 +165,37 @@ def contents(entries):
     return "\n".join(rows)
 
 
+def readme_status(text, entries):
+    """Keep the public verification labels synchronized with their scoped records."""
+    if text.count(LEAN_BEGIN) != 1 or text.count(LEAN_END) != 1:
+        raise ValueError("README needs exactly one generated Lean-status section")
+    start, end = text.index(LEAN_BEGIN), text.index(LEAN_END)
+    if start >= end:
+        raise ValueError("README Lean-status markers are reversed")
+    labels = {
+        "complete": "✅ Complete",
+        "supporting-lemmas": "🟡 Supporting lemmas",
+        "none": "⬜ Not formalized",
+    }
+    order = {status: i for i, status in enumerate(labels)}
+    rows = [
+        LEAN_BEGIN,
+        "",
+        "✅ Complete formalization of the entry's stated main claim · 🟡 Checked supporting lemmas · ⬜ No Lean formalization.",
+        "",
+        "| Result | Lean verification |",
+        "|---|---|",
+    ]
+    for entry in sorted(entries, key=lambda e: order[e["formalization"]["status"]]):
+        formal = entry["formalization"]
+        label = labels[formal["status"]]
+        if formal["status"] == "complete":
+            label = f"[{label}]({formal['statement_correspondence']})"
+        rows.append(f"| [{entry['title']}]({entry['proof']}) | {label} |")
+    rows.extend(["", LEAN_END])
+    return text[:start] + "\n".join(rows) + text[end + len(LEAN_END) :]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--write-index", action="store_true")
@@ -175,6 +208,13 @@ def main():
         path.write_text(generated)
     elif not path.is_file() or path.read_text() != generated:
         raise ValueError("CONTENTS.md is stale; run with --write-index")
+    readme = ROOT / "README.md"
+    old_readme = readme.read_text()
+    new_readme = readme_status(old_readme, entries)
+    if args.write_index:
+        readme.write_text(new_readme)
+    elif old_readme != new_readme:
+        raise ValueError("README Lean status is stale; run with --write-index")
     check_links(ROOT)
     print(f"Validated {len(entries)} entries, dependency graph and local Markdown links.")
 
