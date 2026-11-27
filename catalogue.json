@@ -1173,7 +1173,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "Exact Python certificates determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. The 19 families 2^a p^b are Lean-verified in the entry icg-energy-even-orders; the others await Lean verification.",
+      "statement": "Exact Python certificates determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. The 19 families 2^a p^b are Lean-verified in the entry icg-energy-even-orders, and the two-symbolic-prime orders (except 2p^2q and 2p^3q with p > q) in icg-energy-two-symbolic-primes; the 3^a p^b rows reproduce known theorems.",
       "proof": "results/icg-energy-exceptional-orders/PROOF.md",
       "tests": [
         "test_icg_families.py",
@@ -1282,6 +1282,79 @@
           "url": "https://arxiv.org/abs/1109.3616",
           "recorded": "2026-11-27"
         },
+        {
+          "url": "https://arxiv.org/abs/2608.29523",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2610.36883",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/Horace-Maxwell/ai4math-results/tree/6334a95f2e0c2396f492f3476c1d4ce80e4106ab/lean",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "icg-energy-exceptional-orders"
+      ]
+    },
+    {
+      "id": "icg-energy-two-symbolic-primes",
+      "title": "Maximal-energy integral circulant graphs with two symbolic primes",
+      "subject": "Spectral graph theory",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For 2pq, 3pq, 4pq, 9pq, 3p^2q, 6pq, 15pq and 35pq with distinct primes p, q in the stated ranges, and for 2p^2q and 2p^3q with p < q, every set S of proper divisors satisfies E(ICG(n, S)) <= E_max(p, q), with equality exactly for the listed divisor sets. Kernel-checked in Lean through a spectral bridge for k distinct primes. No earlier determination of these maximisers was found; the search may be incomplete.",
+      "proof": "results/icg-energy-two-symbolic-primes/PROOF.md",
+      "tests": [
+        "test_lean_icg.py"
+      ],
+      "implementation": [
+        "solved/lean_icg.py",
+        "scripts/lean_icg_families.py",
+        "checks/expected/icg-families.json"
+      ],
+      "formalization": {
+        "status": "complete",
+        "files": [
+          "formal/Formal/ICG/MultiFamilies.lean",
+          "formal/Formal/ICG/MultiGraph.lean",
+          "formal/Formal/ICG/MultiPacked.lean",
+          "formal/Formal/ICG/MultiCell.lean",
+          "formal/Formal/ICG/MultiBridge.lean",
+          "formal/Formal/ICG/Box.lean",
+          "formal/Formal/Cert/PackedData.lean",
+          "formal/Formal/Cert/PackedBB.lean",
+          "formal/Formal/Cert/BPoly.lean",
+          "formal/FormalTests/Axioms.lean"
+        ],
+        "statement_correspondence": "results/icg-energy-two-symbolic-primes/FORMALIZATION.md",
+        "theorems": [
+          "Solved.ICG.Multi.Families.energy_2_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_2_p_q_gt",
+          "Solved.ICG.Multi.Families.energy_3_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_3_p_q_gt",
+          "Solved.ICG.Multi.Families.energy_4_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_4_p_q_gt",
+          "Solved.ICG.Multi.Families.energy_2_p2_q_lt",
+          "Solved.ICG.Multi.Families.energy_9_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_9_p_q_gt",
+          "Solved.ICG.Multi.Families.energy_3_p2_q_lt",
+          "Solved.ICG.Multi.Families.energy_3_p2_q_gt",
+          "Solved.ICG.Multi.Families.energy_2_p3_q_lt",
+          "Solved.ICG.Multi.Families.energy_6_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_6_p_q_gt",
+          "Solved.ICG.Multi.Families.energy_15_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_15_p_q_gt",
+          "Solved.ICG.Multi.Families.energy_35_p_q_lt",
+          "Solved.ICG.Multi.Families.energy_35_p_q_gt",
+          "Solved.ICG.Multi.energy_icgAdj_multi",
+          "Solved.ICG.Multi.energy_le_of_certifyM"
+        ],
+        "scope": "Every row of the table is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved from Mathlib's eigenvalues through a k-prime spectral bridge and checked with decide +kernel, without native_decide. 2p^2q and 2p^3q with p > q, other orders, and novelty are outside this formalization."
+      },
+      "sources": [
         {
           "url": "https://arxiv.org/abs/2608.29523",
           "recorded": "2026-11-27"

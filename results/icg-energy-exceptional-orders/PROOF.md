@@ -1,6 +1,6 @@
 # Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3
 
-**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version. The 19 families $2^ap^b$ (with $n=24$ for the exceptional prime of $2^3p$) are now Lean theorems about graph energy: see [Maximal-energy integral circulant graphs of order $2^ap^b$](../icg-energy-even-orders/PROOF.md).
+**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version. The 19 families $2^ap^b$ (with $n=24$ for the exceptional prime of $2^3p$) are now Lean theorems about graph energy: see [Maximal-energy integral circulant graphs of order $2^ap^b$](../icg-energy-even-orders/PROOF.md). So are the orders with two symbolic primes, except $2p^2q$ and $2p^3q$ with $p>q$: see [two symbolic primes](../icg-energy-two-symbolic-primes/PROOF.md).
 
 ## Setting and prior results
 

@@ -1043,3 +1043,94 @@ def render_multi(records):
 
 def multi_from(path):
     return render_multi(json.loads(Path(path).read_text()))
+
+
+def _math_bivariate(E):
+    terms = []
+    for i, row in enumerate(E):
+        for j, c in enumerate(row):
+            if c == 0:
+                continue
+            mono = ("p" if i == 1 else f"p^{{{i}}}" if i else "") + (
+                "q" if j == 1 else f"q^{{{j}}}" if j else ""
+            )
+            body = str(abs(c)) if not mono else (mono if abs(c) == 1 else f"{abs(c)}{mono}")
+            terms.append((i + j, i, "-" if c < 0 else "+", body))
+    terms.sort(key=lambda t: (-t[0], -t[1]))
+    out = ("-" if terms[0][2] == "-" else "") + terms[0][3]
+    for _, _, sign, body in terms[1:]:
+        out += f"{sign}{body}"
+    return out
+
+
+def _math_cell(order, cell):
+    fixed, sym = 1, ""
+    for (r, _), c in zip(order, cell):
+        if not c:
+            continue
+        if isinstance(r, int):
+            fixed *= r**c
+        else:
+            sym += r if c == 1 else f"{r}^{{{c}}}"
+    return (str(fixed) if fixed != 1 or not sym else "") + sym
+
+
+def _math_order(order):
+    fixed, sym = 1, ""
+    for r, e in order:
+        if isinstance(r, int):
+            fixed *= r**e
+        else:
+            sym += r if e == 1 else f"{r}^{{{e}}}"
+    return (str(fixed) if fixed != 1 else "") + sym
+
+
+MULTI_TABLE_BEGIN = "<!-- BEGIN GENERATED MULTI TABLE -->"
+MULTI_TABLE_END = "<!-- END GENERATED MULTI TABLE -->"
+
+
+def render_multi_table(records):
+    rows = [
+        MULTI_TABLE_BEGIN,
+        "",
+        "| Order | Primes | Maximal energy | Maximising divisor sets | Lean theorem |",
+        "|---|---|---|---|---|",
+    ]
+    for r in records:
+        if r["result"]["kind"] != "two-symbolic":
+            continue
+        for region, key in (("lt", "p<q"), ("gt", "p>q")):
+            if r["result"][key]["certificate"] != "exact":
+                continue
+            cert = multi_certificate(r, region)
+            order = cert["order"]
+            big = [f for f, _ in order if isinstance(f, int) and f >= cert["p0"]]
+            rng = f"{cert['p0']}\\le p<q" if region == "lt" else f"{cert['p0']}\\le q<p"
+            if big:
+                rng += ",\\ p,q\\notin\\{" + ",".join(map(str, big)) + "\\}"
+            sets = "; ".join(
+                _math_set(
+                    _math_cell(order, c)
+                    for c in sorted(cs, key=lambda c: mixed_enc(cert["shape"].a, c))
+                )
+                for cs in cert["cells"]
+            )
+            label = multi_label(order) + "_" + region
+            rows.append(
+                f"| ${_math_order(order)}$ | ${rng}$ | ${_math_bivariate(cert['E'])}$ | {sets} "
+                f"| `energy_{label}` |"
+            )
+    rows.extend(["", MULTI_TABLE_END])
+    return "\n".join(rows)
+
+
+def update_multi_table(text, records):
+    if text.count(MULTI_TABLE_BEGIN) != 1 or text.count(MULTI_TABLE_END) != 1:
+        raise ValueError("the manuscript needs exactly one generated multi-prime table")
+    start = text.index(MULTI_TABLE_BEGIN)
+    end = text.index(MULTI_TABLE_END) + len(MULTI_TABLE_END)
+    return text[:start] + render_multi_table(records) + text[end:]
+
+
+def multi_table_from(path, manuscript):
+    return update_multi_table(Path(manuscript).read_text(), json.loads(Path(path).read_text()))

@@ -248,6 +248,8 @@ class Rendering(unittest.TestCase):
         )
         manuscript = (ROOT / "results/icg-energy-even-orders/PROOF.md").read_text()
         self.assertEqual(manuscript, li.update_table(manuscript, RECORDS))
+        multi = (ROOT / "results/icg-energy-two-symbolic-primes/PROOF.md").read_text()
+        self.assertEqual(multi, li.update_multi_table(multi, RECORDS))
 
     def test_axiom_audit_lists_every_family(self):
         text = li.render_axioms(RECORDS)
