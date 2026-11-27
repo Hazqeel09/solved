@@ -356,6 +356,24 @@ def direct_sum(a, b):
     return FlatLattice(a.size + b.size, tuple(order), tuple(flats[f] for f in order))
 
 
+def free_extension(lattice):
+    """Free extension by a new element ``lattice.size`` placed in general position.
+
+    Its flats are the proper flats F, the sets F + e with rk F <= rk - 2, and E + e
+    (rank function r(X + e) = min(r(X) + 1, rk M)).
+    """
+    r, e = lattice.rank, 1 << lattice.size
+    flats = {}
+    for f, k in zip(lattice.flats, lattice.ranks):
+        if k < r:
+            flats[f] = k
+        if k <= r - 2:
+            flats[f | e] = k + 1
+    flats[((1 << lattice.size) - 1) | e] = r
+    order = sorted(flats, key=lambda f: (flats[f], f))
+    return FlatLattice(lattice.size + 1, tuple(order), tuple(flats[f] for f in order))
+
+
 def truncation(lattice, k):
     """Rank-k truncation: the flats of rank < k together with the ground set (rank k)."""
     if not 0 <= k <= lattice.rank:
