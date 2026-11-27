@@ -11,7 +11,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 | Topic | Precise scope |
 |---|---|
 | [Squaring instability](results/square-instability/PROOF.md) | A fully formalized counterexample: 267 and its square both have minimum cost eight. |
-| [Square-root reconstruction](results/root-closure-sectors/PROOF.md) | Constructive root reduction in the three-, four- and seven-nonsquare sectors, including a family requiring new shared helpers. The full defect-two closure question remains open here. |
+| [Square-root reconstruction](results/root-closure-sectors/PROOF.md) | Constructive root reduction in three-, four- and seven-nonsquare sectors and the GGS/GGSG orders, including a family requiring new shared helpers. The full defect-two closure question remains open here. |
 | [Two-small-step addition–multiplication chains](results/two-small-steps/PROOF.md) | An all-length block classification manuscript, with independent finite enumeration. |
 | [Real arithmetic-chain defects](results/am-defect-order/PROOF.md) | Proposed well-ordering and global ordinal type, with a separate [bounded-slice argument](results/am-defect-slices/PROOF.md). |
 | [Subtraction and computation length](results/subtraction-gap/PROOF.md) | An end-to-end Lean proof of unbounded **additive** savings on the tower-minus-one family. Polynomial equivalence remains a separate question. |

@@ -1,7 +1,7 @@
 import unittest
 
 from checks.verify_root_sectors import replay, verify
-from solved.chains import Chain, level
+from solved.chains import Chain, chains, level
 from solved.limits import ResourceLimit
 from solved.menu_programs import shortest_from_menu
 from solved.root_sectors import four_event_menu, reduce_square
@@ -44,6 +44,7 @@ class RootSectorTests(unittest.TestCase):
                 "seven_square_base",
                 "retained_root",
                 "four_event_menu",
+                "late_small_menu",
             },
         )
 
@@ -140,3 +141,100 @@ class RootSectorTests(unittest.TestCase):
             result = reduce_square(source)
             self.assertEqual(replay(result.chain), root)
             self.assertEqual(len(result.chain.recipes), j + 6)
+
+    def test_late_small_power_prefixes_at_large_scales(self):
+        for k, gap in ((1, 0), (1, 8), (2, 0), (4, 4), (8, 3)):
+            prefix = [1, 2]
+            for _ in range(k):
+                prefix.append(prefix[-1] ** 2)
+            A, sqrtA = prefix[-1], prefix[-2]
+            B = A * sqrtA
+            C = A * B
+            prefix.extend((B, C, B * C))
+            for _ in range(gap):
+                prefix.append(prefix[-1] ** 2)
+            H = prefix[-1]
+            for values in ((*prefix, 4 * H), (*prefix, 4 * H, 4 * H * H)):
+                source = explicit_chain(values)
+                result = reduce_square(source)
+                self.assertEqual(replay(result.chain) ** 2, values[-1])
+                self.assertGreaterEqual(result.saved_instructions, 1)
+                self.assertLessEqual(len(result.chain.recipes) - level(result.root), 2)
+
+    def test_late_small_long_runs_and_exceptional_prefix(self):
+        for prefix in ((1, 2, 3, 6, 18), (1, 2, 4, 8, 32, 256)):
+            for gap, final_gap in ((2, 2), (4, 3), (8, 2)):
+                values = list(prefix)
+                for _ in range(gap):
+                    values.append(values[-1] ** 2)
+                values.append(values[-1] * values[-2])
+                source = explicit_chain(values)
+                result = reduce_square(source)
+                self.assertEqual(replay(result.chain) ** 2, values[-1])
+                for _ in range(final_gap):
+                    values.append(values[-1] ** 2)
+                values.append(values[-1] * values[-2])
+                source = explicit_chain(values)
+                result = reduce_square(source)
+                self.assertEqual(replay(result.chain) ** 2, values[-1])
+                self.assertGreaterEqual(result.saved_instructions, 1)
+
+        for values, root in (
+            ((1, 2, 4, 8, 32, 256, 1024, 262144), 512),
+            ((1, 2, 4, 8, 32, 256, 8192, 67108864, 17179869184), 131072),
+            ((1, 2, 3, 6, 18, 54, 324), 18),
+        ):
+            source = explicit_chain(values)
+            result = reduce_square(source)
+            self.assertEqual(replay(result.chain), root)
+            self.assertGreaterEqual(result.saved_instructions, 2)
+
+    def test_remaining_event_orders_stay_explicitly_unsupported(self):
+        for values in (
+            (1, 2, 3, 4, 5, 16),
+            (1, 2, 3, 4, 8, 32, 256),
+            (1, 2, 3, 9, 10, 27, 270, 72900),
+            (1, 2, 3, 9, 10, 81, 810, 65610, 4304672100),
+        ):
+            with self.assertRaisesRegex(ValueError, "supported sectors"):
+                reduce_square(explicit_chain(values))
+        source = explicit_chain((1, 2, 4, 8, 32, 256, 1024, 262144))
+        for limits in ({"max_states": 0}, {"max_pairs": 0}):
+            with self.assertRaises(ResourceLimit):
+                reduce_square(source, **limits)
+
+    def test_published_prefix_families_against_independent_enumeration(self):
+        checked = 0
+        for defect, source in chains((1 << 256) - 1, 1):
+            events = [
+                i
+                for i in range(1, len(source.values))
+                if source.values[i] != source.values[i - 1] ** 2
+            ]
+            if defect != 1 or len(events) != 4:
+                continue
+            prefix = source.values[: events[3] + 1]
+            if prefix[2] == 3:
+                self.assertEqual(prefix, (1, 2, 3, 6, 18))
+            else:
+                tower = prefix[: events[1]]
+                A, sqrtA = tower[-1], tower[-2]
+                self.assertGreaterEqual(A, 4)
+                self.assertEqual(prefix, (*tower, A * sqrtA, A * A * sqrtA, A**4))
+            checked += 1
+        self.assertGreater(checked, 10)
+
+    def test_fixed_prefix_zero_gap_palette(self):
+        prefix = (1, 2, 3, 6, 18)
+        small_values = {v for x in prefix for y in prefix for v in (x + y, x * y) if 18 < v < 256}
+        self.assertEqual(small_values, {19, 20, 21, 24, 36, 54, 108})
+        endpoints = set()
+        from math import isqrt
+
+        for D in small_values:
+            for x in (*prefix, D):
+                for y in (*prefix, D):
+                    for N in (x + y, x * y):
+                        if 256 <= N != D * D and isqrt(N) ** 2 == N:
+                            endpoints.add(N)
+        self.assertEqual(endpoints, {324})

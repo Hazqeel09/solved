@@ -947,7 +947,7 @@
       "subject": "Arithmetic complexity",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "Square endpoints of two-small-step AM chains with three, four or seven canonical nonsquares have root witnesses using at least one fewer instruction. The four-event argument supplies a complete finite candidate menu and an infinite family where original values and their roots alone cost an extra write. A remaining defect-two root-closure counterexample must have five or six canonical nonsquares in every shortest chain for its square.",
+      "statement": "Square endpoints of two-small-step AM chains in the three-, four- and seven-nonsquare sectors, and the GGS/GGSG event orders, have root witnesses using at least one fewer instruction. The shared finite candidate menu includes an infinite family where source values and roots alone cost an extra write. Remaining defect-two root-closure counterexamples must have event order SGG, GSG, SGGG or GSGG in every shortest chain for their square.",
       "proof": "results/root-closure-sectors/PROOF.md",
       "tests": [
         "test_root_sectors.py",
@@ -963,7 +963,7 @@
         "files": [
           "lean/RootSectorLemmas.lean"
         ],
-        "scope": "Twelve square-gap, factor-root and power-of-two lemmas include a universal arithmetic-program exchange identity saving one suffix instruction. Complete sector coverage, finite-menu optimality and the seven-sector classification dependency retain written proofs with finite checks; the full root-closure question remains unresolved."
+        "scope": "Fourteen square-gap, factor-root and power-of-two lemmas include the shared-helper exchange program, paired-cofactor identity and boundary-square argument. Full sector coverage, finite-menu optimality and the one-/seven-sector classification dependencies retain written proofs with finite checks; the full root-closure question remains unresolved."
       },
       "sources": [
         {

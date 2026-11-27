@@ -119,8 +119,8 @@ def _seven_root(target):
     return _from_values(exceptional[base]), "seven_square_base"
 
 
-def _four_event_menu(chain, root, events):
-    """The source/root menu plus the helper families in the four-event argument.
+def _candidate_menu(chain, root, events):
+    """The shared menu in the four-event and late-small-event arguments.
 
     Values in this menu are candidates, not free inputs. The menu solver
     charges all instructions required to construct them from 1.
@@ -165,7 +165,7 @@ def four_event_menu(chain):
     chain, events, root = _square_source(chain)
     if len(events) != 4:
         raise ValueError("exactly four canonical nonsquares are required")
-    return _four_event_menu(chain, root, events)
+    return _candidate_menu(chain, root, events)
 
 
 def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
@@ -174,8 +174,10 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
     chain, events, root = _square_source(chain)
     values, recipes = chain.values, chain.recipes
     source_length = len(recipes)
-    if len(events) not in (3, 4, 7):
-        raise ValueError("exactly three, four or seven canonical nonsquares are required")
+    word = "".join("S" if level(values[i]) == level(values[i - 1]) else "G" for i in events[2:])
+    late_small = word in ("GGS", "GGSG")
+    if len(events) not in (3, 4, 7) and not late_small:
+        raise ValueError("supported sectors are three, four, seven, GGS and GGSG")
 
     def result(output, rule):
         encode(output)
@@ -187,19 +189,19 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
 
     if values[-1] == values[-2] ** 2:
         return result(_prefix(chain, source_length - 1), "trailing_square")
-    if len(events) == 4:
+    if len(events) == 4 or late_small:
         if root in values[:-1]:
             return result(_prefix(chain, values.index(root)), "retained_root")
         output = shortest_from_menu(
-            _four_event_menu(chain, root, events),
+            _candidate_menu(chain, root, events),
             root,
             source_length - 1,
             max_states=max_states,
             max_pairs=max_pairs,
         )
         if output is None:
-            raise ArithmeticError("the four-event candidate menu has no root certificate")
-        return result(output, "four_event_menu")
+            raise ArithmeticError("the proved candidate menu has no root certificate")
+        return result(output, "late_small_menu" if late_small else "four_event_menu")
     if len(events) == 7:
         output, rule = _seven_root(values[-1])
         return result(output, rule)

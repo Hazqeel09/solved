@@ -150,4 +150,27 @@ theorem exchange_program (history : SolvedMarked.Hist)
 theorem exchange_cost :
     SolvedInflation.cost exchangeRoot+1=SolvedInflation.cost exchangeSource := by decide
 
+theorem paired_cofactors (x v w z : Nat) (pair : v*w=z*z) :
+    ((x*x)*v)*w=(x*z)*(x*z) := by
+  calc
+    ((x*x)*v)*w = (x*x)*(v*w) := by ac_rfl
+    _ = (x*x)*(z*z) := by rw [pair]
+    _ = (x*z)*(x*z) := by ac_rfl
+
+theorem square_at_boundary {H D w root : Nat} (positive : 0<H)
+    (small : D<H*H) (old : w≤H) (big : H*H≤D+w)
+    (square : D+w=root*root) : root=H := by
+  have lower : H≤root := by
+    by_cases below : root<H
+    · have first := Nat.mul_le_mul_left root (Nat.le_of_lt below)
+      have second := Nat.mul_lt_mul_of_pos_right below positive
+      omega
+    · omega
+  by_cases equal : root=H
+  · exact equal
+  · have above : H+1≤root := by omega
+    have bound := Nat.mul_le_mul above above
+    simp only [Nat.add_mul,Nat.mul_add,Nat.one_mul,Nat.mul_one] at bound
+    omega
+
 end SolvedRootBlocks

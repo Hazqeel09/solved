@@ -26,9 +26,13 @@ def replay(chain):
 
 
 def eligible(chain, defect):
+    events = [i for i in range(1, len(chain.values)) if chain.values[i] != chain.values[i - 1] ** 2]
+    word = "".join(
+        "S" if level(chain.values[i]) == level(chain.values[i - 1]) else "G" for i in events[2:]
+    )
     return (
         defect == 2
-        and sum(y != x * x for x, y in zip(chain.values, chain.values[1:])) in (3, 4, 7)
+        and (len(events) in (3, 4, 7) or word in ("GGS", "GGSG"))
         and isqrt(chain.values[-1]) ** 2 == chain.values[-1]
     )
 
@@ -77,7 +81,7 @@ def verify(max_level=12, *, aliases=False):
             digest.update(reduction.rule.encode("ascii") + b"\0")
     return {
         "complete_through_level": max_level,
-        "source_sector": "exactly two small steps and three, four or seven canonical nonsquares",
+        "source_sector": "exactly two small steps; three, four or seven nonsquares, or event word GGS/GGSG",
         "checked_square_chains_or_recipe_variants": sum(counts.values()),
         "unique_roots": len(square_roots),
         "rules": dict(sorted(counts.items())),
