@@ -62,6 +62,12 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 |---|---|---|
 | [Exact register requirements for a fixed one-shot DAG](results/one-shot-registers/PROOF.md) | proof-draft | none |
 
+## Matroid theory
+
+| Result | Status | Formalization |
+|---|---|---|
+| [Matroid polynomial conjectures on q-uniform matroids with free points](results/q-uniform-matroid-checks/PROOF.md) | finite-verification | none |
+
 ## Order theory and arithmetic complexity
 
 | Result | Status | Formalization |

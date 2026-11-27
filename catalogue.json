@@ -1044,6 +1044,76 @@
         "square-instability",
         "bounded-am-chains"
       ]
+    },
+    {
+      "id": "q-uniform-matroid-checks",
+      "title": "Matroid polynomial conjectures on q-uniform matroids with free points",
+      "subject": "Matroid theory",
+      "status": "finite-verification",
+      "review": "independent-review-pending",
+      "statement": "For the 9,371 matroids T_k(PG(n-1,q)) plus m free points listed in the entry (q in {1,2,3,4,5,7,8,9,11,13,16}), the Z-polynomial, Chow polynomial and augmented Chow polynomial are real-rooted and the inverse Z-polynomial is unimodal and log-concave. For every modular geometric lattice the inverse Z-polynomial is sum_F |mu(0,F)||mu(F,1)| t^{crk F}, and for PG(r-1,q) with q >= 2 it is strictly log-concave with an explicit ratio tending to 1.",
+      "proof": "results/q-uniform-matroid-checks/PROOF.md",
+      "tests": [
+        "test_q_uniform.py",
+        "test_matroid_polynomials.py"
+      ],
+      "implementation": [
+        "solved/q_uniform.py",
+        "solved/matroid_polynomials.py",
+        "solved/matroid_lattice.py",
+        "solved/native_lattice.py",
+        "solved/intpoly.py",
+        "native/lattice_intervals.c",
+        "checks/verify_q_uniform.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1706.05575",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2507.01332",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2212.03190",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2007.15349",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/1412.7408",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2208.04893",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2604.04550",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2609.07636",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2607.24186",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2609.13417",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": []
     }
   ]
 }

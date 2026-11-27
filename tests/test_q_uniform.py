@@ -73,3 +73,44 @@ class QUniformTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ModularPropositionTests(unittest.TestCase):
+    def test_inverse_z_of_projective_geometries(self):
+        from fractions import Fraction
+
+        for q in (2, 3, 4, 5, 7):
+            engine = QUniform(q)
+            for r in range(1, 9):
+                y = engine.inverse_z(r, r)
+                formula = tuple(
+                    gaussian(r, j, q) * q ** (j * (j - 1) // 2 + (r - j) * (r - j - 1) // 2)
+                    for j in range(r + 1)
+                )
+                self.assertEqual(y, formula)
+                self.assertEqual(engine.inverse_kl(r, r), (q ** (r * (r - 1) // 2),))
+                for j in range(1, r):
+                    ratio = Fraction(y[j] ** 2, y[j - 1] * y[j + 1])
+                    closed = Fraction(
+                        (q ** (r - j + 1) - 1) * (q ** (j + 1) - 1),
+                        q**2 * (q**j - 1) * (q ** (r - j) - 1),
+                    )
+                    self.assertEqual(ratio, closed)
+                    self.assertGreater(ratio, 1)
+
+    def test_lattice_engine_agrees_on_modular_lattices(self):
+        for r, q in ((3, 2), (4, 2), (5, 2), (3, 3), (4, 3)):
+            lattice, _ = ml.projective_deletion(r, q)
+            self.assertEqual(
+                polynomials(lattice, nl.interval_characteristic(lattice)).inverse_z,
+                QUniform(q).inverse_z(r, r),
+            )
+
+
+class VerificationRangeTests(unittest.TestCase):
+    def test_stated_range_has_no_failures(self):
+        from checks.verify_q_uniform import run
+
+        checked, failures = run()
+        self.assertEqual(checked, 9371)
+        self.assertEqual(failures, [])
