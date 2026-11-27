@@ -947,7 +947,7 @@
       "subject": "Arithmetic complexity",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "Square endpoints of two-small-step AM chains in the three-, four- and seven-nonsquare sectors, the GGS/GGSG event orders, or power-only histories have root witnesses using at least one fewer instruction. Power-only reconstruction uses classical two-small-step addition-chain halving, and supplies endpoint normal forms with at most four canonical nonsquares without increasing cost. Remaining counterexamples must have event order SGG, GSG, SGGG or GSGG and a non-power-of-two value in every shortest chain for their square.",
+      "statement": "Square endpoints of two-small-step AM chains in the three-, four- and seven-nonsquare sectors, the GGS/GGSG/GSG event orders, or power-only histories have root witnesses using at least one fewer instruction. Power-only reconstruction uses classical two-small-step addition-chain halving, and supplies endpoint normal forms with at most four canonical nonsquares without increasing cost. Remaining counterexamples must have event order SGG, SGGG or GSGG and a non-power-of-two value in every shortest chain for their square.",
       "proof": "results/root-closure-sectors/PROOF.md",
       "tests": [
         "test_root_sectors.py",
@@ -966,7 +966,7 @@
           "lean/RootSectorLemmas.lean",
           "lean/PowerChainLift.lean"
         ],
-        "scope": "Fourteen square-gap, factor-root and power-of-two lemmas include the shared-helper exchange and late-small identities. A separate module constructs valid AM programs from arbitrary addition-only chains, charging the initial write of 2, with three audited statements. The classical low-step addition classification, exponent extraction and full sector coverage retain written proofs and cited dependencies; the full root-closure question remains unresolved."
+        "scope": "Seventeen square-gap, factor-root, power-of-two and growth lemmas include the shared-helper exchange, late-small identities and first-big-prefix cubic bounds. A separate module constructs valid AM programs from arbitrary addition-only chains, charging the initial write of 2, with three audited statements. The classical low-step addition classification, exponent extraction and full sector coverage retain written proofs and cited dependencies; the full root-closure question remains unresolved."
       },
       "sources": [
         {

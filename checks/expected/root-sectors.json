@@ -1,8 +1,8 @@
 {
   "complete_through_level": 12,
-  "source_sector": "exactly two small steps; three, four or seven nonsquares, GGS/GGSG, or power-only histories",
-  "checked_square_chains_or_recipe_variants": 254387,
-  "unique_roots": 28090,
+  "source_sector": "exactly two small steps; three, four or seven nonsquares, GGS/GGSG/GSG, or power-only histories",
+  "checked_square_chains_or_recipe_variants": 335275,
+  "unique_roots": 31706,
   "rules": {
     "exceptional_product": 1,
     "exceptional_sum": 4,
@@ -11,26 +11,27 @@
     "halve_first_product": 156,
     "halve_two_products": 375,
     "late_small_menu": 898,
+    "one_big_menu": 6566,
     "paired_twos": 10,
     "power_exponents": 18457,
-    "retained_root": 13533,
+    "retained_root": 27767,
     "seven_ray": 116,
     "seven_square_base": 3,
-    "trailing_square": 193182,
+    "trailing_square": 253270,
     "unused_first_event": 660
   },
   "canonical_nonsquares": {
     "3": 32810,
     "4": 162271,
-    "5": 47561,
+    "5": 128449,
     "6": 11339,
     "7": 406
   },
   "saved_writes": {
-    "1": 219195,
-    "2": 29272,
-    "3": 5920
+    "1": 283220,
+    "2": 45895,
+    "3": 6160
   },
   "all_final_recipe_variants": null,
-  "source_and_root_values_sha256": "887bee1a2876131041e2572a28e727004b4fbf887f624de521e61dfae2a82839"
+  "source_and_root_values_sha256": "0e59272f4f3bc4fbe31474a6404e0d285c44dd0443059fbf90cc286c5503516e"
 }

@@ -78,7 +78,7 @@ class PowerRootTests(unittest.TestCase):
         self.assertEqual(replay(exponents), 4)
         self.assertEqual(replay(reduce_power_square(source)), 4)
 
-    def test_remaining_event_orders_have_power_only_coverage(self):
+    def test_exponent_construction_for_four_nontrivial_event_orders(self):
         # Exact exponent witnesses for GSG, GSGG, SGG and SGGG, respectively.
         for exponents in (
             (1, 2, 3, 4, 5, 8),

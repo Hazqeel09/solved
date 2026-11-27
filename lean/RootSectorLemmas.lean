@@ -173,4 +173,45 @@ theorem square_at_boundary {H D w root : Nat} (positive : 0<H)
     simp only [Nat.add_mul,Nat.mul_add,Nat.one_mul,Nat.mul_one] at bound
     omega
 
+theorem scalar_cubic_gap (s : Nat) (large : 2≤s) : (s^2+1)^3<s^7 := by
+  have square : 4≤s^2 := by simpa using Nat.pow_le_pow_left large 2
+  have scaled : 4*(s^2+1)≤5*s^2 := by
+    simp only [Nat.mul_add,Nat.mul_one]
+    omega
+  have cube : 64*(s^2+1)^3≤125*s^6 := by
+    simpa [Nat.mul_pow,← Nat.pow_mul] using Nat.pow_le_pow_left scaled 3
+  have positive : 0<s^6 := Nat.pow_pos (by omega)
+  have strict : 125*s^6<128*s^6 := Nat.mul_lt_mul_of_pos_right (by decide) positive
+  have bound : 128*s^6≤64*s^7 := by
+    calc
+      128*s^6 = (64*2)*s^6 := by rfl
+      _ ≤ (64*s)*s^6 := Nat.mul_le_mul_right _ (Nat.mul_le_mul_left _ large)
+      _ = 64*s^7 := by rw [show s^7=s^6*s from Nat.pow_succ s 6]; ac_rfl
+  exact Nat.lt_of_mul_lt_mul_left (Nat.lt_of_le_of_lt cube (Nat.lt_of_lt_of_le strict bound))
+
+theorem one_big_sum_cube {s C Q : Nat} (large : 2≤s)
+    (head : C≤s^5) (previous : Q≤s^3) : (C+Q)^3<(s^8)^2 := by
+  have sum : C+Q≤s^3*(s^2+1) := by
+    calc
+      C+Q ≤ s^5+s^3 := Nat.add_le_add head previous
+      _ = s^3*(s^2+1) := by rw [Nat.mul_add,Nat.mul_one,← Nat.pow_add]
+  calc
+    (C+Q)^3 ≤ (s^3*(s^2+1))^3 := Nat.pow_le_pow_left sum 3
+    _ = s^9*(s^2+1)^3 := by rw [Nat.mul_pow,← Nat.pow_mul]
+    _ < s^9*s^7 := Nat.mul_lt_mul_of_pos_left (scalar_cubic_gap s large)
+      (Nat.pow_pos (by omega))
+    _ = (s^8)^2 := by rw [← Nat.pow_add,← Nat.pow_mul]
+
+theorem one_big_head_gap {s C : Nat} (large : 2≤s) (head : C≤s^5) :
+    C*C*(C+1)<(s^8)^2 := by
+  have power : s^10<s^15 := (Nat.pow_lt_pow_iff_right (by omega : 1<s)).mpr (by decide)
+  calc
+    C*C*(C+1) ≤ (s^5*s^5)*(s^5+1) :=
+      Nat.mul_le_mul (Nat.mul_le_mul head head) (Nat.add_le_add_right head 1)
+    _ = s^15+s^10 := by simp only [Nat.mul_add,Nat.mul_one,← Nat.pow_add]
+    _ < s^15+s^15 := Nat.add_lt_add_left power _
+    _ = 2*s^15 := by omega
+    _ ≤ s*s^15 := Nat.mul_le_mul_right _ large
+    _ = (s^8)^2 := by rw [← Nat.pow_mul]; simp only [Nat.pow_succ]; ac_rfl
+
 end SolvedRootBlocks

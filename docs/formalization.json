@@ -351,7 +351,10 @@
         "SolvedRootBlocks.exchange_program",
         "SolvedRootBlocks.exchange_cost",
         "SolvedRootBlocks.paired_cofactors",
-        "SolvedRootBlocks.square_at_boundary"
+        "SolvedRootBlocks.square_at_boundary",
+        "SolvedRootBlocks.scalar_cubic_gap",
+        "SolvedRootBlocks.one_big_sum_cube",
+        "SolvedRootBlocks.one_big_head_gap"
       ]
     },
     {

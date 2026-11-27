@@ -141,8 +141,8 @@ arbitrary old intermediates needed by a later continuation.
 This explains why additional covered histories need not add new distinct
 endpoints to a finite certificate: a shorter history in a previously covered
 sector can already have the same endpoint. In particular, after combining
-it with the other sector arguments, any remaining defect-two root-closure
-counterexample must have event order SGG, GSG, SGGG or GSGG in every
+it with the other sector arguments, including [GSG](ONE-BIG.md), any remaining defect-two root-closure
+counterexample must have event order SGG, SGGG or GSGG in every
 shortest chain for its square, **and every such chain must contain at least
 one value that is not a power of two**. Its endpoint might still be a power
 of two; that case is not excluded by the present theorem.

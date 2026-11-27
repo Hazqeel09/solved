@@ -1,4 +1,6 @@
 import unittest
+from itertools import combinations_with_replacement
+from math import isqrt
 
 from checks.verify_root_sectors import replay, verify
 from solved.chains import Chain, chains, level
@@ -46,6 +48,7 @@ class RootSectorTests(unittest.TestCase):
                 "four_event_menu",
                 "late_small_menu",
                 "power_exponents",
+                "one_big_menu",
             },
         )
 
@@ -86,7 +89,6 @@ class RootSectorTests(unittest.TestCase):
         for source in (
             explicit_chain((1, 2, 4)),
             explicit_chain((1, 2, 4, 5, 6)),
-            explicit_chain((1, 2, 3, 4, 7, 49, 2401, 117649)),
             Chain((1, 2, 4, 5, 9), (("+", 0, 0), ("*", 1, 1), ("+", 0, 2), ("+", 4, 4))),
             Chain((1, 2), (("+", True, 0),)),
             None,
@@ -192,7 +194,6 @@ class RootSectorTests(unittest.TestCase):
 
     def test_remaining_event_orders_stay_explicitly_unsupported(self):
         for values in (
-            (1, 2, 3, 4, 5, 16),
             (1, 2, 3, 4, 8, 32, 256),
             (1, 2, 3, 9, 10, 27, 270, 72900),
             (1, 2, 3, 9, 10, 81, 810, 65610, 4304672100),
@@ -239,3 +240,114 @@ class RootSectorTests(unittest.TestCase):
                         if 256 <= N != D * D and isqrt(N) ** 2 == N:
                             endpoints.add(N)
         self.assertEqual(endpoints, {324})
+
+    def test_one_big_prefix_growth_gaps(self):
+        checked = set()
+        for defect, chain in chains((1 << 512) - 1, 1):
+            events = [
+                i
+                for i in range(1, len(chain.values))
+                if chain.values[i] != chain.values[i - 1] ** 2
+            ]
+            if defect != 1 or len(events) != 3:
+                continue
+            prefix = chain.values[: events[-1] + 1]
+            if prefix in checked:
+                continue
+            checked.add(prefix)
+            Q, C = prefix[-2:]
+            U = 1 << (1 << level(C))
+            self.assertLess(C * C * (C + 1), U * U)
+            self.assertLess(Q * Q + C, U)
+            self.assertLess(2 * C + Q, U)
+            if C not in (4, 5, 6):
+                self.assertLess((C + Q) ** 3, U * U)
+            if all(v & (v - 1) == 0 for v in prefix):
+                for addend in prefix[:-1]:
+                    D = C + addend
+                    for cofactor in prefix:
+                        N = D * cofactor
+                        if D < U <= N:
+                            self.assertNotEqual(isqrt(N) ** 2, N)
+        self.assertGreater(len(checked), 100)
+        for addend in (1, 2, 4, 16):
+            N = 288 * (288 + addend)
+            self.assertNotEqual(isqrt(N) ** 2, N)
+
+    def test_gsg_fixed_palette_completeness(self):
+        cases = (
+            ((1, 2, 3, 4), 16, {16, 36}),
+            ((1, 2, 3, 5), 16, {16, 25}),
+            ((1, 2, 3, 6), 16, {16, 36}),
+            ((1, 2, 3, 9, 18), 256, {324, 729, 2916}),
+            ((1, 2, 3, 9, 27), 256, {324, 729, 6561}),
+        )
+        for prefix, boundary, expected in cases:
+            small = {
+                v
+                for x, y in combinations_with_replacement(prefix, 2)
+                for v in (x + y, x * y)
+                if prefix[-1] < v < boundary
+            }
+            endpoints = set()
+            for D in small:
+                for x, y in combinations_with_replacement((*prefix, D), 2):
+                    for N in (x + y, x * y):
+                        if N >= boundary and N != D * D and isqrt(N) ** 2 == N:
+                            endpoints.add(N)
+                            result = reduce_square(explicit_chain((*prefix, D, N)))
+                            self.assertEqual(replay(result.chain) ** 2, N)
+                            self.assertGreaterEqual(result.saved_instructions, 1)
+            self.assertEqual(endpoints, expected)
+
+    def test_gsg_tall_towers_and_required_second_small_root(self):
+        for k in (1, 2, 4, 7):
+            tower = [1, 2]
+            for _ in range(k):
+                tower.append(tower[-1] ** 2)
+            A = tower[-1]
+            for offset in {1, 2, tower[-2]}:
+                B = A + offset
+                C = A * B
+                D = C * B
+                for suffix in ((4 * C, 4 * C * C), (D, D * D, D**3)):
+                    source = explicit_chain((*tower, B, C, *suffix))
+                    result = reduce_square(source)
+                    self.assertEqual(replay(result.chain) ** 2, source.values[-1])
+                    self.assertGreaterEqual(result.saved_instructions, 1)
+        source = explicit_chain((1, 2, 3, 4, 7, 49, 2401, 117649))
+        self.assertEqual(replay(reduce_square(source).chain), 343)
+
+    def test_gsg_missing_first_big_root_and_operand_aliases(self):
+        for e in (2, 3, 6, 10):
+            prefix = [1, 2, 3]
+            for _ in range(e):
+                prefix.append(prefix[-1] ** 2)
+            Q, X = prefix[-1], prefix[-2]
+            C = Q * X
+            prefix.append(C)
+            for D in (C * Q, C * X):
+                source = explicit_chain((*prefix, D, D * D, D * D * C))
+                result = reduce_square(source)
+                self.assertEqual(replay(result.chain) ** 2, source.values[-1])
+                self.assertGreaterEqual(result.saved_instructions, 1)
+                if D == Q * Q:
+                    rows = list(source.recipes)
+                    rows[len(prefix) - 1] = ("*", prefix.index(Q), prefix.index(Q))
+                    aliased = Chain(source.values, tuple(rows))
+                    result = reduce_square(aliased)
+                    self.assertEqual(replay(result.chain) ** 2, source.values[-1])
+
+    def test_gsg_half_root_helper_is_necessary_in_the_declared_menu(self):
+        # At A=4,B=6,g=1 the distinct nonsquare pair B,C reaches the boundary.
+        for D in (3456, 13824):
+            source = explicit_chain((1, 2, 4, 6, 24, 576, D, 82944))
+            root = 288
+            without_half = {1, 2, 3, 4, 6, 16, 24, 256, root}
+            self.assertIsNone(shortest_from_menu(without_half, root, 6))
+            result = reduce_square(source)
+            self.assertEqual(result.rule, "one_big_menu")
+            self.assertEqual(result.chain.values, (1, 2, 4, 6, 24, 144, 288))
+            self.assertEqual(result.saved_instructions, 1)
+            with self.assertRaises(ResourceLimit):
+                reduce_square(source, max_states=0)

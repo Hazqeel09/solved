@@ -100,7 +100,7 @@ def _seven_root(target):
 
 
 def _candidate_menu(chain, root, events):
-    """The shared menu in the four-event and late-small-event arguments.
+    """The shared menu in the proved root-sector arguments.
 
     Values in this menu are candidates, not free inputs. The menu solver
     charges all instructions required to construct them from 1.
@@ -156,10 +156,11 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
     source_length = len(recipes)
     word = "".join("S" if level(values[i]) == level(values[i - 1]) else "G" for i in events[2:])
     late_small = word in ("GGS", "GGSG")
-    known_sector = len(events) in (3, 4, 7) or late_small
+    one_big = word == "GSG"
+    known_sector = len(events) in (3, 4, 7) or late_small or one_big
     if not known_sector and not all(_power_of_two(v) for v in values):
         raise ValueError(
-            "supported sectors are three, four, seven, GGS, GGSG and power-only histories"
+            "supported sectors are three, four, seven, GGS, GGSG, GSG and power-only histories"
         )
 
     def result(output, rule):
@@ -172,9 +173,9 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
 
     if values[-1] == values[-2] ** 2:
         return result(_prefix(chain, source_length - 1), "trailing_square")
-    if not known_sector:
+    if not known_sector or one_big and all(_power_of_two(v) for v in values):
         return result(reduce_power_square(chain), "power_exponents")
-    if len(events) == 4 or late_small:
+    if len(events) == 4 or late_small or one_big:
         if root in values[:-1]:
             return result(_prefix(chain, values.index(root)), "retained_root")
         output = shortest_from_menu(
@@ -186,7 +187,8 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
         )
         if output is None:
             raise ArithmeticError("the proved candidate menu has no root certificate")
-        return result(output, "late_small_menu" if late_small else "four_event_menu")
+        rule = "one_big_menu" if one_big else "late_small_menu" if late_small else "four_event_menu"
+        return result(output, rule)
     if len(events) == 7:
         output, rule = _seven_root(values[-1])
         return result(output, rule)
