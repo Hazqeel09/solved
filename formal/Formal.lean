@@ -11,3 +11,5 @@ import Formal.ICG.BridgeProbe
 import Formal.ICG.LocalPoly
 import Formal.ICG.EvenCert
 import Formal.ICG.EvenPacked
+import Formal.ICG.EvenGraph
+import Formal.ICG.EvenFamilies

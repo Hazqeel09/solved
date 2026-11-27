@@ -1,0 +1,411 @@
+"""Certificate data for the Lean theorems on maximal energy of ICG(2^a p^b, S).
+
+The Lean checker ``Solved.ICG.certifyP`` (formal/Formal/ICG/EvenPacked.lean) needs, for each
+order 2^a p^b, the energy polynomial E(p), the maximising masks, an order in which to decide
+the cells, a packed field width and the number of coefficients per polynomial. Its soundness
+does not depend on any of these choices: a wrong value makes the kernel reject the
+certificate. This module computes them from checks/expected/icg-families.json and writes
+formal/Formal/ICG/EvenFamilies.lean.
+
+Polynomials are coefficient lists, lowest degree first, with the same list operations as
+formal/Formal/Cert/UPoly.lean and formal/Formal/ICG/LocalPoly.lean, so lengths agree with the
+kernel's lists.
+"""
+
+import json
+from pathlib import Path
+
+# --- integer polynomials as in Formal/Cert/UPoly.lean -------------------------------------
+
+
+def padd(p, q):
+    """UPoly.add: coefficientwise sum, the shorter list padded with zeros."""
+    n = max(len(p), len(q))
+    return [(p[i] if i < len(p) else 0) + (q[i] if i < len(q) else 0) for i in range(n)]
+
+
+def pscale(c, p):
+    return [c * x for x in p]
+
+
+def pmul(p, q):
+    """UPoly.mul: mul [] q = [], mul (a :: p) q = add (scale a q) (0 :: mul p q)."""
+    if not p:
+        return []
+    return padd(pscale(p[0], q), [0] + pmul(p[1:], q))
+
+
+def peval(p, x):
+    out = 0
+    for c in reversed(p):
+        out = c + x * out
+    return out
+
+
+def shift1(p):
+    """UPoly.shift1: eval (shift1 p) x = eval p (x + 1)."""
+    if not p:
+        return []
+    s = shift1(p[1:])
+    return padd([p[0]], padd(s, [0] + s))
+
+
+def shift(k, p):
+    for _ in range(k):
+        p = shift1(p)
+    return p
+
+
+def neg(p):
+    return [-c for c in p]
+
+
+def nonneg(p):
+    return all(c >= 0 for c in p)
+
+
+def nonpos(p):
+    return all(c <= 0 for c in p)
+
+
+# --- local Ramanujan factors as in Formal/ICG/LocalPoly.lean ---------------------------------
+
+
+def _mono(k, p):
+    return [0] * k + p
+
+
+def phi_p(e):
+    return [1] if e == 0 else _mono(e - 1, [-1, 1])
+
+
+def ram_p(k, u):
+    if k == 0:
+        return [1]
+    if k <= u:
+        return phi_p(k)
+    if k == u + 1:
+        return _mono(u, [-1])
+    return []
+
+
+def tent_p(m, u, j):
+    return pmul(phi_p(max(m - u, 0)), ram_p(max(m - j, 0), u))
+
+
+def cell_p(a, b, k, e):
+    """cellP: contribution of cell k = i(b+1)+l to entry e = u(b+1)+v, a polynomial in p."""
+    B = b + 1
+    return pscale(peval(tent_p(a, e // B, k // B), 2), tent_p(b, e % B, k % B))
+
+
+def cell_table(a, b, p0, k):
+    """cellTable: the contributions of cell k to every entry, in x = p - p0."""
+    return [shift(p0, cell_p(a, b, k, e)) for e in range((a + 1) * (b + 1))]
+
+
+def model_energy(a, b, p, mask):
+    """sum_e |sum_{k in mask} cellP k e (p)|: the energy of ICG(2^a p^b, S) for S's mask."""
+    m = (a + 1) * (b + 1)
+    return sum(
+        abs(sum(peval(cell_p(a, b, k, e), p) for k, bit in enumerate(mask) if bit))
+        for e in range(m)
+    )
+
+
+# --- certificate data -----------------------------------------------------------------------
+
+
+def masks_of(maximisers, b, cells):
+    """Masks of length `cells` from lists of exponent pairs (i, j) for the divisors 2^i p^j."""
+    out = []
+    for divisor_set in maximisers:
+        mask = [False] * cells
+        for i, j in divisor_set:
+            mask[i * (b + 1) + j] = True
+        out.append(mask)
+    return out
+
+
+def energy_polynomial(a, b, p0, mask):
+    """E(p) for a maximiser whose shifted entries have certified signs."""
+    m = (a + 1) * (b + 1)
+    entries = [[] for _ in range(m)]
+    for k, bit in enumerate(mask):
+        if bit:
+            entries = [padd(f, cell_p(a, b, k, e)) for e, f in enumerate(entries)]
+    total = []
+    for f in entries:
+        shifted = shift(p0, f)
+        if not (nonneg(shifted) or nonpos(shifted)):
+            raise ValueError("maximiser entry without a certified sign")
+        total = padd(total, f if nonneg(shifted) else neg(f))
+    while total and total[-1] == 0:
+        total.pop()
+    return total
+
+
+def search_nodes(a, b, p0, target_mask, order):
+    """Nodes visited by the interval branch and bound of `bnbP`, and its unpruned leaves.
+
+    The node test is the one proved in Formal/Cert/PackedBB.lean: with accumulated table a and
+    undecided cells R, the bound has coefficients sum_e (-a - lo + max(2a + S, 0)).
+    """
+    m = (a + 1) * (b + 1)
+    tables = {k: cell_table(a, b, p0, k) for k in order}
+    target = shift(p0, energy_polynomial(a, b, p0, target_mask))
+    suffix_s = [[[] for _ in range(m)]]
+    suffix_lo = [[[] for _ in range(m)]]
+    for k in reversed(order):
+        suffix_s.insert(0, [padd(s, t) for s, t in zip(suffix_s[0], tables[k])])
+        suffix_lo.insert(
+            0, [padd(lo, [min(c, 0) for c in t]) for lo, t in zip(suffix_lo[0], tables[k])]
+        )
+    nodes, leaves = 0, []
+
+    def bound(depth, acc):
+        out = []
+        for e in range(m):
+            a_e, s_e, lo_e = acc[e], suffix_s[depth][e], suffix_lo[depth][e]
+            n = max(len(a_e), len(s_e), len(lo_e))
+            get = lambda f, i: f[i] if i < len(f) else 0  # noqa: E731
+            out = padd(
+                out,
+                [
+                    -get(a_e, i) - get(lo_e, i) + max(2 * get(a_e, i) + get(s_e, i), 0)
+                    for i in range(n)
+                ],
+            )
+        return out
+
+    def passes(bnd):
+        diff = padd(target, neg(bnd))
+        return bool(diff) and diff[0] > 0 and nonneg(diff[1:])
+
+    def go(depth, path, acc):
+        nonlocal nodes
+        nodes += 1
+        if passes(bound(depth, acc)):
+            return
+        if depth == len(order):
+            leaves.append(path)
+            return
+        k = order[depth]
+        go(depth + 1, path, acc)
+        go(depth + 1, path | (1 << k), [padd(x, y) for x, y in zip(acc, tables[k])])
+
+    go(0, 0, [[] for _ in range(m)])
+    return nodes, leaves
+
+
+def _orders(a, b):
+    cells = list(range((a + 1) * (b + 1) - 1))
+    B = b + 1
+    return {
+        "natural": cells,
+        "reverse": cells[::-1],
+        "exponent-of-p first": sorted(cells, key=lambda k: (k % B, k // B)),
+        "exponent-of-p last": sorted(cells, key=lambda k: (-(k % B), -(k // B))),
+    }
+
+
+def field_width(a, b, p0, energy, order):
+    """Smallest w with 4 m B + T < 2^(w-1), the size condition of `certifyP`."""
+    m = (a + 1) * (b + 1)
+    total = sum(abs(c) for k in order for f in cell_table(a, b, p0, k) for c in f)
+    tail = sum(abs(c) for c in shift(p0, energy))
+    return (4 * m * total + tail).bit_length() + 1
+
+
+def family_certificate(record):
+    """Lean certificate data for one even family of checks/expected/icg-families.json."""
+    (two, a), (_, b) = record["order"]
+    result = record["result"]
+    if two != 2 or result["kind"] != "one-symbolic":
+        raise ValueError("not an order 2^a p^b")
+    cells = (a + 1) * (b + 1) - 1
+    p0 = result["certified_from"]
+    masks = masks_of(result["maximisers"], b, cells)
+    energy = energy_polynomial(a, b, p0, masks[0])
+    stored = [0] * (1 + max(t[0] for t in result["energy"]))
+    for degree, q_degree, c in result["energy"]:
+        if q_degree != 0:
+            raise ValueError("unexpected q-degree")
+        stored[degree] += c
+    if energy != stored:
+        raise ValueError("energy polynomial disagrees with the stored certificate")
+    expected = sorted(sum(1 << k for k, bit in enumerate(mk) if bit) for mk in masks)
+    best = None
+    for name, order in _orders(a, b).items():
+        nodes, leaves = search_nodes(a, b, p0, masks[0], order)
+        if sorted(leaves) != expected:
+            raise ValueError("unpruned leaves differ from the maximisers")
+        if best is None or nodes < best[0]:
+            best = (nodes, name, order)
+    nodes, name, order = best
+    lengths = {len(f) for k in order for f in cell_table(a, b, p0, k)}
+    return {
+        "a": a,
+        "b": b,
+        "p0": p0,
+        "w": field_width(a, b, p0, energy, order),
+        "D": max(lengths | {len(shift(p0, energy))}),
+        "energy": energy,
+        "order": order,
+        "order_name": name,
+        "nodes": nodes,
+        "masks": masks,
+        "cells": [[(k // (b + 1), k % (b + 1)) for k, bit in enumerate(mk) if bit] for mk in masks],
+    }
+
+
+# --- Lean rendering ---------------------------------------------------------------------------
+
+
+def _lean_list(items):
+    return "[" + ", ".join(items) + "]"
+
+
+def _lean_bools(mask):
+    return _lean_list("true" if bit else "false" for bit in mask)
+
+
+def _real_poly(coeffs):
+    terms = []
+    for i, c in enumerate(coeffs):
+        if c == 0:
+            continue
+        mono = "" if i == 0 else "(p : ℝ)" if i == 1 else f"(p : ℝ) ^ {i}"
+        body = str(abs(c)) if i == 0 else mono if abs(c) == 1 else f"{abs(c)} * {mono}"
+        terms.append(("-" if c < 0 else "+", body))
+    out = ("-" if terms[0][0] == "-" else "") + terms[0][1]
+    for sign, body in terms[1:]:
+        out += f" {sign} {body}"
+    return out
+
+
+def _divisors(cells):
+    return ", ".join(f"2 ^ {c} * p ^ {e}" for c, e in cells)
+
+
+HEADER = """\
+import Formal.ICG.EvenGraph
+
+/-!
+# Maximal energy of `ICG(2^a p^b, S)`: kernel-checked families
+
+Generated by `python -m scripts.lean_icg_families` from `checks/expected/icg-families.json`;
+do not edit by hand. For each family the kernel evaluates `certifyP` (`decide +kernel`, no
+`native_decide`), and `energy_le_of_certifyP` turns it into a statement about the energy of the
+integral circulant graph `ICG(2^a p^b, S)` for every prime `p ≥ p₀` and every set `S` of proper
+divisors, including the empty set.
+
+For the literature on these orders see `results/icg-energy-exceptional-orders/PROOF.md`; whether
+a family is new is assessed there, not here.
+-/
+
+namespace Solved.ICG.Families
+
+open Solved.Cert Solved.ICG
+
+"""
+
+
+def render_family(cert):
+    a, b, p0 = cert["a"], cert["b"], cert["p0"]
+    energy = _lean_list(map(str, cert["energy"]))
+    expr = _real_poly(cert["energy"])
+    masks, cells = cert["masks"], cert["cells"]
+    graph = f"ICGBridge.energy (ICGBridge.icgAdj (2 ^ {a} * p ^ {b}) S) (ICGBridge.icgAdj_isHermitian _ _)"
+    sets = " ∨ ".join(f"S = {{{_divisors(cs)}}}" for cs in cells)
+    docsets = ", ".join("`{" + ", ".join(f"2^{c} p^{e}" for c, e in cs) + "}`" for cs in cells)
+    plain = expr.replace("(p : ℝ)", "p")
+    out = f"""\
+/-- The certificate for `2^{a} p^{b}` from `p ≥ {p0}` ({cert["nodes"]} search nodes). -/
+theorem cert_{a}_{b} : certifyP {a} {b} {p0} {cert["w"]} {cert["D"]} {energy}
+    {_lean_list(map(str, cert["order"]))}
+    {_lean_bools(masks[0])}
+    {_lean_list(_lean_bools(mk) for mk in masks[1:])} = true := by
+  decide +kernel
+
+/-- **`n = 2^{a} p^{b}`.** For every prime `p ≥ {p0}` and every set `S` of proper divisors of `n`,
+the energy of `ICG(n, S)` is at most `{plain}`, with equality exactly for
+{docsets}. -/
+theorem energy_{a}_{b} {{p : ℕ}} (hp : p.Prime) (hp0 : {p0} ≤ p) {{S : Finset ℕ}}
+    (hS : S ⊆ (2 ^ {a} * p ^ {b}).properDivisors) :
+    {graph} ≤
+        {expr} ∧
+      ({graph} =
+          {expr} ↔ {sets}) := by
+  have h := energy_le_of_certifyP cert_{a}_{b} hp (by omega) hp0 hS
+  have hE : ((UPoly.eval {energy} (p : ℤ) : ℤ) : ℝ) = {expr} := by
+    simp only [UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+"""
+    for j, (mk, cs) in enumerate(zip(masks, cells)):
+        out += f"""\
+  have h{j} : divsOfMask {a} {b} p {_lean_bools(mk)} = {{{_divisors(cs)}}} := by
+    rw [show divsOfMask {a} {b} p {_lean_bools(mk)} =
+      ([{_divisors(cs)}] : List ℕ).toFinset from rfl]
+    simp
+"""
+    names = ", ".join(f"h{j}" for j in range(len(masks)))
+    out += f"""\
+  rw [hE] at h
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false, {names}]
+    using h
+
+"""
+    return out
+
+
+def render(records):
+    certs = [
+        family_certificate(r)
+        for r in records
+        if r["result"]["kind"] == "one-symbolic" and r["order"][0][0] == 2
+    ]
+    return HEADER + "".join(render_family(c) for c in certs) + "end Solved.ICG.Families\n"
+
+
+def render_from(path):
+    return render(json.loads(Path(path).read_text()))
+
+
+GENERAL = [
+    "Solved.ICG.certify_sound",
+    "Solved.ICG.certifyP_sound",
+    "Solved.ICG.energy_le_of_certifyP",
+]
+
+AXIOMS = "[propext, Classical.choice, Quot.sound]"
+
+
+def render_axioms(records):
+    """A test file that fails to build unless every theorem rests on the standard axioms only."""
+    names = GENERAL + [
+        f"Solved.ICG.Families.energy_{r['order'][0][1]}_{r['order'][1][1]}"
+        for r in records
+        if r["result"]["kind"] == "one-symbolic" and r["order"][0][0] == 2
+    ]
+    out = """\
+import Formal.ICG.EvenFamilies
+
+/-!
+# Axiom audit for the energy certificates
+
+Generated by `python -m scripts.lean_icg_families`; do not edit by hand. `#guard_msgs` fails the
+build unless each theorem depends on exactly the standard axioms `propext`, `Classical.choice`
+and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
+-/
+"""
+    for name in names:
+        out += f"""
+/-- info: '{name}' depends on axioms: {AXIOMS} -/
+#guard_msgs in
+#print axioms {name}
+"""
+    return out
+
+
+def axioms_from(path):
+    return render_axioms(json.loads(Path(path).read_text()))
