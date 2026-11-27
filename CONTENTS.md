@@ -87,4 +87,4 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 | Result | Status | Formalization |
 |---|---|---|
 | [The maximal-energy divisor set of integral circulant graphs of order p^2q^3](results/icg-energy-p2q3/PROOF.md) | proof-draft | none |
-| [Maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md) | proof-draft | none |
+| [Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md) | proof-draft | none |

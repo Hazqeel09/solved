@@ -1,6 +1,6 @@
-# Maximal-energy integral circulant graphs at the primes 2 and 3
+# Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3
 
-**Status:** proof draft. Every row of the tables below is a theorem backed by an exact, computer-checked certificate. Independent review is pending. The three conjectures at the end are open. No proof-assistant formalization.
+**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version.
 
 ## Setting and prior results
 
@@ -8,13 +8,22 @@ For $n\ge2$ and a nonempty set $\mathcal D$ of proper divisors of $n$, the integ
 $$E(n,\mathcal D)=\sum_{e\mid n}\varphi(n/e)\Bigl|\sum_{d\in\mathcal D}c(e,n/d)\Bigr|,$$
 where $c$ is the Ramanujan sum. The problem is to find $\max_{\mathcal D}E(n,\mathcal D)$ and every maximising $\mathcal D$. Write $\Omega(d)$ for the number of prime factors of $d$ counted with multiplicity. The *even-Ω set* is $\{d\mid n,\ d\ne n:\ \Omega(d)\ \text{even}\}$; the *odd-Ω set* is defined likewise.
 
-As far as we found on 27 November 2026, proved answers exist for exactly three classes:
+Earlier work covers the following:
 
-- **Prime powers $p^s$, every prime.** Sander–Sander [SS11, Thm 1.1]. For $p=2$ there are extra maximisers.
-- **$p^aq^b$ with $p,q\ge5$ and $a+b$ even.** Exactly the odd-Ω set and the even-Ω set [JY26b, Thm A].
-- **Odd $n$ with odd total exponent, every prime of odd exponent at least 5.** Uniquely the even-Ω set [JY26a, Thm A]. The exclusion of $3$ is a limitation of their semidefinite method [JY26a, Thm B, Remark 4.2].
+- **Prime powers $p^s$, every prime.** Sander–Sander [SS11, Thm 1.1].
+- **Odd total exponent, any number of distinct odd primes, each odd-exponent prime at least 5.** The even-Ω set is the unique maximiser [JY26a, Thm A].
+- **Two distinct odd primes, same parity, $p,q\ge5$.** Exactly the odd-Ω set and the even-Ω set without $n$ [JY26b, Thm A].
+- **Two distinct odd primes with the prime 3.** Dong [D26] gives Lean-formalized theorems for all opposite-parity orders $p^{2r}3^{2s+1}$ and for all same-parity orders in which one prime is 3 or one exponent is at most 2. With [JY26a, JY26b], every order $p^aq^b$ with $p,q$ distinct odd primes is settled.
+- **The value for $pq$**, from Sander–Sander.
+- **Roldán's $p^2q^3$ case**, by Park, Schreib, the Omega Institute and Dong (see the companion entry).
 
-Every order involving the prime 2 with at least two prime factors lies outside these classes. So does every two-prime order involving 3 with an odd exponent of 3 or with same-parity exponents, and every order with three or more primes and even total exponent. The tables below settle many such orders. They also show that for even orders the maximiser can depend on the relative size of the primes.
+**Novelty of the rows below (literature checked 27 November 2026).** Rows for $3^ap^b$ reproduce theorems of [JY26a] and [D26]; they serve here only as independent consistency checks. For the remaining 30 order families, we found no earlier treatment in the papers and public repositories above, or by web search:
+
+- every even order: $2^ap^b$, $2pq$, $2^2pq$, $2p^2q$, $2p^3q$, $6pq$;
+- odd orders with at least three distinct primes in which 3 has an odd exponent: $3pq$;
+- odd orders with at least three distinct primes and even total exponent: $3^2pq$, $3p^2q$, $3\cdot5\cdot7\cdot p$, $15pq$, $35pq$.
+
+This search may be incomplete.
 
 ## Method
 
@@ -149,27 +158,12 @@ For example, $B$ wins at $(p,q)=(103,101)$ and $(127,109)$, and $A$ wins at $(13
 
 ## Conjectures
 
-On 27 November 2026 we found no earlier statement of Conjectures 1 or 2. We checked the sources below, whose own text says that no structural conjecture existed for composite orders [SS11, introduction], and searched the web. The conjectures are named at the request of the repository owner.
-
-**Conjecture 1 — the Hazqeel conjecture (parity law at all odd orders).** Let $n>1$ be odd. If $\sum a_\nu$ is odd, the even-Ω set is the unique maximiser. If $\sum a_\nu\ge2$ is even and $n$ is not a prime power, the maximisers are exactly the even-Ω and odd-Ω sets.
-
-This is [JY26a, JY26b] without the hypothesis that the primes are at least 5. It holds in every certified row with the prime 3 above. It also holds for $3^ap^b$ with up to 19 cells, computed with the same code: $(a,b)=(3,4),(4,3),(2,5),(5,2)$, all for every prime $p\ge5$. It holds at $3\cdot5\cdot7$, and in the four-prime even-total orders above.
-
-**Conjecture 2 — the Afyq conjecture (2-adic tensor structure of even orders).** Let $a\ge2$, $b\ge1$, and let $p$ be an odd prime, with finitely many exceptions such as $2^3\cdot3$. Let $\mathcal S$ be the family of maximal-energy exponent sets of $\mathrm{ICG}(2^a)$ [SS11, Thm 1.1]. Then the maximisers of $\mathrm{ICG}(2^ap^b)$ are exactly
-$$\mathcal D_S=\{2^ip^j\ne n:\ j\equiv[i\in T_S]\pmod 2\},\qquad T_S=\begin{cases}S\setminus\{0\},& b\ \text{odd},\\ (S\setminus\{0,a-1\})\cup\{a\},& b\ \text{even},\end{cases}$$
-for $S\in\mathcal S$.
-
-It holds in every certified row with $a\ge2$, and for $(a,b)=(2,5),(3,4),(5,2)$ with up to 19 cells. The case $a=1$ is different: the number of maximisers of $2p^b$ runs $1,3,3,1,1,3,3$ for $b=1,\dots,7$.
-
-**Conjecture 3 (non-universality).** For every $k\ge1$ there are even orders with two odd prime factors whose maximising divisor set changes at least $k$ times as the ratio of the two primes varies.
-
-The orders $2p^2q$ and $2p^3q$ give one change each.
+Conjectural generalizations of these tables are being checked for novelty. They will be stated only after that check and after the supporting results are formalized in Lean.
 
 ## Limitations
 
 - The certificate covers the 49 listed orders, plus the stated residual enumerations.
 - The 17- and 19-cell cases cited under the conjectures came from exploratory runs of the same functions. They are not in the registered certificate.
-- The conjectures are supported by these finite families only.
 - The convex certificates show that the maximisers lie among the listed candidates. Which candidate wins at a given pair is decided by the explicit candidate energy polynomials stored in the certificate. For $2p^3q$ with $p>q$, those boundaries are not worked out in closed form here.
 
 ## References
@@ -178,6 +172,7 @@ The orders $2p^2q$ and $2p^3q$ give one change each.
 - [JY26a] J. Jiang, C. Yang, Ramanujan transforms and maximum energy of odd-total-exponent integral circulants, arXiv:2608.29523 (v2, 30 October 2026), <https://arxiv.org/abs/2608.29523>.
 - [JY26b] J. Jiang, C. Yang, Maximum energy of integral circulant graphs with same-parity exponents, arXiv:2610.36883, <https://arxiv.org/abs/2610.36883>.
 - [R26] D. G. Roldán, Graph energy maximisation for integral circulant graphs of order $p^2q^3$, arXiv:2604.09491, <https://arxiv.org/abs/2604.09491>.
+- [D26] H. Dong, The maximal energy of integral circulant graphs of order $p^aq^b$ when one prime is 3 or one exponent is at most 2, version 3, 9 November 2026, <https://github.com/Horace-Maxwell/ai4math-results/blob/8e81669b092b3620034c95d8690dbeb99da07ef1/papers/icg-q3-general/note.tex>.
 - [IB11] A. Ilić, M. Bašić, New results on the energy of integral circulant graphs, <https://arxiv.org/abs/1104.4261> (minimal energy for even $n$).
 
 AI assistance: the certificates, code and this write-up were produced with Anthropic Claude. The literature status was checked on 27 November 2026. The novelty of individual rows is subject to the limits of that search.

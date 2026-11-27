@@ -1121,7 +1121,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "For distinct odd primes p, q, the set D* = {1, p^2, pq, q^2, p^2q^2, pq^3} of divisors with an even number of prime factors uniquely maximises the energy of ICG(p^2q^3, D) over nonempty sets of proper divisors (Roldan's Conjecture 1.3). Proved for q >= 5 by Jiang-Yang; this entry gives an independent exact certificate covering all real p, q >= 3, including q = 3.",
+      "statement": "For distinct odd primes p, q, the set D* = {1, p^2, pq, q^2, p^2q^2, pq^3} uniquely maximises the energy of ICG(p^2q^3, D) (Roldan's Conjecture 1.3). The result is known (Park; Schreib; Jiang-Yang for q >= 5; Dong, Lean-formalized). This entry is an independent exact certificate on all real p, q >= 3, awaiting Lean verification.",
       "proof": "results/icg-energy-p2q3/PROOF.md",
       "tests": [
         "test_icg_energy.py"
@@ -1151,17 +1151,29 @@
         {
           "url": "https://github.com/the-omega-institute/trureturing/issues/19144",
           "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/Horace-Maxwell/ai4math-results/tree/8e81669b092b3620034c95d8690dbeb99da07ef1/papers/icg-q3-general",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/coshaman/papers/tree/2f730393e3d5bed4d9641d7d79b1bdc57fbff05d",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/jamesschreib/roldan-universality-conjecture/tree/95bb002688c65948a15cc9380e8e1f08f8bd6801",
+          "recorded": "2026-11-27"
         }
       ],
       "dependencies": []
     },
     {
       "id": "icg-energy-exceptional-orders",
-      "title": "Maximal-energy integral circulant graphs at the primes 2 and 3",
+      "title": "Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3",
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "For 49 order families (45 outside the known theorems) (2^a p^b and 3^a p^b with at most 15 divisor cells, and orders 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic odd primes), exact certificates determine every maximal-energy divisor set of ICG(n, D) for all admissible primes. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. Three conjectures are stated: the Hazqeel conjecture (the parity law at every odd order), the Afyq conjecture (even orders 2^a p^b follow the Sander-Sander maximisers of 2^a), and a conjecture that the maximiser of even orders can change arbitrarily often with the prime ratio.",
+      "statement": "Exact Python certificates (awaiting Lean verification) determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8.",
       "proof": "results/icg-energy-exceptional-orders/PROOF.md",
       "tests": [
         "test_icg_families.py",
@@ -1197,6 +1209,10 @@
         },
         {
           "url": "https://arxiv.org/abs/1104.4261",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/Horace-Maxwell/ai4math-results/blob/8e81669b092b3620034c95d8690dbeb99da07ef1/papers/icg-q3-general/note.tex",
           "recorded": "2026-11-27"
         }
       ],

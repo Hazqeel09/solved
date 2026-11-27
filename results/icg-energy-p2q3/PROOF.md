@@ -1,13 +1,16 @@
 # The maximal-energy divisor set of integral circulant graphs of order $p^2q^3$
 
-**Status:** proof draft. The argument is a complete, exact, computer-checked certificate, awaiting independent review. No proof-assistant formalization.
+**Status:** proof draft (independent re-verification of known results), awaiting Lean verification.
 
-**Priority.** This is an independent proof, not the first. The statement is Conjecture 1.3 of Roldán [R26].
+**Priority.** This is an independent re-verification of a known result. The statement is Conjecture 1.3 of Roldán [R26]. Earlier treatments:
 
-- Jiang and Yang proved it for $q\ge5$ as a case of a general theorem [JY26, Theorem A].
-- The remaining case $q=3$ was recorded as "Proved", using an integer certificate over the 2,047 competitors, in an unreviewed public issue of the Omega Institute research tracker [OI26], closed on 23 October 2026.
+- S. Park claims a proof for all distinct odd primes (manuscript, 21 August 2026).
+- J. A. Schreib gives a written proof of the case $q=3$ (5 September 2026).
+- Jiang and Yang prove the case $q\ge5$ as part of a general theorem [JY26, Theorem A].
+- The Omega Institute announced an arithmetic certificate for $q=3$ [OI26].
+- H. Dong proves the case $q=3$ for all orders $p^{2r}3^{2s+1}$, with a Lean formalization bridged to the graph energy of Mathlib's circulant graphs [D26].
 
-The certificate here was developed independently and covers every pair at once, including $q=3$. Its value is an independent, reproducible verification. We claim no priority.
+The certificate here was developed independently of these, before we found them. We claim no priority. This entry is not yet formalized in Lean.
 
 ## Statement
 
@@ -61,6 +64,9 @@ During exploration a separate vectorized search confirmed $\mathcal D^*$ for all
 - [R26] D. G. Roldán, Graph energy maximisation for integral circulant graphs of order $n=p^2q^3$, arXiv:2604.09491 (v1, 10 April 2026), Conjecture 1.3, Theorems 1.1–1.2. <https://arxiv.org/abs/2604.09491>
 - [JY26] J. Jiang, C. Yang, Ramanujan transforms and maximum energy of odd-total-exponent integral circulants, arXiv:2608.29523 (v2, 30 October 2026), Theorem A. It requires every prime with odd exponent to be at least 5; the case $q=3$ is outside its hypotheses. <https://arxiv.org/abs/2608.29523>
 - [JY26b] J. Jiang, C. Yang, Maximum energy of integral circulant graphs with same-parity exponents, arXiv:2610.36883. <https://arxiv.org/abs/2610.36883>
+- [D26] H. Dong, ai4math-results, paper 1 version 3 (9 November 2026), <https://github.com/Horace-Maxwell/ai4math-results/tree/8e81669b092b3620034c95d8690dbeb99da07ef1/papers/icg-q3-general>.
+- [P26] S. Park, Exact energy maximisation for integral circulant graphs of order $p^2q^3$, <https://github.com/coshaman/papers/tree/2f730393e3d5bed4d9641d7d79b1bdc57fbff05d>.
+- [S26] J. A. Schreib, The Roldán universality conjecture, <https://github.com/jamesschreib/roldan-universality-conjecture/tree/95bb002688c65948a15cc9380e8e1f08f8bd6801>.
 - [OI26] Omega Institute research tracker, issue #19144, "prove Roldan Conjecture 1.3 … including the open case q = 3", closed 23 October 2026 as "Proved" (unreviewed). <https://github.com/the-omega-institute/trureturing/issues/19144>
 
 AI assistance: the certificate, code and write-up were produced with Anthropic Claude. The literature status was checked on 27 November 2026.

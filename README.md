@@ -10,8 +10,8 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 
 These are exact computer certificates in Python. They are **not claimed as results** until each has a Lean formalization and a statement correspondence. That work is in progress.
 
-- [Integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md): certificates for 49 order families and a ratio-dependent maximiser for $2p^2q$. It proposes two conjectures, the **Hazqeel conjecture** and the **Afyq conjecture**.
-- [Roldán's conjecture for ICG(p²q³)](results/icg-energy-p2q3/PROOF.md): an independent certificate for all odd primes.
+- [Integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md): certificates for 49 order families. The 19 families $3^ap^b$ reproduce known theorems (Jiang–Yang, Dong). No earlier treatment was found for the other 30, which include every even order listed and a ratio-dependent maximiser for $2p^2q$.
+- [Roldán's conjecture for ICG(p²q³)](results/icg-energy-p2q3/PROOF.md): an independent re-verification of a result already proved by Park, Schreib, Jiang–Yang and Dong.
 - [Matroid polynomial checks on q-uniform matroids](results/q-uniform-matroid-checks/PROOF.md): negative evidence on 9,371 matroids for open conjectures.
 
 ## Results
@@ -53,7 +53,7 @@ These are exact computer certificates in Python. They are **not claimed as resul
 | [An elementary eventually-periodic case of essential components](results/periodic-essential-components/PROOF.md) | ⬜ Not formalized |
 | [Matroid polynomial conjectures on q-uniform matroids with free points](results/q-uniform-matroid-checks/PROOF.md) | ⬜ Not formalized |
 | [The maximal-energy divisor set of integral circulant graphs of order p^2q^3](results/icg-energy-p2q3/PROOF.md) | ⬜ Not formalized |
-| [Maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md) | ⬜ Not formalized |
+| [Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md) | ⬜ Not formalized |
 
 <!-- END GENERATED LEAN STATUS -->
 
