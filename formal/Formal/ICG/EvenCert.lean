@@ -1,4 +1,5 @@
 import Formal.Cert.BranchBound
+import Formal.Cert.Sums
 import Formal.ICG.LocalPoly
 import Research.ICGGeneralThm5
 
@@ -61,18 +62,6 @@ theorem L1mat_eq (a b : ℕ) (L : List Bool) (p : ℤ) :
 
 /-! ## Flat indices on the exponent box -/
 
-theorem sum_range_mul_flat {M : Type*} [AddCommMonoid M] (A B : ℕ) (f : ℕ → M) :
-    ∑ k ∈ range (A * B), f k = ∑ i ∈ range A, ∑ l ∈ range B, f (i * B + l) := by
-  induction A with
-  | zero => simp
-  | succ A ih => rw [add_one_mul, sum_range_add, ih, sum_range_succ]
-
-theorem cell_div {B : ℕ} (i : ℕ) {l : ℕ} (hl : l < B) : (i * B + l) / B = i := by
-  rw [Nat.mul_comm, Nat.mul_add_div (by omega), Nat.div_eq_of_lt hl, Nat.add_zero]
-
-theorem cell_mod {B : ℕ} (i : ℕ) {l : ℕ} (hl : l < B) : (i * B + l) % B = l := by
-  rw [Nat.mul_comm, Nat.mul_add_mod, Nat.mod_eq_of_lt hl]
-
 /-- Contribution of cell `k = i(b+1)+l` to entry `e = u(b+1)+v`, a polynomial in `p`. -/
 def cellP (a b k e : ℕ) : UPoly :=
   UPoly.scale (UPoly.eval (tentP a (e / (b + 1)) (k / (b + 1))) 2)
@@ -91,7 +80,7 @@ theorem eval_entryP_flat (a b : ℕ) (L : List Bool) (e : ℕ) (p : ℤ) :
   refine sum_congr rfl fun i _ => sum_congr rfl fun l hl => ?_
   have hl' : l < b + 1 := mem_range.1 hl
   unfold cellP
-  rw [cell_div i hl', cell_mod i hl']
+  rw [flat_div i hl', flat_mod i hl']
   split_ifs <;> simp
 
 theorem L1mat_flat (a b : ℕ) (L : List Bool) (p : ℤ) :
@@ -100,7 +89,7 @@ theorem L1mat_flat (a b : ℕ) (L : List Bool) (p : ℤ) :
         |((UPoly.eval (entryP a b L (e / (b + 1)) (e % (b + 1))) p : ℤ) : ℝ)| := by
   rw [L1mat_eq, sum_range_mul_flat]
   refine sum_congr rfl fun u _ => sum_congr rfl fun v hv => ?_
-  rw [cell_div u (mem_range.1 hv), cell_mod u (mem_range.1 hv)]
+  rw [flat_div u (mem_range.1 hv), flat_mod u (mem_range.1 hv)]
 
 /-! ## Exact energies of sign-certified masks -/
 
@@ -172,6 +161,22 @@ theorem L1mat_eq_runAcc (a b p0 : ℕ) {ks : List ℕ}
   refine sum_congr rfl fun e he => ?_
   rw [eval_runAcc_steps a b p0 hperm hL (mem_range.1 he)]
 
+/-- A mask whose entries have certified signs and whose exact energy is `E`. -/
+theorem L1mat_of_exact {a b p0 : ℕ} {E : UPoly} {ks : List ℕ}
+    (hperm : ks.Perm (List.range ((a + 1) * (b + 1) - 1))) {L : List Bool}
+    (hlen : L.length = (a + 1) * (b + 1) - 1)
+    (hsigns : signsOK ((a + 1) * (b + 1)) (runAcc L (steps a b p0 ks) []) = true)
+    (hzero : UPoly.allZero (UPoly.add (absSum ((a + 1) * (b + 1)) (runAcc L (steps a b p0 ks) []))
+      (UPoly.neg (UPoly.shift p0 E))) = true) {p : ℤ} (hp : (p0 : ℤ) ≤ p) :
+    ICGGeneral.L1mat 2 (p : ℝ) a b (ind b L) = ((UPoly.eval E p : ℤ) : ℝ) := by
+  have hx : (0 : ℤ) ≤ p - p0 := sub_nonneg.2 hp
+  have htarget : UPoly.eval (UPoly.shift p0 E) (p - p0) = UPoly.eval E p := by
+    rw [UPoly.eval_shift, sub_add_cancel]
+  rw [L1mat_eq_runAcc a b p0 hperm hlen, sum_abs_eq_absSum hsigns hx, ← htarget]
+  have := UPoly.eval_eq_zero_of_allZero hzero (p - p0)
+  simp only [UPoly.eval_add, UPoly.eval_neg] at this
+  exact_mod_cast (sub_eq_zero.1 (by linarith))
+
 /-- What a successful certificate proves about `ICGGeneral.L1mat 2 p a b`. -/
 theorem certify_sound {a b p0 : ℕ} {E : UPoly} {ks : List ℕ} {star : List Bool}
     {others : List (List Bool)} (h : certify a b p0 E ks star others = true) {p : ℤ}
@@ -189,15 +194,11 @@ theorem certify_sound {a b p0 : ℕ} {E : UPoly} {ks : List ℕ} {star : List Bo
     rw [UPoly.eval_shift, sub_add_cancel]
   refine ⟨fun L hL => ?_, fun L hL hnot => ?_⟩
   · obtain ⟨⟨hlen, hsigns⟩, hzero⟩ := hall L hL
-    refine ⟨hlen, ?_⟩
-    rw [L1mat_eq_runAcc a b p0 hperm' hlen, sum_abs_eq_absSum hsigns hx, ← htarget]
-    have := UPoly.eval_eq_zero_of_allZero hzero (p - p0)
-    simp only [UPoly.eval_add, UPoly.eval_neg] at this
-    exact_mod_cast (sub_eq_zero.1 (by linarith))
+    exact ⟨hlen, L1mat_of_exact hperm' hlen hsigns hzero hp⟩
   · have hsound := bnb_sound _ _ _ _ _ hbnb L hx ((a + 1) * (b + 1))
-    have hpath : runPath L (build (ks.map fun k => (k, cellTable a b p0 k)))
-        (List.replicate ((a + 1) * (b + 1) - 1) false) = L :=
-      runPath_build _ (by simpa [Function.comp_def] using hperm') hL
+    have hpath : runCells L ((ks.map fun k => (k, cellTable a b p0 k)).map Prod.fst)
+        (List.replicate ((a + 1) * (b + 1) - 1) false) = L := by
+      simpa [Function.comp_def] using runCells_perm hperm' hL
     rw [hpath] at hsound
     rcases hsound with hmem | hlt
     · exact absurd hmem hnot

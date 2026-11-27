@@ -83,6 +83,11 @@ theorem pack_mod {w n : ℕ} {f : ℕ → ℕ} (h0 : f 0 < 2 ^ w) :
     pack w (n + 1) f % 2 ^ w = f 0 := by
   rw [pack_succ, Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt h0]
 
+theorem pack_mod_of_pos {w n : ℕ} {f : ℕ → ℕ} (hn : 0 < n) (h0 : f 0 < 2 ^ w) :
+    pack w n f % 2 ^ w = f 0 := by
+  obtain ⟨n, rfl⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+  exact pack_mod h0
+
 theorem pack_div {w n : ℕ} {f : ℕ → ℕ} (h0 : f 0 < 2 ^ w) :
     pack w (n + 1) f / 2 ^ w = pack w n (fun i => f (i + 1)) := by
   rw [pack_succ, Nat.add_mul_div_left _ _ (by positivity), Nat.div_eq_of_lt h0, Nat.zero_add]
@@ -203,5 +208,211 @@ theorem hsum_spec {w D m : ℕ} {f : ℕ → ℕ} (hf : ∀ i < m * D, f i < 2 ^
     congr 1
     refine pack_congr fun d _ => ?_
     rw [Nat.mul_comm D e]
+
+end Solved.Cert.Pack
+
+namespace Solved.Cert.Pack
+
+open Finset
+
+/-! ## Signed fields: offset encoding -/
+
+/-- `∑_{i<n} f i · 2^{w i}` over `ℤ`. -/
+def packZ (w n : ℕ) (f : ℕ → ℤ) : ℤ := ∑ i ∈ range n, f i * 2 ^ (w * i)
+
+theorem cast_pack (w n : ℕ) (F : ℕ → ℕ) :
+    ((pack w n F : ℕ) : ℤ) = packZ w n (fun i => (F i : ℤ)) := by
+  simp [pack, packZ]
+
+theorem packZ_congr {w n : ℕ} {f g : ℕ → ℤ} (h : ∀ i < n, f i = g i) :
+    packZ w n f = packZ w n g :=
+  sum_congr rfl fun i hi => by rw [h i (mem_range.1 hi)]
+
+theorem packZ_add (w n : ℕ) (f g : ℕ → ℤ) :
+    packZ w n (fun i => f i + g i) = packZ w n f + packZ w n g := by
+  simp [packZ, add_mul, sum_add_distrib]
+
+theorem packZ_sub (w n : ℕ) (f g : ℕ → ℤ) :
+    packZ w n (fun i => f i - g i) = packZ w n f - packZ w n g := by
+  simp [packZ, sub_mul, sum_sub_distrib]
+
+theorem packZ_mul_left (w n : ℕ) (c : ℤ) (f : ℕ → ℤ) :
+    packZ w n (fun i => c * f i) = c * packZ w n f := by
+  simp [packZ, mul_sum, mul_assoc]
+
+theorem packZ_sum {ι : Type*} (s : Finset ι) (w n : ℕ) (F : ι → ℕ → ℤ) :
+    packZ w n (fun i => ∑ j ∈ s, F j i) = ∑ j ∈ s, packZ w n (F j) := by
+  simp only [packZ, sum_mul]; exact sum_comm
+
+theorem packZ_nonneg {w n : ℕ} {f : ℕ → ℤ} (h : ∀ i < n, 0 ≤ f i) : 0 ≤ packZ w n f :=
+  sum_nonneg fun i hi => mul_nonneg (h i (mem_range.1 hi)) (by positivity)
+
+/-- Every field of `f` below `n` lies strictly between `-2^{w-1}` and `2^{w-1}`. -/
+def Fits (w n : ℕ) (f : ℕ → ℤ) : Prop := ∀ i < n, |f i| < 2 ^ (w - 1)
+
+/-- Offset encoding: field `i` holds `f i + 2^{w-1}`. -/
+def enc (w n : ℕ) (f : ℕ → ℤ) : ℕ := pack w n (fun i => (f i + 2 ^ (w - 1)).toNat)
+
+theorem two_pow_pred_mul_two {w : ℕ} (hw : 0 < w) : (2 : ℤ) ^ (w - 1) * 2 = 2 ^ w := by
+  rw [← pow_succ, Nat.sub_add_cancel hw]
+
+theorem field_lt {w : ℕ} (hw : 0 < w) {x : ℤ} (h : |x| < 2 ^ (w - 1)) :
+    (x + 2 ^ (w - 1)).toNat < 2 ^ w := by
+  have h2 := two_pow_pred_mul_two hw
+  have := abs_lt.1 h
+  have hlt : x + 2 ^ (w - 1) < (2 : ℤ) ^ w := by linarith
+  have hcast : ((x + 2 ^ (w - 1)).toNat : ℤ) = x + 2 ^ (w - 1) := Int.toNat_of_nonneg (by linarith)
+  exact_mod_cast hcast ▸ hlt
+
+theorem enc_fields_lt {w n : ℕ} (hw : 0 < w) {f : ℕ → ℤ} (h : Fits w n f) :
+    ∀ i < n, (f i + 2 ^ (w - 1)).toNat < 2 ^ w := fun i hi => field_lt hw (h i hi)
+
+theorem cast_enc {w n : ℕ} {f : ℕ → ℤ} (h : Fits w n f) :
+    (enc w n f : ℤ) = packZ w n f + packZ w n (fun _ => 2 ^ (w - 1)) := by
+  rw [enc, cast_pack, ← packZ_add]
+  refine packZ_congr fun i hi => Int.toNat_of_nonneg ?_
+  have := abs_lt.1 (h i hi)
+  linarith
+
+theorem cast_rep (w n c : ℕ) : ((rep w n c : ℕ) : ℤ) = packZ w n (fun _ => (c : ℤ)) := by
+  rw [rep, cast_pack]
+
+/-- A natural number whose integer value is that of `enc w n g` is `enc w n g`. -/
+theorem eq_enc {w n : ℕ} {g : ℕ → ℤ} (hg : Fits w n g) {X : ℕ}
+    (h : (X : ℤ) = packZ w n g + packZ w n (fun _ => 2 ^ (w - 1))) : X = enc w n g := by
+  have := cast_enc hg
+  exact_mod_cast h.trans this.symm
+
+/-- `A - B` (truncated) is `enc w n g` when its integer value is. -/
+theorem sub_eq_enc {w n : ℕ} {g : ℕ → ℤ} (hg : Fits w n g) {A B : ℕ}
+    (h : (A : ℤ) - B = packZ w n g + packZ w n (fun _ => 2 ^ (w - 1))) : A - B = enc w n g := by
+  have hnn : (0 : ℤ) ≤ packZ w n g + packZ w n (fun _ => 2 ^ (w - 1)) := by
+    rw [← packZ_add]
+    refine packZ_nonneg fun i hi => ?_
+    have := abs_lt.1 (hg i hi)
+    linarith
+  have hBA : B ≤ A := by omega
+  refine eq_enc hg ?_
+  rw [Nat.cast_sub hBA]
+  exact h
+
+/-! ## Computable packing for certificate data -/
+
+/-- Horner packing of a list of fields. -/
+def packL (w : ℕ) : List ℕ → ℕ
+  | [] => 0
+  | f :: fs => f + 2 ^ w * packL w fs
+
+theorem packL_eq (w : ℕ) (l : List ℕ) : packL w l = pack w l.length (fun i => l.getD i 0) := by
+  induction l with
+  | nil => simp [packL]
+  | cons f fs ih => simp [packL, pack_succ, ih]
+
+/-- `rep w n c` by recursion, for the kernel. -/
+def repC (w c : ℕ) : ℕ → ℕ
+  | 0 => 0
+  | n + 1 => c + 2 ^ w * repC w c n
+
+theorem repC_eq (w c n : ℕ) : repC w c n = rep w n c := by
+  induction n with
+  | zero => simp [repC, rep]
+  | succ n ih => rw [repC, ih, rep, rep, pack_succ]
+
+/-! ## Block sums with one multiplication -/
+
+theorem two_pow_mul_pack (w s n : ℕ) (f : ℕ → ℕ) :
+    2 ^ (w * s) * pack w n f = pack w (s + n) (fun i => if s ≤ i then f (i - s) else 0) := by
+  rw [pack_split]
+  have h0 : pack w s (fun i => if s ≤ i then f (i - s) else 0) = 0 :=
+    (pack_congr (g := fun _ => 0) fun i hi => by simp [Nat.not_le.2 hi]).trans (by simp [pack])
+  rw [h0, Nat.zero_add]
+  congr 1
+  exact pack_congr fun i _ => by simp
+
+theorem pack_extend {w n L : ℕ} (hnL : n ≤ L) {g : ℕ → ℕ} (hg : ∀ i, n ≤ i → g i = 0) :
+    pack w n g = pack w L g := by
+  obtain ⟨r, rfl⟩ := Nat.exists_eq_add_of_le hnL
+  rw [pack_split]
+  have : pack w r (fun i => g (n + i)) = 0 :=
+    (pack_congr (g := fun _ => 0) fun i _ => hg _ (by omega)).trans (by simp [pack])
+  rw [this, Nat.mul_zero, Nat.add_zero]
+
+/-- `∑_{e<m} 2^{w D e}`: one `1` per block of `D` fields. -/
+def spread (w D m : ℕ) : ℕ := ∑ e ∈ range m, 2 ^ (w * (e * D))
+
+/-- The sum of the `m` blocks of `D` fields of `P`: one multiplication, a shift and a
+remainder. -/
+def blockSum (w D m R P : ℕ) : ℕ := (P * R) >>> (w * ((m - 1) * D)) % 2 ^ (w * D)
+
+theorem blockSum_spec {w D m F : ℕ} (hm : 0 < m) {f : ℕ → ℕ} (hf : ∀ i < m * D, f i ≤ F)
+    (hF : m * F < 2 ^ w) :
+    blockSum w D m (spread w D m) (pack w (m * D) f) =
+      pack w D (fun d => ∑ e ∈ range m, f (e * D + d)) := by
+  set fz : ℕ → ℕ := fun i => if i < m * D then f i else 0 with hfz
+  set L := (m - 1) * D + m * D
+  have hP : pack w (m * D) f = pack w (m * D) fz := pack_congr fun i hi => by simp [hfz, hi]
+  -- each shifted copy, extended to `L` fields
+  have hshift : ∀ e ∈ range m, pack w (m * D) fz * 2 ^ (w * (e * D)) =
+      pack w L (fun i => if e * D ≤ i then fz (i - e * D) else 0) := by
+    intro e he
+    have he' := mem_range.1 he
+    rw [Nat.mul_comm, two_pow_mul_pack]
+    have hle : e * D + m * D ≤ L := by
+      have : e * D ≤ (m - 1) * D := Nat.mul_le_mul_right _ (by omega)
+      show e * D + m * D ≤ (m - 1) * D + m * D; omega
+    refine pack_extend hle fun i hi => ?_
+    have : ¬ (i - e * D < m * D) := by omega
+    simp [hfz, this]
+  have hprod : pack w (m * D) fz * spread w D m =
+      pack w L (fun i => ∑ e ∈ range m, if e * D ≤ i then fz (i - e * D) else 0) := by
+    rw [spread, mul_sum, sum_congr rfl hshift, pack_sum]
+  -- every field of the product is at most `m F`
+  have hfield : ∀ i < L, (∑ e ∈ range m, if e * D ≤ i then fz (i - e * D) else 0) < 2 ^ w := by
+    intro i _
+    refine lt_of_le_of_lt ?_ hF
+    calc (∑ e ∈ range m, if e * D ≤ i then fz (i - e * D) else 0) ≤ ∑ _e ∈ range m, F := by
+          refine sum_le_sum fun e _ => ?_
+          split_ifs
+          · simp only [hfz]; split_ifs with h
+            · exact hf _ h
+            · exact Nat.zero_le _
+          · exact Nat.zero_le _
+      _ = m * F := by simp
+  have hkL : (m - 1) * D + D ≤ L := by
+    have : D ≤ m * D := Nat.le_mul_of_pos_left D hm
+    show (m - 1) * D + D ≤ (m - 1) * D + m * D; omega
+  unfold blockSum
+  rw [hP, hprod, Nat.shiftRight_eq_div_pow,
+    pack_block (k := (m - 1) * D) (n := D) (N := L) hkL hfield]
+  refine pack_congr fun d hd => ?_
+  -- the middle block collects every block once
+  rw [← sum_range_reflect]
+  refine sum_congr rfl fun e he => ?_
+  have he' := mem_range.1 he
+  have hle : (m - 1 - e) * D ≤ (m - 1) * D + d := by
+    have : (m - 1 - e) * D ≤ (m - 1) * D := Nat.mul_le_mul_right _ (by omega)
+    omega
+  have hidx : (m - 1) * D + d - (m - 1 - e) * D = e * D + d := by
+    have : (m - 1) * D = (m - 1 - e) * D + e * D := by
+      rw [← Nat.add_mul]; congr 1; omega
+    omega
+  have hlt : e * D + d < m * D := by nlinarith
+  simp [hle, hidx, hfz, hlt]
+
+/-- `spread` by recursion, for the kernel. -/
+def spreadC (w D : ℕ) : ℕ → ℕ
+  | 0 => 0
+  | m + 1 => 1 + 2 ^ (w * D) * spreadC w D m
+
+theorem spreadC_eq (w D m : ℕ) : spreadC w D m = spread w D m := by
+  induction m with
+  | zero => simp [spreadC, spread]
+  | succ m ih =>
+    rw [spreadC, ih, spread, spread, sum_range_succ', mul_sum]
+    simp only [Nat.zero_mul, Nat.mul_zero, pow_zero]
+    rw [add_comm]
+    congr 1
+    refine sum_congr rfl fun e _ => ?_
+    rw [← pow_add]; congr 1; ring
 
 end Solved.Cert.Pack

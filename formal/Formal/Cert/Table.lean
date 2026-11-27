@@ -57,13 +57,10 @@ def add : Table → Table → Table
     | nil => cases e <;> simp [add]
     | cons g t => cases e <;> simp [add, ih]
 
-/-- Apply `φ` to every entry. -/
-def map (φ : UPoly → UPoly) (t : Table) : Table := List.map φ t
-
 theorem get_map (φ : UPoly → UPoly) (hφ : φ [] = []) (t : Table) (e : ℕ) :
-    (map φ t).get e = φ (t.get e) := by
+    get (List.map φ t) e = φ (get t e) := by
   induction t generalizing e with
-  | nil => simp [map, hφ]
+  | nil => simp [hφ]
   | cons f t ih =>
     cases e with
     | zero => rfl

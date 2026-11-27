@@ -1,3 +1,4 @@
+import Formal.Cert.Mask
 import Formal.Cert.Table
 
 /-!
@@ -11,73 +12,13 @@ its absolute value is at most the larger of the two endpoint absolute values. If
 already below `target` for all `x ≥ 0` the subtree is closed; at a leaf a mask must either be
 below `target` or be one of the `allowed` masks.
 
-`bnb_sound` is the semantic statement, and `runPath_build` / `eval_runAcc_build` identify the
-mask a choice sequence reaches when the cells are a permutation of `0, …, N-1`.
+`bnb_sound` is the semantic statement; with `runCells_perm` and `eval_runAcc_build` it covers
+every mask when the cells are a permutation of `0, …, N-1`.
 -/
 
 namespace Solved.Cert
 
 open Finset
-
-/-! ## Masks -/
-
-/-- Bit `k` of a mask; positions past the end are `false`. -/
-def bit : List Bool → ℕ → Bool
-  | [], _ => false
-  | c :: _, 0 => c
-  | _ :: L, k + 1 => bit L k
-
-@[simp] theorem bit_nil (k : ℕ) : bit [] k = false := by cases k <;> rfl
-@[simp] theorem bit_cons_zero (c : Bool) (L : List Bool) : bit (c :: L) 0 = c := rfl
-@[simp] theorem bit_cons_succ (c : Bool) (L : List Bool) (k : ℕ) : bit (c :: L) (k + 1) = bit L k :=
-  rfl
-
-theorem bit_of_length_le {L : List Bool} {k : ℕ} (h : L.length ≤ k) : bit L k = false := by
-  induction L generalizing k with
-  | nil => simp
-  | cons c L ih =>
-    cases k with
-    | zero => simp at h
-    | succ k => simpa using ih (by simpa using h)
-
-@[simp] theorem bit_replicate_false (N k : ℕ) : bit (List.replicate N false) k = false := by
-  induction N generalizing k with
-  | zero => simp
-  | succ N ih => cases k <;> simp [List.replicate_succ, ih]
-
-theorem bit_ext {L₁ L₂ : List Bool} (hl : L₁.length = L₂.length)
-    (h : ∀ k < L₁.length, bit L₁ k = bit L₂ k) : L₁ = L₂ := by
-  induction L₁ generalizing L₂ with
-  | nil => cases L₂ with
-    | nil => rfl
-    | cons _ _ => simp at hl
-  | cons c L₁ ih =>
-    cases L₂ with
-    | nil => simp at hl
-    | cons d L₂ =>
-      have h0 := h 0 (by simp)
-      simp only [bit_cons_zero] at h0
-      rw [h0, ih (by simpa using hl) fun k hk => by simpa using h (k + 1) (by simpa using hk)]
-
-/-- Set bit `k` (no change past the end). -/
-def setBit : List Bool → ℕ → List Bool
-  | [], _ => []
-  | _ :: L, 0 => true :: L
-  | c :: L, k + 1 => c :: setBit L k
-
-@[simp] theorem length_setBit (L : List Bool) (k : ℕ) : (setBit L k).length = L.length := by
-  induction L generalizing k with
-  | nil => rfl
-  | cons c L ih => cases k <;> simp [setBit, ih]
-
-theorem bit_setBit (L : List Bool) (k i : ℕ) :
-    bit (setBit L k) i = (bit L i || (i == k && decide (i < L.length))) := by
-  induction L generalizing k i with
-  | nil => simp [setBit]
-  | cons c L ih =>
-    cases k with
-    | zero => cases i <;> simp [setBit]
-    | succ k => cases i <;> simp [setBit, ih]
 
 /-! ## Steps and their precomputed interval bounds -/
 
@@ -105,8 +46,8 @@ def build : List (ℕ × Table) → List Step
   | (k, t) :: r =>
     let ss := build r
     { cell := k, tab := t
-      hi := Table.add (Table.map UPoly.posPart t) (hiOf ss)
-      lo := Table.add (Table.map UPoly.negPart t) (loOf ss) } :: ss
+      hi := Table.add (List.map UPoly.posPart t) (hiOf ss)
+      lo := Table.add (List.map UPoly.negPart t) (loOf ss) } :: ss
 
 theorem map_cell_build (l : List (ℕ × Table)) : (build l).map Step.cell = l.map Prod.fst := by
   induction l with
@@ -117,11 +58,6 @@ theorem map_cell_build (l : List (ℕ × Table)) : (build l).map Step.cell = l.m
 def runAcc (L : List Bool) : List Step → Table → Table
   | [], acc => acc
   | s :: ss, acc => runAcc L ss (if bit L s.cell then Table.add acc s.tab else acc)
-
-/-- The path (mask of decided cells) a mask reaches along the steps. -/
-def runPath (L : List Bool) : List Step → List Bool → List Bool
-  | [], path => path
-  | s :: ss, path => runPath L ss (if bit L s.cell then setBit path s.cell else path)
 
 /-- The selected contributions to entry `e` at `x`. -/
 def chosen (L : List Bool) (ss : List Step) (e : ℕ) (x : ℤ) : ℤ :=
@@ -178,7 +114,7 @@ def bnb (target : UPoly) (allowed : List (List Bool)) : List Step → List Bool 
 theorem bnb_sound (target : UPoly) (allowed : List (List Bool)) (l : List (ℕ × Table))
     (path : List Bool) (acc : Table) (h : bnb target allowed (build l) path acc = true)
     (L : List Bool) {x : ℤ} (hx : 0 ≤ x) (m : ℕ) :
-    runPath L (build l) path ∈ allowed ∨
+    runCells L (l.map Prod.fst) path ∈ allowed ∨
       ∑ e ∈ range m, |UPoly.eval ((runAcc L (build l) acc).get e) x| < UPoly.eval target x := by
   induction l generalizing path acc with
   | nil =>
@@ -190,8 +126,8 @@ theorem bnb_sound (target : UPoly) (allowed : List (List Bool)) (l : List (ℕ �
     obtain ⟨k, t⟩ := kt
     let s : Step :=
       { cell := k, tab := t
-        hi := Table.add (Table.map UPoly.posPart t) (hiOf (build r))
-        lo := Table.add (Table.map UPoly.negPart t) (loOf (build r)) }
+        hi := Table.add (List.map UPoly.posPart t) (hiOf (build r))
+        lo := Table.add (List.map UPoly.negPart t) (loOf (build r)) }
     have hbuild : build ((k, t) :: r) = s :: build r := rfl
     have hb : ∀ e, UPoly.eval (s.lo.get e) x ≤ chosen L (s :: build r) e x ∧
         chosen L (s :: build r) e x ≤ UPoly.eval (s.hi.get e) x :=
@@ -207,45 +143,12 @@ theorem bnb_sound (target : UPoly) (allowed : List (List Bool)) (l : List (ℕ �
       have e₃ := eval_runAcc L (s :: build r) acc e x
       rw [max_comm]
       exact abs_le_max_abs_abs (by linarith) (by linarith)
-    · simp only [runPath, runAcc]
+    · simp only [List.map_cons, runCells, runAcc, show s.cell = k from rfl]
       split_ifs
       · exact ih _ _ h₁
       · exact ih _ _ h₀
 
-/-! ## Reaching every mask -/
-
-theorem length_runPath (L : List Bool) (ss : List Step) (path : List Bool) :
-    (runPath L ss path).length = path.length := by
-  induction ss generalizing path with
-  | nil => rfl
-  | cons s ss ih => simp only [runPath]; split_ifs <;> simp [ih]
-
-theorem bit_runPath (L : List Bool) (ss : List Step) (path : List Bool) {i : ℕ}
-    (hi : i < path.length) :
-    bit (runPath L ss path) i = (bit path i || (decide (i ∈ ss.map Step.cell) && bit L i)) := by
-  induction ss generalizing path with
-  | nil => simp [runPath]
-  | cons s ss ih =>
-    simp only [runPath]
-    split_ifs with hs
-    · rw [ih _ (by simpa using hi), bit_setBit]
-      by_cases his : i = s.cell
-      · subst his; simp [hs, hi]
-      · have hne : (i == s.cell) = false := by simpa using his
-        simp [his, hne]
-    · rw [ih _ hi]
-      by_cases his : i = s.cell
-      · subst his; simp [hs]
-      · simp [his]
-
-/-- If the cells are a permutation of `0, …, N-1`, the mask of length `N` reaches itself. -/
-theorem runPath_build (l : List (ℕ × Table)) {N : ℕ}
-    (hperm : (l.map Prod.fst).Perm (List.range N)) {L : List Bool} (hL : L.length = N) :
-    runPath L (build l) (List.replicate N false) = L := by
-  refine bit_ext (by simp [length_runPath, hL]) fun i hi => ?_
-  have hiN : i < N := by simpa [length_runPath] using hi
-  rw [bit_runPath _ _ _ (by simpa using hiN)]
-  simp [map_cell_build, hperm.mem_iff, hiN]
+/-! ## Accumulated values for a permutation of the cells -/
 
 theorem chosen_build (L : List Bool) (l : List (ℕ × Table)) (e : ℕ) (x : ℤ) :
     chosen L (build l) e x =
