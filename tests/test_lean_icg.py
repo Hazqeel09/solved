@@ -99,6 +99,25 @@ class Certificates(unittest.TestCase):
             self.assertGreaterEqual(need, 2 ** (cert["w"] - 2))
             self.assertEqual(cert["D"], b + 1)
 
+    def test_small_primes_against_definition(self):
+        """The fixed-prime data agree with an exhaustive search using the definitional energy."""
+        certs = li.small_prime_certificates(EVEN[(3, 1)])
+        self.assertEqual([c["p"] for c in certs], [3])
+        for cert in certs:
+            n = 2 ** cert["a"] * cert["p"] ** cert["b"]
+            proper = [d for d in range(1, n) if n % d == 0]
+            values = {}
+            for code in range(1 << len(proper)):
+                subset = tuple(d for i, d in enumerate(proper) if code >> i & 1)
+                values[subset] = direct_energy(n, subset)
+            top = max(values.values())
+            self.assertEqual(top, cert["energy"])
+            winners = sorted(tuple(sorted(s)) for s, v in values.items() if v == top)
+            claimed = sorted(
+                tuple(sorted(2**c * cert["p"] ** e for c, e in cs)) for cs in cert["cells"]
+            )
+            self.assertEqual(winners, claimed)
+
     def test_rejects_wrong_energy(self):
         record = json.loads(json.dumps(EVEN[(1, 1)]))
         record["result"]["energy"][0][2] += 1
