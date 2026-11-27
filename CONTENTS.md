@@ -81,3 +81,9 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 |---|---|---|
 | [Exact synthesis by target saturation and helper branching](results/target-saturation/PROOF.md) | proof-draft | none |
 | [A complete finite menu for the final helper](results/final-helper/PROOF.md) | proof-draft | none |
+
+## Spectral graph theory
+
+| Result | Status | Formalization |
+|---|---|---|
+| [The maximal-energy divisor set of integral circulant graphs of order p^2q^3](results/icg-energy-p2q3/PROOF.md) | proof-draft | none |

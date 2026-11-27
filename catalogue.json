@@ -1114,6 +1114,46 @@
         }
       ],
       "dependencies": []
+    },
+    {
+      "id": "icg-energy-p2q3",
+      "title": "The maximal-energy divisor set of integral circulant graphs of order p^2q^3",
+      "subject": "Spectral graph theory",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For distinct odd primes p, q, the set D* = {1, p^2, pq, q^2, p^2q^2, pq^3} of divisors with an even number of prime factors uniquely maximises the energy of ICG(p^2q^3, D) over nonempty sets of proper divisors (Roldan's Conjecture 1.3). Proved for q >= 5 by Jiang-Yang; this entry gives an independent exact certificate covering all real p, q >= 3, including q = 3.",
+      "proof": "results/icg-energy-p2q3/PROOF.md",
+      "tests": [
+        "test_icg_energy.py"
+      ],
+      "implementation": [
+        "solved/icg_energy.py",
+        "checks/verify_icg_energy.py"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/2604.09491",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2608.29523",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2610.36883",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/the-omega-institute/trureturing/issues/19144",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": []
     }
   ]
 }
