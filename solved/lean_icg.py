@@ -628,3 +628,287 @@ def update_table(text, records):
 
 def table_from(path, manuscript):
     return update_table(Path(manuscript).read_text(), json.loads(Path(path).read_text()))
+
+
+# --- multi-prime orders on a region (Formal/ICG/MultiPacked.lean) ----------------------------
+
+
+def badd(P, Q):
+    """BPoly.add: rowwise UPoly.add, the shorter list padded with empty rows."""
+    n = max(len(P), len(Q))
+    return [padd(P[i] if i < len(P) else [], Q[i] if i < len(Q) else []) for i in range(n)]
+
+
+def bscale(c, P):
+    return [pscale(c, row) for row in P]
+
+
+def bmul_lin(c0, c1, c2, P):
+    """BPoly.mulLin: (c0 + c1 x + c2 y) * P."""
+    return badd(bscale(c0, P), badd(bscale(c1, [[]] + P), bscale(c2, [[0] + row for row in P])))
+
+
+def bcompose(f, c0, c1, c2):
+    """BPoly.compose: f(c0 + c1 x + c2 y)."""
+    if not f:
+        return []
+    return badd([[f[0]]], bmul_lin(c0, c1, c2, bcompose(f[1:], c0, c1, c2)))
+
+
+def bmul(P, Q):
+    """BPoly.mul: mul (A :: P) Q = add (Q.map (UPoly.mul A)) (mulX (mul P Q))."""
+    if not P:
+        return []
+    return badd([pmul(P[0], row) for row in Q], [[]] + bmul(P[1:], Q))
+
+
+def bsubst(E, s1, s2):
+    """BPoly.subst: E(s1, s2) for affine forms s = (c0, c1, c2)."""
+    if not E:
+        return []
+    return badd(bcompose(E[0], *s2), bmul_lin(*s1, bsubst(E[1:], s1, s2)))
+
+
+def bcoeff(P, i, j):
+    return P[i][j] if i < len(P) and j < len(P[i]) else 0
+
+
+def bflat(Dx, Dy, P):
+    return [bcoeff(P, d // Dy, d % Dy) for d in range(Dx * Dy)]
+
+
+def beval(P, x, y):
+    return sum(peval(row, y) * x**i for i, row in enumerate(P))
+
+
+def mixed_dec(a, e):
+    """Box.dec: little-endian mixed-radix digits with radices a_i + 1."""
+    out = []
+    for ai in a:
+        out.append(e % (ai + 1))
+        e //= ai + 1
+    return out
+
+
+def mixed_enc(a, x):
+    code, stride = 0, 1
+    for ai, xi in zip(a, x):
+        code += xi * stride
+        stride *= ai + 1
+    return code
+
+
+class MultiShape:
+    """Shape: exponents, slots (0 fixed, 1 = p, 2 = q), fixed primes, affine forms."""
+
+    def __init__(self, factors, s1, s2):
+        self.a = [e for _, e in factors]
+        self.slot = [1 if r == "p" else 2 if r == "q" else 0 for r, _ in factors]
+        self.fixed = [r if isinstance(r, int) else 0 for r, _ in factors]
+        self.s1, self.s2 = s1, s2
+        self.size = 1
+        for ai in self.a:
+            self.size *= ai + 1
+
+    def factor(self, u, c, i):
+        t = tent_p(self.a[i], u[i], c[i])
+        if self.slot[i] == 1:
+            return bcompose(t, *self.s1)
+        if self.slot[i] == 2:
+            return bcompose(t, *self.s2)
+        return [[peval(t, self.fixed[i])]]
+
+    def cell(self, e, kc):
+        u, c = mixed_dec(self.a, e), mixed_dec(self.a, kc)
+        out = [[1]]
+        for i in reversed(range(len(self.a))):
+            out = bmul(self.factor(u, c, i), out)
+        return out
+
+
+def regions(p0):
+    """The two regions of the Python certificates: (name, sigma_p, sigma_q)."""
+    return [("lt", (p0, 1, 0), (p0 + 2, 1, 1)), ("gt", (p0 + 2, 1, 1), (p0, 0, 1))]
+
+
+def search_tables(tables, target, order, m, D):
+    """Nodes and unpruned leaves of `bnbP` on flat tables (cell -> m entries of D coefficients)."""
+    suffix_s = [[[0] * D for _ in range(m)]]
+    suffix_lo = [[[0] * D for _ in range(m)]]
+    for kc in reversed(order):
+        prev_s, prev_lo = suffix_s[0], suffix_lo[0]
+        suffix_s.insert(0, [[s + t for s, t in zip(prev_s[e], tables[kc][e])] for e in range(m)])
+        suffix_lo.insert(
+            0, [[lo + min(t, 0) for lo, t in zip(prev_lo[e], tables[kc][e])] for e in range(m)]
+        )
+    nodes, leaves = 0, []
+
+    def passes(depth, acc):
+        z = list(target)
+        for e in range(m):
+            for d in range(D):
+                a_ed = acc[e][d]
+                z[d] += a_ed + suffix_lo[depth][e][d] - max(2 * a_ed + suffix_s[depth][e][d], 0)
+        return z[0] > 0 and all(v >= 0 for v in z)
+
+    def go(depth, path, acc):
+        nonlocal nodes
+        nodes += 1
+        if passes(depth, acc):
+            return
+        if depth == len(order):
+            leaves.append(path)
+            return
+        kc = order[depth]
+        go(depth + 1, path, acc)
+        row = tables[kc]
+        go(depth + 1, path | 1 << kc, [[x + y for x, y in zip(acc[e], row[e])] for e in range(m)])
+
+    go(0, 0, [[0] * D for _ in range(m)])
+    return nodes, leaves
+
+
+def _multi_orders(shape):
+    cells = list(range(shape.size - 1))
+    out = {"natural": cells, "reverse": cells[::-1]}
+    for lead in range(len(shape.a)):
+        name = f"coordinate {lead} first"
+        out[name] = sorted(
+            cells,
+            key=lambda kc: (-mixed_dec(shape.a, kc)[lead], [-v for v in mixed_dec(shape.a, kc)]),
+        )
+    return out
+
+
+def multi_certificate(record, region_name):
+    """Lean data for certifyM: one two-symbolic family on one region ("lt": p < q, "gt": p > q)."""
+    result = record["result"]
+    p0 = result["smallest_symbolic_prime"]
+    name, s1, s2 = next(r for r in regions(p0) if r[0] == region_name)
+    data = result["p<q" if name == "lt" else "p>q"]
+    if data["certificate"] != "exact":
+        raise ValueError("only exact region certificates are supported here")
+    shape = MultiShape(record["order"], s1, s2)
+    N = shape.size
+    cells = [[shape.cell(e, kc) for e in range(N)] for kc in range(N - 1)]
+    deg = {}
+    for i, j, c in data["energy"]:
+        deg[(i, j)] = deg.get((i, j), 0) + c
+    E = [
+        [deg.get((i, j), 0) for j in range(1 + max(j for _, j in deg))]
+        for i in range(1 + max(i for i, _ in deg))
+    ]
+    tgt = bsubst(E, s1, s2)
+    Dx = max([len(P) for row in cells for P in row] + [len(tgt)])
+    Dy = max([len(r) for row in cells for P in row for r in P] + [len(r) for r in tgt])
+    D = Dx * Dy
+    tables = [[bflat(Dx, Dy, P) for P in row] for row in cells]
+    target = bflat(Dx, Dy, tgt)
+    masks = []
+    for divisor_set in data["maximisers"]:
+        mask = [False] * (N - 1)
+        for c in divisor_set:
+            mask[mixed_enc(shape.a, c)] = True
+        masks.append(mask)
+    expected = sorted(sum(1 << k for k, bit in enumerate(mk) if bit) for mk in masks)
+    best = None
+    for oname, order in _multi_orders(shape).items():
+        nodes, leaves = search_tables(tables, target, order, N, D)
+        if sorted(leaves) != expected:
+            raise ValueError(f"unpruned leaves differ from the maximisers ({oname})")
+        if best is None or nodes < best[0]:
+            best = (nodes, oname, order)
+    nodes, oname, order = best
+    total = sum(abs(c) for kc in order for f in tables[kc] for c in f)
+    tail = sum(abs(c) for c in target)
+    w = (4 * N * total + tail).bit_length() + 1
+    return {
+        "order": record["order"],
+        "region": name,
+        "p0": p0,
+        "shape": shape,
+        "w": w,
+        "Dx": Dx,
+        "Dy": Dy,
+        "E": E,
+        "ks": order,
+        "order_name": oname,
+        "nodes": nodes,
+        "masks": masks,
+        "cells": data["maximisers"],
+    }
+
+
+def multi_label(order):
+    """A Lean-identifier label for an order, e.g. 2_p2_q for 2 p^2 q, 6_p_q for 6pq."""
+    fixed = 1
+    parts = []
+    for r, e in order:
+        if isinstance(r, int):
+            fixed *= r**e
+        else:
+            parts.append(r if e == 1 else f"{r}{e}")
+    return "_".join([str(fixed)] + parts)
+
+
+def _lean_vec(xs):
+    return "![" + ", ".join(map(str, xs)) + "]"
+
+
+def render_multi_cert(cert):
+    s = cert["shape"]
+    label = multi_label(cert["order"]) + "_" + cert["region"]
+    region = (
+        f"p ≥ {cert['p0']}, q ≥ p + 2" if cert["region"] == "lt" else f"q ≥ {cert['p0']}, p ≥ q + 2"
+    )
+    E = "[" + ", ".join(_lean_list(map(str, row)) for row in cert["E"]) + "]"
+    return f"""\
+/-- The order `{multi_label(cert["order"]).replace("_", " ")}` on the region `{region}`. -/
+def shape_{label} : Shape {len(s.a)} :=
+  ⟨{_lean_vec(s.a)}, {_lean_vec(s.slot)}, {_lean_vec(s.fixed)}, ⟨{s.s1[0]}, {s.s1[1]}, {s.s1[2]}⟩,
+    ⟨{s.s2[0]}, {s.s2[1]}, {s.s2[2]}⟩⟩
+
+/-- The certificate for `{label}` ({cert["nodes"]} search nodes). -/
+theorem cert_{label} : certifyM shape_{label} {cert["w"]} {cert["Dx"]} {cert["Dy"]} {E}
+    {_lean_list(map(str, cert["ks"]))}
+    {_lean_bools(cert["masks"][0])}
+    {_lean_list(_lean_bools(mk) for mk in cert["masks"][1:])} = true := by
+  decide +kernel
+
+"""
+
+
+MULTI_HEADER = """\
+import Formal.ICG.MultiGraph
+
+/-!
+# Maximal energy of multi-prime `ICG(n, S)`: kernel-checked region certificates
+
+Generated by `python -m scripts.lean_icg_families` from `checks/expected/icg-families.json`;
+do not edit by hand. Each certificate covers one order with two symbolic primes `p, q` on one
+region, `p ≥ p₀, q ≥ p + 2` (`lt`) or `q ≥ p₀, p ≥ q + 2` (`gt`); `energy_le_of_certifyM` turns
+it into a statement about graph energy at every pair of distinct primes in the region.
+-/
+
+namespace Solved.ICG.Multi.Families
+
+open Solved.Cert Solved.ICG.Multi
+
+"""
+
+
+def render_multi(records):
+    body = ""
+    for r in records:
+        if r["result"]["kind"] != "two-symbolic":
+            continue
+        for region in ("lt", "gt"):
+            key = "p<q" if region == "lt" else "p>q"
+            if r["result"][key]["certificate"] != "exact":
+                continue
+            body += render_multi_cert(multi_certificate(r, region))
+    return MULTI_HEADER + body + "end Solved.ICG.Multi.Families\n"
+
+
+def multi_from(path):
+    return render_multi(json.loads(Path(path).read_text()))

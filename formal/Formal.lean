@@ -21,3 +21,4 @@ import Formal.ICG.Box
 import Formal.ICG.MultiCell
 import Formal.ICG.MultiPacked
 import Formal.ICG.MultiGraph
+import Formal.ICG.MultiFamilies

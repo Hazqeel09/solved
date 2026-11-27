@@ -96,6 +96,68 @@ class MultiBridge(unittest.TestCase):
                 )
 
 
+class MultiCertificates(unittest.TestCase):
+    """Region certificate data against exhaustive search with the definitional energy."""
+
+    PAIRS = {"lt": [(3, 5), (5, 11), (7, 13)], "gt": [(5, 3), (11, 5), (13, 7)]}
+
+    def test_regions_against_definition(self):
+        for record in RECORDS:
+            if record["result"]["kind"] != "two-symbolic":
+                continue
+            fixed = [r for r, _ in record["order"] if isinstance(r, int)]
+            for region, pairs in self.PAIRS.items():
+                key = "p<q" if region == "lt" else "p>q"
+                if record["result"][key]["certificate"] != "exact":
+                    continue
+                cert = li.multi_certificate(record, region)
+                for p, q in pairs:
+                    if min(p, q) < cert["p0"] or p in fixed or q in fixed:
+                        continue
+                    primes = [p if r == "p" else q if r == "q" else r for r, _ in record["order"]]
+                    exps = [e for _, e in record["order"]]
+                    n = 1
+                    for r, e in zip(primes, exps):
+                        n *= r**e
+                    proper = [d for d in range(1, n) if n % d == 0]
+                    if len(proper) > 11:
+                        sets = [()]  # exhaustive only for small orders; maximisers below
+                    else:
+                        sets = [
+                            tuple(d for i, d in enumerate(proper) if code >> i & 1)
+                            for code in range(1 << len(proper))
+                        ]
+                    energy = sum(c * p**i * q**j for i, j, c in record["result"][key]["energy"])
+                    claimed = set()
+                    for cells in cert["cells"]:
+                        div = 1
+                        dset = []
+                        for c in cells:
+                            div = 1
+                            for r, ci in zip(primes, c):
+                                div *= r**ci
+                            dset.append(div)
+                        claimed.add(tuple(sorted(dset)))
+                    for divisors in claimed:
+                        self.assertEqual(
+                            direct_energy(n, divisors), energy, (record["order"], p, q)
+                        )
+                    if len(sets) > 1:
+                        values = {tuple(sorted(sub)): direct_energy(n, sub) for sub in sets}
+                        top = max(values.values())
+                        self.assertEqual(top, energy, (record["order"], p, q))
+                        winners = {sub for sub, v in values.items() if v == top}
+                        self.assertEqual(winners, claimed, (record["order"], p, q))
+
+    def test_masks_match_cells(self):
+        record = next(r for r in RECORDS if r["order"] == [[2, 1], ["p", 1], ["q", 1]])
+        cert = li.multi_certificate(record, "lt")
+        for mask, cells in zip(cert["masks"], cert["cells"]):
+            chosen = {li.mixed_enc(cert["shape"].a, c) for c in cells}
+            self.assertEqual({k for k, bit in enumerate(mask) if bit}, chosen)
+            self.assertNotIn(cert["shape"].size - 1, chosen)
+
+
 class Certificates(unittest.TestCase):
     def test_maximal_at_small_primes(self):
         """E(p) is the maximum over all masks, attained exactly by the maximisers, for p >= p0."""
@@ -181,6 +243,9 @@ class Rendering(unittest.TestCase):
             (formal / "FormalTests/Axioms.lean").read_text(), li.render_axioms(RECORDS)
         )
         self.assertEqual((ROOT / REGISTRIES[1]).read_text(), li.render_registry(RECORDS))
+        self.assertEqual(
+            (formal / "Formal/ICG/MultiFamilies.lean").read_text(), li.render_multi(RECORDS)
+        )
         manuscript = (ROOT / "results/icg-energy-even-orders/PROOF.md").read_text()
         self.assertEqual(manuscript, li.update_table(manuscript, RECORDS))
 
