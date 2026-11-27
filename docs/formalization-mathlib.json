@@ -71,6 +71,29 @@
         "Solved.ICG.Families.energy_6_1",
         "Solved.ICG.Families.energy_7_1"
       ]
+    },
+    {
+      "file": "formal/Formal/ICG/MultiFamilies.lean",
+      "theorems": [
+        "Solved.ICG.Multi.Families.energy_2_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_2_p_q_gt",
+        "Solved.ICG.Multi.Families.energy_3_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_3_p_q_gt",
+        "Solved.ICG.Multi.Families.energy_4_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_4_p_q_gt",
+        "Solved.ICG.Multi.Families.energy_2_p2_q_lt",
+        "Solved.ICG.Multi.Families.energy_9_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_9_p_q_gt",
+        "Solved.ICG.Multi.Families.energy_3_p2_q_lt",
+        "Solved.ICG.Multi.Families.energy_3_p2_q_gt",
+        "Solved.ICG.Multi.Families.energy_2_p3_q_lt",
+        "Solved.ICG.Multi.Families.energy_6_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_6_p_q_gt",
+        "Solved.ICG.Multi.Families.energy_15_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_15_p_q_gt",
+        "Solved.ICG.Multi.Families.energy_35_p_q_lt",
+        "Solved.ICG.Multi.Families.energy_35_p_q_gt"
+      ]
     }
   ]
 }

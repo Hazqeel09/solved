@@ -133,4 +133,39 @@ theorem energy_le_of_certifyM {s : Shape k} {w Dx Dy : ℕ} {E : BPoly} {ks : Li
     obtain ⟨L, hL, rfl⟩ := List.mem_map.1 hS'
     exact absurd (by rw [maskOfDivs_divsOfMask hr (hmax L hL).1]; exact hL) hmem
 
+/-! ## The two regions of the certificates -/
+
+/-- Distinct odd primes differ by at least two. -/
+theorem add_two_le_of_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp2 : p ≠ 2) (hq2 : q ≠ 2)
+    (h : p < q) : p + 2 ≤ q := by
+  rcases hp.eq_two_or_odd with h1 | h1 <;> rcases hq.eq_two_or_odd with h2 | h2 <;> omega
+
+/-- The region `p ≥ p₀, q ≥ p + 2`, with coordinates `p = p₀ + x`, `q = p₀ + 2 + x + y`. -/
+theorem energy_le_lt {s : Shape k} {w Dx Dy : ℕ} {E : BPoly} {ks : List ℕ} {star : List Bool}
+    {others : List (List Bool)} (h : certifyM s w Dx Dy E ks star others = true) {p0 : ℕ}
+    (hσ1 : s.σ1 = ⟨(p0 : ℤ), 1, 0⟩) (hσ2 : s.σ2 = ⟨(p0 : ℤ) + 2, 1, 1⟩) {p q : ℕ} (hp0 : p0 ≤ p)
+    (hpq : p + 2 ≤ q) (hr : Primes (rOf s p q)) {S : Finset ℕ}
+    (hS : S ⊆ (pw (rOf s p q) s.a).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        ((BPoly.eval E p q : ℤ) : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S)
+          (ICGBridge.icgAdj_isHermitian _ _) = ((BPoly.eval E p q : ℤ) : ℝ) ↔
+        S ∈ (star :: others).map (divsOfMask (rOf s p q) s.a)) :=
+  energy_le_of_certifyM h (x := (p : ℤ) - p0) (y := (q : ℤ) - p - 2) (by omega) (by omega)
+    (by rw [hσ1, Affine.val]; ring) (by rw [hσ2, Affine.val]; ring) hr hS
+
+/-- The region `q ≥ q₀, p ≥ q + 2`, with coordinates `q = q₀ + y`, `p = q₀ + 2 + x + y`. -/
+theorem energy_le_gt {s : Shape k} {w Dx Dy : ℕ} {E : BPoly} {ks : List ℕ} {star : List Bool}
+    {others : List (List Bool)} (h : certifyM s w Dx Dy E ks star others = true) {q0 : ℕ}
+    (hσ1 : s.σ1 = ⟨(q0 : ℤ) + 2, 1, 1⟩) (hσ2 : s.σ2 = ⟨(q0 : ℤ), 0, 1⟩) {p q : ℕ} (hq0 : q0 ≤ q)
+    (hqp : q + 2 ≤ p) (hr : Primes (rOf s p q)) {S : Finset ℕ}
+    (hS : S ⊆ (pw (rOf s p q) s.a).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        ((BPoly.eval E p q : ℤ) : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S)
+          (ICGBridge.icgAdj_isHermitian _ _) = ((BPoly.eval E p q : ℤ) : ℝ) ↔
+        S ∈ (star :: others).map (divsOfMask (rOf s p q) s.a)) :=
+  energy_le_of_certifyM h (x := (p : ℤ) - q - 2) (y := (q : ℤ) - q0) (by omega) (by omega)
+    (by rw [hσ1, Affine.val]; ring) (by rw [hσ2, Affine.val]; ring) hr hS
+
 end Solved.ICG.Multi

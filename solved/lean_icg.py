@@ -503,10 +503,25 @@ def family_theorems(records):
     return names
 
 
+def multi_theorems(records):
+    names = []
+    for r in records:
+        if r["result"]["kind"] != "two-symbolic":
+            continue
+        for region, key in (("lt", "p<q"), ("gt", "p>q")):
+            if r["result"][key]["certificate"] == "exact":
+                names.append(f"Solved.ICG.Multi.Families.energy_{multi_label(r['order'])}_{region}")
+    return names
+
+
+MULTI_FAMILIES = "formal/Formal/ICG/MultiFamilies.lean"
+
+
 def registry(records):
     """The theorem registry of the Mathlib project: exactly the theorems the audit covers."""
     modules = [{"file": f, "theorems": names} for f, names in GENERAL.items()]
     modules.append({"file": FAMILIES, "theorems": family_theorems(records)})
+    modules.append({"file": MULTI_FAMILIES, "theorems": multi_theorems(records)})
     return {
         "toolchain": "leanprover/lean4:v4.34.1",
         "project": "formal",
@@ -878,6 +893,115 @@ theorem cert_{label} : certifyM shape_{label} {cert["w"]} {cert["Dx"]} {cert["Dy
 """
 
 
+def _factor_text(r, e, real=False):
+    base = f"({r} : ℝ)" if real and not isinstance(r, int) else str(r)
+    return base if e == 1 else f"{base} ^ {e}"
+
+
+def _order_text(order):
+    return " * ".join(_factor_text(r, e) for r, e in order)
+
+
+def _cell_text(order, cell):
+    parts = [_factor_text(r, c) for (r, _), c in zip(order, cell) if c]
+    return " * ".join(parts) if parts else "1"
+
+
+def _bivariate_text(E):
+    terms = []
+    for i, row in enumerate(E):
+        for j, c in enumerate(row):
+            if c == 0:
+                continue
+            mono = " * ".join(
+                [
+                    m
+                    for m in (
+                        _factor_text("p", i, True) if i else "",
+                        _factor_text("q", j, True) if j else "",
+                    )
+                    if m
+                ]
+            )
+            body = str(abs(c)) if not mono else (mono if abs(c) == 1 else f"{abs(c)} * {mono}")
+            terms.append(("-" if c < 0 else "+", body))
+    out = ("-" if terms[0][0] == "-" else "") + terms[0][1]
+    for sign, body in terms[1:]:
+        out += f" {sign} {body}"
+    return out
+
+
+def render_multi_theorem(cert):
+    order, region, p0 = cert["order"], cert["region"], cert["p0"]
+    label = multi_label(order) + "_" + region
+    shape = f"shape_{label}"
+    n = _order_text(order)
+    energy = _bivariate_text(cert["E"])
+    E = "[" + ", ".join(_lean_list(map(str, row)) for row in cert["E"]) + "]"
+    big = [r for r, _ in order if isinstance(r, int) and r >= p0]
+    if region == "lt":
+        hyps = f"(hp0 : {p0} ≤ p) (hpq : p < q)"
+        gap = "have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq"
+        lemma = "energy_le_lt"
+        where = f"`{p0} ≤ p < q`"
+    else:
+        hyps = f"(hq0 : {p0} ≤ q) (hqp : q < p)"
+        gap = "have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp"
+        lemma = "energy_le_gt"
+        where = f"`{p0} ≤ q < p`"
+    extra = "".join(f" (hp{f} : p ≠ {f}) (hq{f} : q ≠ {f})" for f in big)
+    region_arg = "hp0" if region == "lt" else "hq0"
+    sets, haves, names = [], "", []
+    for j, (mask, cells) in enumerate(zip(cert["masks"], cert["cells"])):
+        coded = sorted(cells, key=lambda c: mixed_enc(cert["shape"].a, c))
+        codes = [mixed_enc(cert["shape"].a, c) for c in coded]
+        text = "{" + ", ".join(_cell_text(order, c) for c in coded) + "}"
+        sets.append(f"S = {text}")
+        names.append(f"h{j}")
+        haves += f"""\
+  have h{j} : divsOfMask (rOf {shape} p q) {shape}.a {_lean_bools(mask)} =
+      {text} := by
+    rw [divsOfMask, show List.filter (bit {_lean_bools(mask)})
+      (List.range (size {shape}.a - 1)) = {_lean_list(map(str, codes))} from rfl]
+    simp [pw, rOf, {shape}, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+"""
+    docsets = ", ".join(
+        "`{"
+        + ", ".join(
+            _cell_text(order, c) for c in sorted(cs, key=lambda c: mixed_enc(cert["shape"].a, c))
+        )
+        + "}`"
+        for cs in cert["cells"]
+    )
+    graph = f"ICGBridge.energy (ICGBridge.icgAdj ({n}) S) (ICGBridge.icgAdj_isHermitian _ _)"
+    return f"""\
+/-- **`n = {n}`, {where}.** For all primes `p, q` with {where} and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `{energy}`, with equality exactly for {docsets}. -/
+theorem energy_{label} {{p q : ℕ}} (hp : p.Prime) (hq : q.Prime) {hyps}{extra}
+    {{S : Finset ℕ}} (hS : S ⊆ ({n}).properDivisors) :
+    {graph} ≤
+        {energy} ∧
+      ({graph} =
+          {energy} ↔ {" ∨ ".join(sets)}) := by
+  {gap}
+  have hn : pw (rOf {shape} p q) {shape}.a = {n} := by
+    simp [pw, rOf, {shape}, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf {shape} p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, {shape}] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, {shape}] at hij ⊢ <;> omega
+  have h := {lemma} cert_{label} rfl rfl {region_arg} hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval {E} (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      {energy} := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+{haves}  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    {", ".join(names)}] using h
+
+"""
+
+
 MULTI_HEADER = """\
 import Formal.ICG.MultiGraph
 
@@ -894,6 +1018,12 @@ namespace Solved.ICG.Multi.Families
 
 open Solved.Cert Solved.ICG.Multi
 
+-- Every maximiser set is identified by the same script, `simp <;> ring_nf`; `ring_nf` is only
+-- needed when a divisor has several fixed prime factors, so these three style lints are off here.
+set_option linter.unusedTactic false
+set_option linter.unreachableTactic false
+set_option linter.unnecessarySeqFocus false
+
 """
 
 
@@ -906,7 +1036,8 @@ def render_multi(records):
             key = "p<q" if region == "lt" else "p>q"
             if r["result"][key]["certificate"] != "exact":
                 continue
-            body += render_multi_cert(multi_certificate(r, region))
+            cert = multi_certificate(r, region)
+            body += render_multi_cert(cert) + render_multi_theorem(cert)
     return MULTI_HEADER + body + "end Solved.ICG.Multi.Families\n"
 
 

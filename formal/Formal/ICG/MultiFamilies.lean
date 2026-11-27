@@ -13,6 +13,12 @@ namespace Solved.ICG.Multi.Families
 
 open Solved.Cert Solved.ICG.Multi
 
+-- Every maximiser set is identified by the same script, `simp <;> ring_nf`; `ring_nf` is only
+-- needed when a divisor has several fixed prime factors, so these three style lints are off here.
+set_option linter.unusedTactic false
+set_option linter.unreachableTactic false
+set_option linter.unnecessarySeqFocus false
+
 /-- The order `2 p q` on the region `p ≥ 3, q ≥ p + 2`. -/
 def shape_2_p_q_lt : Shape 3 :=
   ⟨![1, 1, 1], ![0, 1, 2], ![2, 0, 0], ⟨3, 1, 0⟩,
@@ -24,6 +30,45 @@ theorem cert_2_p_q_lt : certifyM shape_2_p_q_lt 16 3 3 [[8, -6], [-12, 10]]
     [true, false, true, true, false, true, false]
     [[true, true, false, true, false, false, true], [false, true, true, true, true, false, false]] = true := by
   decide +kernel
+
+/-- **`n = 2 * p * q`, `3 ≤ p < q`.** For all primes `p, q` with `3 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `8 - 6 * (q : ℝ) - 12 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, p, 2 * p, 2 * q}`, `{1, 2, 2 * p, p * q}`, `{2, p, 2 * p, q}`. -/
+theorem energy_2_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 3 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (2 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        8 - 6 * (q : ℝ) - 12 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          8 - 6 * (q : ℝ) - 12 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ) ↔ S = {1, p, 2 * p, 2 * q} ∨ S = {1, 2, 2 * p, p * q} ∨ S = {2, p, 2 * p, q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_2_p_q_lt p q) shape_2_p_q_lt.a = 2 * p * q := by
+    simp [pw, rOf, shape_2_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_2_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_2_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_2_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_2_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[8, -6], [-12, 10]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      8 - 6 * (q : ℝ) - 12 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_2_p_q_lt p q) shape_2_p_q_lt.a [true, false, true, true, false, true, false] =
+      {1, p, 2 * p, 2 * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, true, true, false, true, false])
+      (List.range (size shape_2_p_q_lt.a - 1)) = [0, 2, 3, 5] from rfl]
+    simp [pw, rOf, shape_2_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_2_p_q_lt p q) shape_2_p_q_lt.a [true, true, false, true, false, false, true] =
+      {1, 2, 2 * p, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, false, true, false, false, true])
+      (List.range (size shape_2_p_q_lt.a - 1)) = [0, 1, 3, 6] from rfl]
+    simp [pw, rOf, shape_2_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h2 : divsOfMask (rOf shape_2_p_q_lt p q) shape_2_p_q_lt.a [false, true, true, true, true, false, false] =
+      {2, p, 2 * p, q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, true, true, false, false])
+      (List.range (size shape_2_p_q_lt.a - 1)) = [1, 2, 3, 4] from rfl]
+    simp [pw, rOf, shape_2_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1, h2] using h
 
 /-- The order `2 p q` on the region `q ≥ 3, p ≥ q + 2`. -/
 def shape_2_p_q_gt : Shape 3 :=
@@ -37,6 +82,45 @@ theorem cert_2_p_q_gt : certifyM shape_2_p_q_gt 16 3 3 [[8, -12], [-6, 10]]
     [[true, true, false, false, false, true, true], [false, true, true, false, true, true, false]] = true := by
   decide +kernel
 
+/-- **`n = 2 * p * q`, `3 ≤ q < p`.** For all primes `p, q` with `3 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `8 - 12 * (q : ℝ) - 6 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 2 * p, q, 2 * q}`, `{1, 2, 2 * q, p * q}`, `{2, p, q, 2 * q}`. -/
+theorem energy_2_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 3 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (2 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        8 - 12 * (q : ℝ) - 6 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          8 - 12 * (q : ℝ) - 6 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ) ↔ S = {1, 2 * p, q, 2 * q} ∨ S = {1, 2, 2 * q, p * q} ∨ S = {2, p, q, 2 * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_2_p_q_gt p q) shape_2_p_q_gt.a = 2 * p * q := by
+    simp [pw, rOf, shape_2_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_2_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_2_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_2_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_2_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[8, -12], [-6, 10]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      8 - 12 * (q : ℝ) - 6 * (p : ℝ) + 10 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_2_p_q_gt p q) shape_2_p_q_gt.a [true, false, false, true, true, true, false] =
+      {1, 2 * p, q, 2 * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, true, true, false])
+      (List.range (size shape_2_p_q_gt.a - 1)) = [0, 3, 4, 5] from rfl]
+    simp [pw, rOf, shape_2_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_2_p_q_gt p q) shape_2_p_q_gt.a [true, true, false, false, false, true, true] =
+      {1, 2, 2 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, false, false, false, true, true])
+      (List.range (size shape_2_p_q_gt.a - 1)) = [0, 1, 5, 6] from rfl]
+    simp [pw, rOf, shape_2_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h2 : divsOfMask (rOf shape_2_p_q_gt p q) shape_2_p_q_gt.a [false, true, true, false, true, true, false] =
+      {2, p, q, 2 * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, true, true, false])
+      (List.range (size shape_2_p_q_gt.a - 1)) = [1, 2, 4, 5] from rfl]
+    simp [pw, rOf, shape_2_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1, h2] using h
+
 /-- The order `3 p q` on the region `p ≥ 5, q ≥ p + 2`. -/
 def shape_3_p_q_lt : Shape 3 :=
   ⟨![1, 1, 1], ![0, 1, 2], ![3, 0, 0], ⟨5, 1, 0⟩,
@@ -48,6 +132,35 @@ theorem cert_3_p_q_lt : certifyM shape_3_p_q_lt 18 3 3 [[40, -30], [-30, 24]]
     [true, false, false, true, false, true, true]
     [] = true := by
   decide +kernel
+
+/-- **`n = 3 * p * q`, `5 ≤ p < q`.** For all primes `p, q` with `5 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 3 * p, 3 * q, p * q}`. -/
+theorem energy_3_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 5 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (3 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ) ↔ S = {1, 3 * p, 3 * q, p * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_3_p_q_lt p q) shape_3_p_q_lt.a = 3 * p * q := by
+    simp [pw, rOf, shape_3_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_3_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_3_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_3_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_3_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[40, -30], [-30, 24]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_3_p_q_lt p q) shape_3_p_q_lt.a [true, false, false, true, false, true, true] =
+      {1, 3 * p, 3 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, false, true, true])
+      (List.range (size shape_3_p_q_lt.a - 1)) = [0, 3, 5, 6] from rfl]
+    simp [pw, rOf, shape_3_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
 
 /-- The order `3 p q` on the region `q ≥ 5, p ≥ q + 2`. -/
 def shape_3_p_q_gt : Shape 3 :=
@@ -61,6 +174,35 @@ theorem cert_3_p_q_gt : certifyM shape_3_p_q_gt 18 3 3 [[40, -30], [-30, 24]]
     [] = true := by
   decide +kernel
 
+/-- **`n = 3 * p * q`, `5 ≤ q < p`.** For all primes `p, q` with `5 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 3 * p, 3 * q, p * q}`. -/
+theorem energy_3_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 5 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (3 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ) ↔ S = {1, 3 * p, 3 * q, p * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_3_p_q_gt p q) shape_3_p_q_gt.a = 3 * p * q := by
+    simp [pw, rOf, shape_3_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_3_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_3_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_3_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_3_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[40, -30], [-30, 24]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      40 - 30 * (q : ℝ) - 30 * (p : ℝ) + 24 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_3_p_q_gt p q) shape_3_p_q_gt.a [true, false, false, true, false, true, true] =
+      {1, 3 * p, 3 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, false, true, true])
+      (List.range (size shape_3_p_q_gt.a - 1)) = [0, 3, 5, 6] from rfl]
+    simp [pw, rOf, shape_3_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
+
 /-- The order `4 p q` on the region `p ≥ 3, q ≥ p + 2`. -/
 def shape_4_p_q_lt : Shape 3 :=
   ⟨![2, 1, 1], ![0, 1, 2], ![2, 0, 0], ⟨3, 1, 0⟩,
@@ -72,6 +214,35 @@ theorem cert_4_p_q_lt : certifyM shape_4_p_q_lt 18 3 3 [[64, -48], [-48, 38]]
     [true, true, false, false, false, true, false, false, true, true, true]
     [] = true := by
   decide +kernel
+
+/-- **`n = 2 ^ 2 * p * q`, `3 ≤ p < q`.** For all primes `p, q` with `3 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 2, 2 ^ 2 * p, 2 ^ 2 * q, p * q, 2 * p * q}`. -/
+theorem energy_4_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 3 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (2 ^ 2 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ) ↔ S = {1, 2, 2 ^ 2 * p, 2 ^ 2 * q, p * q, 2 * p * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_4_p_q_lt p q) shape_4_p_q_lt.a = 2 ^ 2 * p * q := by
+    simp [pw, rOf, shape_4_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_4_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_4_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_4_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_4_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[64, -48], [-48, 38]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_4_p_q_lt p q) shape_4_p_q_lt.a [true, true, false, false, false, true, false, false, true, true, true] =
+      {1, 2, 2 ^ 2 * p, 2 ^ 2 * q, p * q, 2 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, false, false, false, true, false, false, true, true, true])
+      (List.range (size shape_4_p_q_lt.a - 1)) = [0, 1, 5, 8, 9, 10] from rfl]
+    simp [pw, rOf, shape_4_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
 
 /-- The order `4 p q` on the region `q ≥ 3, p ≥ q + 2`. -/
 def shape_4_p_q_gt : Shape 3 :=
@@ -85,6 +256,35 @@ theorem cert_4_p_q_gt : certifyM shape_4_p_q_gt 18 3 3 [[64, -48], [-48, 38]]
     [] = true := by
   decide +kernel
 
+/-- **`n = 2 ^ 2 * p * q`, `3 ≤ q < p`.** For all primes `p, q` with `3 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 2, 2 ^ 2 * p, 2 ^ 2 * q, p * q, 2 * p * q}`. -/
+theorem energy_4_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 3 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (2 ^ 2 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ) ↔ S = {1, 2, 2 ^ 2 * p, 2 ^ 2 * q, p * q, 2 * p * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_4_p_q_gt p q) shape_4_p_q_gt.a = 2 ^ 2 * p * q := by
+    simp [pw, rOf, shape_4_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_4_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_4_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_4_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_4_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[64, -48], [-48, 38]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      64 - 48 * (q : ℝ) - 48 * (p : ℝ) + 38 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_4_p_q_gt p q) shape_4_p_q_gt.a [true, true, false, false, false, true, false, false, true, true, true] =
+      {1, 2, 2 ^ 2 * p, 2 ^ 2 * q, p * q, 2 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, false, false, false, true, false, false, true, true, true])
+      (List.range (size shape_4_p_q_gt.a - 1)) = [0, 1, 5, 8, 9, 10] from rfl]
+    simp [pw, rOf, shape_4_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
+
 /-- The order `2 p2 q` on the region `p ≥ 3, q ≥ p + 2`. -/
 def shape_2_p2_q_lt : Shape 3 :=
   ⟨![1, 2, 1], ![0, 1, 2], ![2, 0, 0], ⟨3, 1, 0⟩,
@@ -96,6 +296,35 @@ theorem cert_2_p2_q_lt : certifyM shape_2_p2_q_lt 19 4 4 [[8, -6], [16, -12], [-
     [true, false, true, true, false, true, false, true, false, false, true]
     [] = true := by
   decide +kernel
+
+/-- **`n = 2 * p ^ 2 * q`, `3 ≤ p < q`.** For all primes `p, q` with `3 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `8 - 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) - 20 * (p : ℝ) ^ 2 + 16 * (p : ℝ) ^ 2 * (q : ℝ)`, with equality exactly for `{1, p, 2 * p, 2 * p ^ 2, 2 * q, p ^ 2 * q}`. -/
+theorem energy_2_p2_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 3 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (2 * p ^ 2 * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 * p ^ 2 * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        8 - 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) - 20 * (p : ℝ) ^ 2 + 16 * (p : ℝ) ^ 2 * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 * p ^ 2 * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          8 - 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) - 20 * (p : ℝ) ^ 2 + 16 * (p : ℝ) ^ 2 * (q : ℝ) ↔ S = {1, p, 2 * p, 2 * p ^ 2, 2 * q, p ^ 2 * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_2_p2_q_lt p q) shape_2_p2_q_lt.a = 2 * p ^ 2 * q := by
+    simp [pw, rOf, shape_2_p2_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_2_p2_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_2_p2_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_2_p2_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_2_p2_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[8, -6], [16, -12], [-20, 16]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      8 - 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) - 20 * (p : ℝ) ^ 2 + 16 * (p : ℝ) ^ 2 * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_2_p2_q_lt p q) shape_2_p2_q_lt.a [true, false, true, true, false, true, false, true, false, false, true] =
+      {1, p, 2 * p, 2 * p ^ 2, 2 * q, p ^ 2 * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, true, true, false, true, false, true, false, false, true])
+      (List.range (size shape_2_p2_q_lt.a - 1)) = [0, 2, 3, 5, 7, 10] from rfl]
+    simp [pw, rOf, shape_2_p2_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
 
 /-- The order `9 p q` on the region `p ≥ 5, q ≥ p + 2`. -/
 def shape_9_p_q_lt : Shape 3 :=
@@ -109,6 +338,40 @@ theorem cert_9_p_q_lt : certifyM shape_9_p_q_lt 21 3 3 [[180, -140], [-140, 112]
     [[false, true, false, true, false, true, true, false, true, false, true]] = true := by
   decide +kernel
 
+/-- **`n = 3 ^ 2 * p * q`, `5 ≤ p < q`.** For all primes `p, q` with `5 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 3 ^ 2, 3 * p, 3 * q, p * q}`, `{3, p, 3 ^ 2 * p, q, 3 ^ 2 * q, 3 * p * q}`. -/
+theorem energy_9_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 5 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (3 ^ 2 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ) ↔ S = {1, 3 ^ 2, 3 * p, 3 * q, p * q} ∨ S = {3, p, 3 ^ 2 * p, q, 3 ^ 2 * q, 3 * p * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_9_p_q_lt p q) shape_9_p_q_lt.a = 3 ^ 2 * p * q := by
+    simp [pw, rOf, shape_9_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_9_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_9_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_9_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_9_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[180, -140], [-140, 112]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_9_p_q_lt p q) shape_9_p_q_lt.a [true, false, true, false, true, false, false, true, false, true, false] =
+      {1, 3 ^ 2, 3 * p, 3 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, true, false, true, false, false, true, false, true, false])
+      (List.range (size shape_9_p_q_lt.a - 1)) = [0, 2, 4, 7, 9] from rfl]
+    simp [pw, rOf, shape_9_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_9_p_q_lt p q) shape_9_p_q_lt.a [false, true, false, true, false, true, true, false, true, false, true] =
+      {3, p, 3 ^ 2 * p, q, 3 ^ 2 * q, 3 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, false, true, false, true, true, false, true, false, true])
+      (List.range (size shape_9_p_q_lt.a - 1)) = [1, 3, 5, 6, 8, 10] from rfl]
+    simp [pw, rOf, shape_9_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
+
 /-- The order `9 p q` on the region `q ≥ 5, p ≥ q + 2`. -/
 def shape_9_p_q_gt : Shape 3 :=
   ⟨![2, 1, 1], ![0, 1, 2], ![3, 0, 0], ⟨7, 1, 1⟩,
@@ -120,6 +383,40 @@ theorem cert_9_p_q_gt : certifyM shape_9_p_q_gt 21 3 3 [[180, -140], [-140, 112]
     [true, false, true, false, true, false, false, true, false, true, false]
     [[false, true, false, true, false, true, true, false, true, false, true]] = true := by
   decide +kernel
+
+/-- **`n = 3 ^ 2 * p * q`, `5 ≤ q < p`.** For all primes `p, q` with `5 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 3 ^ 2, 3 * p, 3 * q, p * q}`, `{3, p, 3 ^ 2 * p, q, 3 ^ 2 * q, 3 * p * q}`. -/
+theorem energy_9_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 5 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (3 ^ 2 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 ^ 2 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ) ↔ S = {1, 3 ^ 2, 3 * p, 3 * q, p * q} ∨ S = {3, p, 3 ^ 2 * p, q, 3 ^ 2 * q, 3 * p * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_9_p_q_gt p q) shape_9_p_q_gt.a = 3 ^ 2 * p * q := by
+    simp [pw, rOf, shape_9_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_9_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_9_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_9_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_9_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[180, -140], [-140, 112]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      180 - 140 * (q : ℝ) - 140 * (p : ℝ) + 112 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_9_p_q_gt p q) shape_9_p_q_gt.a [true, false, true, false, true, false, false, true, false, true, false] =
+      {1, 3 ^ 2, 3 * p, 3 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, true, false, true, false, false, true, false, true, false])
+      (List.range (size shape_9_p_q_gt.a - 1)) = [0, 2, 4, 7, 9] from rfl]
+    simp [pw, rOf, shape_9_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_9_p_q_gt p q) shape_9_p_q_gt.a [false, true, false, true, false, true, true, false, true, false, true] =
+      {3, p, 3 ^ 2 * p, q, 3 ^ 2 * q, 3 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, false, true, false, true, true, false, true, false, true])
+      (List.range (size shape_9_p_q_gt.a - 1)) = [1, 3, 5, 6, 8, 10] from rfl]
+    simp [pw, rOf, shape_9_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
 
 /-- The order `3 p2 q` on the region `p ≥ 5, q ≥ p + 2`. -/
 def shape_3_p2_q_lt : Shape 3 :=
@@ -133,6 +430,40 @@ theorem cert_3_p2_q_lt : certifyM shape_3_p2_q_lt 22 4 4 [[-36, 28], [76, -58], 
     [[false, true, true, false, false, true, true, false, false, true, true]] = true := by
   decide +kernel
 
+/-- **`n = 3 * p ^ 2 * q`, `5 ≤ p < q`.** For all primes `p, q` with `5 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `-36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ)`, with equality exactly for `{1, 3 * p, p ^ 2, 3 * q, p * q}`, `{3, p, 3 * p ^ 2, q, 3 * p * q, p ^ 2 * q}`. -/
+theorem energy_3_p2_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 5 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (3 * p ^ 2 * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 * p ^ 2 * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        -36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 * p ^ 2 * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          -36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ) ↔ S = {1, 3 * p, p ^ 2, 3 * q, p * q} ∨ S = {3, p, 3 * p ^ 2, q, 3 * p * q, p ^ 2 * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_3_p2_q_lt p q) shape_3_p2_q_lt.a = 3 * p ^ 2 * q := by
+    simp [pw, rOf, shape_3_p2_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_3_p2_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_3_p2_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_3_p2_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_3_p2_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[-36, 28], [76, -58], [-48, 38]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      -36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_3_p2_q_lt p q) shape_3_p2_q_lt.a [true, false, false, true, true, false, false, true, true, false, false] =
+      {1, 3 * p, p ^ 2, 3 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, true, false, false, true, true, false, false])
+      (List.range (size shape_3_p2_q_lt.a - 1)) = [0, 3, 4, 7, 8] from rfl]
+    simp [pw, rOf, shape_3_p2_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_3_p2_q_lt p q) shape_3_p2_q_lt.a [false, true, true, false, false, true, true, false, false, true, true] =
+      {3, p, 3 * p ^ 2, q, 3 * p * q, p ^ 2 * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, false, true, true, false, false, true, true])
+      (List.range (size shape_3_p2_q_lt.a - 1)) = [1, 2, 5, 6, 9, 10] from rfl]
+    simp [pw, rOf, shape_3_p2_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
+
 /-- The order `3 p2 q` on the region `q ≥ 5, p ≥ q + 2`. -/
 def shape_3_p2_q_gt : Shape 3 :=
   ⟨![1, 2, 1], ![0, 1, 2], ![3, 0, 0], ⟨7, 1, 1⟩,
@@ -144,6 +475,40 @@ theorem cert_3_p2_q_gt : certifyM shape_3_p2_q_gt 22 4 4 [[-36, 28], [76, -58], 
     [true, false, false, true, true, false, false, true, true, false, false]
     [[false, true, true, false, false, true, true, false, false, true, true]] = true := by
   decide +kernel
+
+/-- **`n = 3 * p ^ 2 * q`, `5 ≤ q < p`.** For all primes `p, q` with `5 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `-36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ)`, with equality exactly for `{1, 3 * p, p ^ 2, 3 * q, p * q}`, `{3, p, 3 * p ^ 2, q, 3 * p * q, p ^ 2 * q}`. -/
+theorem energy_3_p2_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 5 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (3 * p ^ 2 * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 * p ^ 2 * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        -36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 * p ^ 2 * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          -36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ) ↔ S = {1, 3 * p, p ^ 2, 3 * q, p * q} ∨ S = {3, p, 3 * p ^ 2, q, 3 * p * q, p ^ 2 * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_3_p2_q_gt p q) shape_3_p2_q_gt.a = 3 * p ^ 2 * q := by
+    simp [pw, rOf, shape_3_p2_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_3_p2_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_3_p2_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_3_p2_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_3_p2_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[-36, 28], [76, -58], [-48, 38]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      -36 + 28 * (q : ℝ) + 76 * (p : ℝ) - 58 * (p : ℝ) * (q : ℝ) - 48 * (p : ℝ) ^ 2 + 38 * (p : ℝ) ^ 2 * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_3_p2_q_gt p q) shape_3_p2_q_gt.a [true, false, false, true, true, false, false, true, true, false, false] =
+      {1, 3 * p, p ^ 2, 3 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, true, false, false, true, true, false, false])
+      (List.range (size shape_3_p2_q_gt.a - 1)) = [0, 3, 4, 7, 8] from rfl]
+    simp [pw, rOf, shape_3_p2_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_3_p2_q_gt p q) shape_3_p2_q_gt.a [false, true, true, false, false, true, true, false, false, true, true] =
+      {3, p, 3 * p ^ 2, q, 3 * p * q, p ^ 2 * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, false, true, true, false, false, true, true])
+      (List.range (size shape_3_p2_q_gt.a - 1)) = [1, 2, 5, 6, 9, 10] from rfl]
+    simp [pw, rOf, shape_3_p2_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
 
 /-- The order `2 p3 q` on the region `p ≥ 3, q ≥ p + 2`. -/
 def shape_2_p3_q_lt : Shape 3 :=
@@ -157,6 +522,35 @@ theorem cert_2_p3_q_lt : certifyM shape_2_p3_q_lt 22 5 5 [[-8, 6], [16, -12], [2
     [] = true := by
   decide +kernel
 
+/-- **`n = 2 * p ^ 3 * q`, `3 ≤ p < q`.** For all primes `p, q` with `3 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `-8 + 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) + 24 * (p : ℝ) ^ 2 - 18 * (p : ℝ) ^ 2 * (q : ℝ) - 28 * (p : ℝ) ^ 3 + 22 * (p : ℝ) ^ 3 * (q : ℝ)`, with equality exactly for `{1, 2, p, 2 * p ^ 3, 2 * p * q, p ^ 2 * q, 2 * p ^ 2 * q, p ^ 3 * q}`. -/
+theorem energy_2_p3_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 3 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (2 * p ^ 3 * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 * p ^ 3 * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        -8 + 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) + 24 * (p : ℝ) ^ 2 - 18 * (p : ℝ) ^ 2 * (q : ℝ) - 28 * (p : ℝ) ^ 3 + 22 * (p : ℝ) ^ 3 * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 * p ^ 3 * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          -8 + 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) + 24 * (p : ℝ) ^ 2 - 18 * (p : ℝ) ^ 2 * (q : ℝ) - 28 * (p : ℝ) ^ 3 + 22 * (p : ℝ) ^ 3 * (q : ℝ) ↔ S = {1, 2, p, 2 * p ^ 3, 2 * p * q, p ^ 2 * q, 2 * p ^ 2 * q, p ^ 3 * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_2_p3_q_lt p q) shape_2_p3_q_lt.a = 2 * p ^ 3 * q := by
+    simp [pw, rOf, shape_2_p3_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_2_p3_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_2_p3_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_2_p3_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_2_p3_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[-8, 6], [16, -12], [24, -18], [-28, 22]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      -8 + 6 * (q : ℝ) + 16 * (p : ℝ) - 12 * (p : ℝ) * (q : ℝ) + 24 * (p : ℝ) ^ 2 - 18 * (p : ℝ) ^ 2 * (q : ℝ) - 28 * (p : ℝ) ^ 3 + 22 * (p : ℝ) ^ 3 * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_2_p3_q_lt p q) shape_2_p3_q_lt.a [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true] =
+      {1, 2, p, 2 * p ^ 3, 2 * p * q, p ^ 2 * q, 2 * p ^ 2 * q, p ^ 3 * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true])
+      (List.range (size shape_2_p3_q_lt.a - 1)) = [0, 1, 2, 7, 11, 12, 13, 14] from rfl]
+    simp [pw, rOf, shape_2_p3_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
+
 /-- The order `6 p q` on the region `p ≥ 5, q ≥ p + 2`. -/
 def shape_6_p_q_lt : Shape 4 :=
   ⟨![1, 1, 1, 1], ![0, 0, 1, 2], ![2, 3, 0, 0], ⟨5, 1, 0⟩,
@@ -168,6 +562,35 @@ theorem cert_6_p_q_lt : certifyM shape_6_p_q_lt 21 3 3 [[112, -84], [-84, 66]]
     [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true]
     [] = true := by
   decide +kernel
+
+/-- **`n = 2 * 3 * p * q`, `5 ≤ p < q`.** For all primes `p, q` with `5 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 2, 3, 2 * 3 * p, 2 * 3 * q, p * q, 2 * p * q, 3 * p * q}`. -/
+theorem energy_6_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 5 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (2 * 3 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 * 3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 * 3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ) ↔ S = {1, 2, 3, 2 * 3 * p, 2 * 3 * q, p * q, 2 * p * q, 3 * p * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_6_p_q_lt p q) shape_6_p_q_lt.a = 2 * 3 * p * q := by
+    simp [pw, rOf, shape_6_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_6_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_6_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_6_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_6_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[112, -84], [-84, 66]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_6_p_q_lt p q) shape_6_p_q_lt.a [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true] =
+      {1, 2, 3, 2 * 3 * p, 2 * 3 * q, p * q, 2 * p * q, 3 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true])
+      (List.range (size shape_6_p_q_lt.a - 1)) = [0, 1, 2, 7, 11, 12, 13, 14] from rfl]
+    simp [pw, rOf, shape_6_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
 
 /-- The order `6 p q` on the region `q ≥ 5, p ≥ q + 2`. -/
 def shape_6_p_q_gt : Shape 4 :=
@@ -181,6 +604,35 @@ theorem cert_6_p_q_gt : certifyM shape_6_p_q_gt 21 3 3 [[112, -84], [-84, 66]]
     [] = true := by
   decide +kernel
 
+/-- **`n = 2 * 3 * p * q`, `5 ≤ q < p`.** For all primes `p, q` with `5 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 2, 3, 2 * 3 * p, 2 * 3 * q, p * q, 2 * p * q, 3 * p * q}`. -/
+theorem energy_6_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 5 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (2 * 3 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (2 * 3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (2 * 3 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ) ↔ S = {1, 2, 3, 2 * 3 * p, 2 * 3 * q, p * q, 2 * p * q, 3 * p * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_6_p_q_gt p q) shape_6_p_q_gt.a = 2 * 3 * p * q := by
+    simp [pw, rOf, shape_6_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_6_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_6_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_6_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_6_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[112, -84], [-84, 66]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      112 - 84 * (q : ℝ) - 84 * (p : ℝ) + 66 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_6_p_q_gt p q) shape_6_p_q_gt.a [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true] =
+      {1, 2, 3, 2 * 3 * p, 2 * 3 * q, p * q, 2 * p * q, 3 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, true, true, false, false, false, false, true, false, false, false, true, true, true, true])
+      (List.range (size shape_6_p_q_gt.a - 1)) = [0, 1, 2, 7, 11, 12, 13, 14] from rfl]
+    simp [pw, rOf, shape_6_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0] using h
+
 /-- The order `15 p q` on the region `p ≥ 7, q ≥ p + 2`. -/
 def shape_15_p_q_lt : Shape 4 :=
   ⟨![1, 1, 1, 1], ![0, 0, 1, 2], ![3, 5, 0, 0], ⟨7, 1, 0⟩,
@@ -192,6 +644,40 @@ theorem cert_15_p_q_lt : certifyM shape_15_p_q_lt 23 3 3 [[428, -324], [-324, 25
     [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false]
     [[false, true, true, false, true, false, false, true, true, false, false, true, false, true, true]] = true := by
   decide +kernel
+
+/-- **`n = 3 * 5 * p * q`, `7 ≤ p < q`.** For all primes `p, q` with `7 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 3 * 5, 3 * p, 5 * p, 3 * q, 5 * q, p * q}`, `{3, 5, p, 3 * 5 * p, q, 3 * 5 * q, 3 * p * q, 5 * p * q}`. -/
+theorem energy_15_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 7 ≤ p) (hpq : p < q)
+    {S : Finset ℕ} (hS : S ⊆ (3 * 5 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 * 5 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 * 5 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ) ↔ S = {1, 3 * 5, 3 * p, 5 * p, 3 * q, 5 * q, p * q} ∨ S = {3, 5, p, 3 * 5 * p, q, 3 * 5 * q, 3 * p * q, 5 * p * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_15_p_q_lt p q) shape_15_p_q_lt.a = 3 * 5 * p * q := by
+    simp [pw, rOf, shape_15_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_15_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_15_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_15_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_15_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[428, -324], [-324, 252]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_15_p_q_lt p q) shape_15_p_q_lt.a [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false] =
+      {1, 3 * 5, 3 * p, 5 * p, 3 * q, 5 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false])
+      (List.range (size shape_15_p_q_lt.a - 1)) = [0, 3, 5, 6, 9, 10, 12] from rfl]
+    simp [pw, rOf, shape_15_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_15_p_q_lt p q) shape_15_p_q_lt.a [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true] =
+      {3, 5, p, 3 * 5 * p, q, 3 * 5 * q, 3 * p * q, 5 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true])
+      (List.range (size shape_15_p_q_lt.a - 1)) = [1, 2, 4, 7, 8, 11, 13, 14] from rfl]
+    simp [pw, rOf, shape_15_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
 
 /-- The order `15 p q` on the region `q ≥ 7, p ≥ q + 2`. -/
 def shape_15_p_q_gt : Shape 4 :=
@@ -205,6 +691,40 @@ theorem cert_15_p_q_gt : certifyM shape_15_p_q_gt 23 3 3 [[428, -324], [-324, 25
     [[false, true, true, false, true, false, false, true, true, false, false, true, false, true, true]] = true := by
   decide +kernel
 
+/-- **`n = 3 * 5 * p * q`, `7 ≤ q < p`.** For all primes `p, q` with `7 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 3 * 5, 3 * p, 5 * p, 3 * q, 5 * q, p * q}`, `{3, 5, p, 3 * 5 * p, q, 3 * 5 * q, 3 * p * q, 5 * p * q}`. -/
+theorem energy_15_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 7 ≤ q) (hqp : q < p)
+    {S : Finset ℕ} (hS : S ⊆ (3 * 5 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (3 * 5 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (3 * 5 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ) ↔ S = {1, 3 * 5, 3 * p, 5 * p, 3 * q, 5 * q, p * q} ∨ S = {3, 5, p, 3 * 5 * p, q, 3 * 5 * q, 3 * p * q, 5 * p * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_15_p_q_gt p q) shape_15_p_q_gt.a = 3 * 5 * p * q := by
+    simp [pw, rOf, shape_15_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_15_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_15_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_15_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_15_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[428, -324], [-324, 252]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      428 - 324 * (q : ℝ) - 324 * (p : ℝ) + 252 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_15_p_q_gt p q) shape_15_p_q_gt.a [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false] =
+      {1, 3 * 5, 3 * p, 5 * p, 3 * q, 5 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false])
+      (List.range (size shape_15_p_q_gt.a - 1)) = [0, 3, 5, 6, 9, 10, 12] from rfl]
+    simp [pw, rOf, shape_15_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_15_p_q_gt p q) shape_15_p_q_gt.a [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true] =
+      {3, 5, p, 3 * 5 * p, q, 3 * 5 * q, 3 * p * q, 5 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true])
+      (List.range (size shape_15_p_q_gt.a - 1)) = [1, 2, 4, 7, 8, 11, 13, 14] from rfl]
+    simp [pw, rOf, shape_15_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
+
 /-- The order `35 p q` on the region `p ≥ 3, q ≥ p + 2`. -/
 def shape_35_p_q_lt : Shape 4 :=
   ⟨![1, 1, 1, 1], ![0, 0, 1, 2], ![5, 7, 0, 0], ⟨3, 1, 0⟩,
@@ -217,6 +737,40 @@ theorem cert_35_p_q_lt : certifyM shape_35_p_q_lt 23 3 3 [[1436, -1092], [-1092,
     [[false, true, true, false, true, false, false, true, true, false, false, true, false, true, true]] = true := by
   decide +kernel
 
+/-- **`n = 5 * 7 * p * q`, `3 ≤ p < q`.** For all primes `p, q` with `3 ≤ p < q` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 5 * 7, 5 * p, 7 * p, 5 * q, 7 * q, p * q}`, `{5, 7, p, 5 * 7 * p, q, 5 * 7 * q, 5 * p * q, 7 * p * q}`. -/
+theorem energy_35_p_q_lt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hp0 : 3 ≤ p) (hpq : p < q) (hp5 : p ≠ 5) (hq5 : q ≠ 5) (hp7 : p ≠ 7) (hq7 : q ≠ 7)
+    {S : Finset ℕ} (hS : S ⊆ (5 * 7 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (5 * 7 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (5 * 7 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ) ↔ S = {1, 5 * 7, 5 * p, 7 * p, 5 * q, 7 * q, p * q} ∨ S = {5, 7, p, 5 * 7 * p, q, 5 * 7 * q, 5 * p * q, 7 * p * q}) := by
+  have hgap : p + 2 ≤ q := add_two_le_of_lt hp hq (by omega) (by omega) hpq
+  have hn : pw (rOf shape_35_p_q_lt p q) shape_35_p_q_lt.a = 5 * 7 * p * q := by
+    simp [pw, rOf, shape_35_p_q_lt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_35_p_q_lt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_35_p_q_lt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_35_p_q_lt] at hij ⊢ <;> omega
+  have h := energy_le_lt cert_35_p_q_lt rfl rfl hp0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[1436, -1092], [-1092, 844]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_35_p_q_lt p q) shape_35_p_q_lt.a [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false] =
+      {1, 5 * 7, 5 * p, 7 * p, 5 * q, 7 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false])
+      (List.range (size shape_35_p_q_lt.a - 1)) = [0, 3, 5, 6, 9, 10, 12] from rfl]
+    simp [pw, rOf, shape_35_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_35_p_q_lt p q) shape_35_p_q_lt.a [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true] =
+      {5, 7, p, 5 * 7 * p, q, 5 * 7 * q, 5 * p * q, 7 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true])
+      (List.range (size shape_35_p_q_lt.a - 1)) = [1, 2, 4, 7, 8, 11, 13, 14] from rfl]
+    simp [pw, rOf, shape_35_p_q_lt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
+
 /-- The order `35 p q` on the region `q ≥ 3, p ≥ q + 2`. -/
 def shape_35_p_q_gt : Shape 4 :=
   ⟨![1, 1, 1, 1], ![0, 0, 1, 2], ![5, 7, 0, 0], ⟨5, 1, 1⟩,
@@ -228,5 +782,39 @@ theorem cert_35_p_q_gt : certifyM shape_35_p_q_gt 23 3 3 [[1436, -1092], [-1092,
     [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false]
     [[false, true, true, false, true, false, false, true, true, false, false, true, false, true, true]] = true := by
   decide +kernel
+
+/-- **`n = 5 * 7 * p * q`, `3 ≤ q < p`.** For all primes `p, q` with `3 ≤ q < p` and every set `S` of proper divisors
+of `n`, the energy of `ICG(n, S)` is at most `1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ)`, with equality exactly for `{1, 5 * 7, 5 * p, 7 * p, 5 * q, 7 * q, p * q}`, `{5, 7, p, 5 * 7 * p, q, 5 * 7 * q, 5 * p * q, 7 * p * q}`. -/
+theorem energy_35_p_q_gt {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hq0 : 3 ≤ q) (hqp : q < p) (hp5 : p ≠ 5) (hq5 : q ≠ 5) (hp7 : p ≠ 7) (hq7 : q ≠ 7)
+    {S : Finset ℕ} (hS : S ⊆ (5 * 7 * p * q).properDivisors) :
+    ICGBridge.energy (ICGBridge.icgAdj (5 * 7 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) ≤
+        1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ) ∧
+      (ICGBridge.energy (ICGBridge.icgAdj (5 * 7 * p * q) S) (ICGBridge.icgAdj_isHermitian _ _) =
+          1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ) ↔ S = {1, 5 * 7, 5 * p, 7 * p, 5 * q, 7 * q, p * q} ∨ S = {5, 7, p, 5 * 7 * p, q, 5 * 7 * q, 5 * p * q, 7 * p * q}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf shape_35_p_q_gt p q) shape_35_p_q_gt.a = 5 * 7 * p * q := by
+    simp [pw, rOf, shape_35_p_q_gt, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf shape_35_p_q_gt p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, shape_35_p_q_gt] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, shape_35_p_q_gt] at hij ⊢ <;> omega
+  have h := energy_le_gt cert_35_p_q_gt rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  have hE : ((BPoly.eval [[1436, -1092], [-1092, 844]] (p : ℤ) (q : ℤ) : ℤ) : ℝ) =
+      1436 - 1092 * (q : ℝ) - 1092 * (p : ℝ) + 844 * (p : ℝ) * (q : ℝ) := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+  rw [hE] at h
+  have h0 : divsOfMask (rOf shape_35_p_q_gt p q) shape_35_p_q_gt.a [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false] =
+      {1, 5 * 7, 5 * p, 7 * p, 5 * q, 7 * q, p * q} := by
+    rw [divsOfMask, show List.filter (bit [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false])
+      (List.range (size shape_35_p_q_gt.a - 1)) = [0, 3, 5, 6, 9, 10, 12] from rfl]
+    simp [pw, rOf, shape_35_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have h1 : divsOfMask (rOf shape_35_p_q_gt p q) shape_35_p_q_gt.a [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true] =
+      {5, 7, p, 5 * 7 * p, q, 5 * 7 * q, 5 * p * q, 7 * p * q} := by
+    rw [divsOfMask, show List.filter (bit [false, true, true, false, true, false, false, true, true, false, false, true, false, true, true])
+      (List.range (size shape_35_p_q_gt.a - 1)) = [1, 2, 4, 7, 8, 11, 13, 14] from rfl]
+    simp [pw, rOf, shape_35_p_q_gt, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  simpa only [List.map_cons, List.map_nil, List.mem_cons, List.not_mem_nil, or_false,
+    h0, h1] using h
 
 end Solved.ICG.Multi.Families

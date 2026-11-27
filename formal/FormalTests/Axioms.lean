@@ -119,3 +119,75 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 /-- info: 'Solved.ICG.Families.energy_7_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Families.energy_7_1
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_3_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_3_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_3_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_3_p_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_4_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_4_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_4_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_4_p_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p2_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p2_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_9_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_9_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_9_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_9_p_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_3_p2_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_3_p2_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_3_p2_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_3_p2_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p3_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p3_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_6_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_6_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_6_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_6_p_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_15_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_15_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_15_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_15_p_q_gt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_35_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_35_p_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_35_p_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_35_p_q_gt
