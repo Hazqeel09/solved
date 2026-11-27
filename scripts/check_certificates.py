@@ -24,6 +24,7 @@ def main():
         ("classical", "classical.json", []),
         ("verify_order", "order-checks.json", []),
         ("verify_two_small", "two-small-classification.json", []),
+        ("verify_icg_families", "icg-families.json", []),
         ("counting_check", "counting-level10.json", ["--level", "10"]),
         ("counting_check", "counting-level12.json", ["--level", "12"]),
     ]

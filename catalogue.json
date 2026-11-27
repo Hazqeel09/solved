@@ -1154,6 +1154,55 @@
         }
       ],
       "dependencies": []
+    },
+    {
+      "id": "icg-energy-exceptional-orders",
+      "title": "Maximal-energy integral circulant graphs at the primes 2 and 3",
+      "subject": "Spectral graph theory",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For 46 order families outside the known theorems (2^a p^b and 3^a p^b with at most 15 divisor cells, and orders 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq with symbolic odd primes), exact certificates determine every maximal-energy divisor set of ICG(n, D) for all admissible primes. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. Three conjectures extend the parity law to all odd orders, describe even orders 2^a p^b through the Sander-Sander maximisers of 2^a, and predict ratio-dependent maximisers.",
+      "proof": "results/icg-energy-exceptional-orders/PROOF.md",
+      "tests": [
+        "test_icg_families.py",
+        "test_icg_energy.py"
+      ],
+      "implementation": [
+        "solved/icg_families.py",
+        "solved/icg_energy.py",
+        "checks/verify_icg_families.py",
+        "checks/expected/icg-families.json"
+      ],
+      "formalization": {
+        "status": "none",
+        "files": [],
+        "scope": "No proof-assistant formalization is claimed."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1109.3616",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2608.29523",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2610.36883",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2604.09491",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/1104.4261",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "icg-energy-p2q3"
+      ]
     }
   ]
 }

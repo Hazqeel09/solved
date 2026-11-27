@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 31 entries, comprising 26 research proof drafts and 5 finite verification records. Twenty-seven Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, its computable-threshold extension, and the obstruction to marked-root reconstruction. Independent mathematical review remains pending.
+**Current catalogue:** 32 entries, comprising 27 research proof drafts and 5 finite verification records. Twenty-seven Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, its computable-threshold extension, and the obstruction to marked-root reconstruction. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -45,6 +45,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 | [An elementary eventually-periodic case of essential components](results/periodic-essential-components/PROOF.md) | ⬜ Not formalized |
 | [Matroid polynomial conjectures on q-uniform matroids with free points](results/q-uniform-matroid-checks/PROOF.md) | ⬜ Not formalized |
 | [The maximal-energy divisor set of integral circulant graphs of order p^2q^3](results/icg-energy-p2q3/PROOF.md) | ⬜ Not formalized |
+| [Maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md) | ⬜ Not formalized |
 
 <!-- END GENERATED LEAN STATUS -->
 
