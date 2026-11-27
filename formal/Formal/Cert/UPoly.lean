@@ -92,5 +92,47 @@ theorem eval_nonneg_of_allNonneg {p : UPoly} (h : allNonneg p = true) {x : ℤ} 
     simp only [eval_cons]
     exact add_nonneg h.1 (mul_nonneg hx (ih h.2))
 
+/-- Coefficient `d` of a polynomial (zero past the end). -/
+def coeff : UPoly → ℕ → ℤ
+  | [], _ => 0
+  | c :: _, 0 => c
+  | _ :: cs, d + 1 => coeff cs d
+
+@[simp] theorem coeff_nil (d : ℕ) : coeff [] d = 0 := by cases d <;> rfl
+@[simp] theorem coeff_cons_zero (c : ℤ) (cs : UPoly) : coeff (c :: cs) 0 = c := rfl
+@[simp] theorem coeff_cons_succ (c : ℤ) (cs : UPoly) (d : ℕ) :
+    coeff (c :: cs) (d + 1) = coeff cs d := rfl
+
+theorem coeff_add (f g : UPoly) (d : ℕ) : coeff (add f g) d = coeff f d + coeff g d := by
+  induction f generalizing g d with
+  | nil => simp [add]
+  | cons a f ih =>
+    cases g with
+    | nil => cases d <;> simp [add]
+    | cons b g => cases d <;> simp [add, ih]
+
+theorem eval_eq_sum_coeff (f : UPoly) {D : ℕ} (h : f.length ≤ D) (x : ℤ) :
+    eval f x = ∑ d ∈ Finset.range D, coeff f d * x ^ d := by
+  induction f generalizing D with
+  | nil => simp
+  | cons a f ih =>
+    obtain ⟨D, rfl⟩ : ∃ D', D = D' + 1 := ⟨D - 1, by simp at h; omega⟩
+    rw [eval_cons, Finset.sum_range_succ', ih (by simpa using h), Finset.mul_sum]
+    simp only [coeff_cons_succ, coeff_cons_zero, pow_zero, mul_one]
+    rw [add_comm]
+    congr 1
+    exact Finset.sum_congr rfl fun d _ => by ring
+
+theorem sum_abs_coeff (f : UPoly) {D : ℕ} (h : f.length ≤ D) :
+    ∑ d ∈ Finset.range D, |coeff f d| = (f.map fun c => |c|).sum := by
+  induction f generalizing D with
+  | nil => simp
+  | cons a f ih =>
+    obtain ⟨D, rfl⟩ : ∃ D', D = D' + 1 := ⟨D - 1, by simp at h; omega⟩
+    rw [Finset.sum_range_succ']
+    simp only [coeff_cons_succ, coeff_cons_zero]
+    rw [ih (by simpa using h)]
+    simp [add_comm]
+
 end UPoly
 end Solved.Cert

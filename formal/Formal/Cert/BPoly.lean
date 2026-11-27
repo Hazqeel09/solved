@@ -100,33 +100,13 @@ theorem eval_map_mul (A : UPoly) (Q : BPoly) (x y : ℤ) :
 
 /-! ## Coefficients -/
 
-/-- Coefficient of `y^j` in a univariate polynomial, zero past the end. -/
-def coeffU : UPoly → ℕ → ℤ
-  | [], _ => 0
-  | c :: _, 0 => c
-  | _ :: cs, j + 1 => coeffU cs j
-
-@[simp] theorem coeffU_nil (j : ℕ) : coeffU [] j = 0 := by cases j <;> rfl
-
 /-- Coefficient of `xⁱ yʲ`. -/
 def coeff : BPoly → ℕ → ℕ → ℤ
   | [], _, _ => 0
-  | Q :: _, 0, j => coeffU Q j
+  | Q :: _, 0, j => UPoly.coeff Q j
   | _ :: P, i + 1, j => coeff P i j
 
 @[simp] theorem coeff_nil (i j : ℕ) : coeff [] i j = 0 := by cases i <;> rfl
-
-theorem evalU_eq_sum (Q : UPoly) {Dy : ℕ} (h : Q.length ≤ Dy) (y : ℤ) :
-    UPoly.eval Q y = ∑ j ∈ range Dy, coeffU Q j * y ^ j := by
-  induction Q generalizing Dy with
-  | nil => simp
-  | cons c Q ih =>
-    obtain ⟨Dy, rfl⟩ : ∃ D', Dy = D' + 1 := ⟨Dy - 1, by simp at h; omega⟩
-    rw [UPoly.eval_cons, sum_range_succ', ih (by simpa using h), mul_sum]
-    simp only [coeffU, pow_zero, mul_one]
-    rw [add_comm]
-    congr 1
-    exact sum_congr rfl fun j _ => by ring
 
 /-- With at most `Dx` rows of length at most `Dy`, `P = ∑ᵢ ∑ⱼ coeff P i j xⁱ yʲ`. -/
 theorem eval_eq_sum (P : BPoly) {Dx Dy : ℕ} (hx : P.length ≤ Dx) (hy : ∀ Q ∈ P, Q.length ≤ Dy)
@@ -137,7 +117,7 @@ theorem eval_eq_sum (P : BPoly) {Dx Dy : ℕ} (hx : P.length ≤ Dx) (hy : ∀ Q
   | cons Q P ih =>
     obtain ⟨Dx, rfl⟩ : ∃ D', Dx = D' + 1 := ⟨Dx - 1, by simp at hx; omega⟩
     rw [eval_cons, sum_range_succ', ih (by simpa using hx) fun R hR => hy R (by simp [hR]),
-      mul_sum, evalU_eq_sum Q (hy Q (by simp))]
+      mul_sum, UPoly.eval_eq_sum_coeff Q (hy Q (by simp))]
     simp only [coeff, pow_zero, one_mul]
     rw [add_comm]
     congr 1

@@ -135,4 +135,12 @@ theorem eval_le_cmax_right (p q : UPoly) {x : ℤ} (hx : 0 ≤ x) : eval q x ≤
 theorem eval_absC_nonneg (p : UPoly) {x : ℤ} (hx : 0 ≤ x) : 0 ≤ eval (absC p) x :=
   (abs_nonneg _).trans (abs_eval_le_absC p hx)
 
+theorem coeff_negPart (f : UPoly) (d : ℕ) : coeff (negPart f) d = min (coeff f d) 0 := by
+  induction f generalizing d with
+  | nil => simp [negPart]
+  | cons a f ih =>
+    cases d with
+    | zero => rfl
+    | succ d => exact ih d
+
 end Solved.Cert.UPoly
