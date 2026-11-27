@@ -6,13 +6,13 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
-## New results (27 November 2026)
+## Work awaiting Lean verification (27 November 2026)
 
-- **[Maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md).** Exact certificates settle 49 order families, 45 of them outside every published theorem: even orders such as $2pq$, $2^2pq$ and $2^ap^b$; orders with an odd power of 3; and four-prime orders with even total exponent. For $n=2p^2q$ the maximiser depends on the sign of $5p^2-6pq+9q-8$, so for even orders the optimum is not universal. Two new conjectures: the **Hazqeel conjecture** (the parity law holds for every odd order) and the **Afyq conjecture** (2-adic tensor structure of even orders).
-- **[Roldán's conjecture for ICG(p²q³)](results/icg-energy-p2q3/PROOF.md).** An independent exact certificate for all odd primes, including the case $q=3$ outside Jiang–Yang's theorem.
-- **[Matroid polynomial conjectures on q-uniform matroids](results/q-uniform-matroid-checks/PROOF.md).** An exact engine reproducing the 2026 Cheng–Liu counterexample, and negative evidence on 9,371 matroids for four open real-rootedness and log-concavity conjectures.
+These are exact computer certificates in Python. They are **not claimed as results** until each has a Lean formalization and a statement correspondence. That work is in progress.
 
-These are computer-certified proof drafts awaiting independent review; ⬜ in the table below means no Lean formalization, not an unproved claim.
+- [Integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md): certificates for 49 order families and a ratio-dependent maximiser for $2p^2q$. It proposes two conjectures, the **Hazqeel conjecture** and the **Afyq conjecture**.
+- [Roldán's conjecture for ICG(p²q³)](results/icg-energy-p2q3/PROOF.md): an independent certificate for all odd primes.
+- [Matroid polynomial checks on q-uniform matroids](results/q-uniform-matroid-checks/PROOF.md): negative evidence on 9,371 matroids for open conjectures.
 
 ## Results
 
