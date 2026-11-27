@@ -67,6 +67,35 @@ class CellModel(unittest.TestCase):
                     )
 
 
+class MultiBridge(unittest.TestCase):
+    """The statement of the k-prime bridge, against the definitional energy formula."""
+
+    def test_against_definition(self):
+        rng = random.Random(3)
+        cases = [
+            ((2, 3), (1, 1)),
+            ((2, 5), (2, 1)),
+            ((3, 7), (1, 2)),
+            ((2, 3, 5), (1, 1, 1)),
+            ((2, 3, 5), (2, 1, 1)),
+            ((3, 5, 7), (1, 1, 1)),
+            ((2, 3, 5, 7), (1, 1, 1, 1)),
+            ((2, 7, 11), (1, 2, 1)),
+        ]
+        for primes, exponents in cases:
+            n = 1
+            for r, a in zip(primes, exponents):
+                n *= r**a
+            proper = [d for d in range(1, n) if n % d == 0]
+            subsets = [()] + [tuple(d for d in proper if rng.random() < 0.5) for _ in range(40)]
+            for subset in subsets:
+                self.assertEqual(
+                    li.multi_energy(primes, exponents, set(subset)),
+                    direct_energy(n, subset),
+                    (primes, exponents, subset),
+                )
+
+
 class Certificates(unittest.TestCase):
     def test_maximal_at_small_primes(self):
         """E(p) is the maximum over all masks, attained exactly by the maximisers, for p >= p0."""

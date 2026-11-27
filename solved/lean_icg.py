@@ -104,6 +104,34 @@ def cell_table(a, b, p0, k):
     return [shift(p0, cell_p(a, b, k, e)) for e in range((a + 1) * (b + 1))]
 
 
+def multi_energy(primes, exponents, divisors):
+    """The right side of `Solved.ICG.Multi.energy_icgAdj_multi` at concrete primes.
+
+    sum over classes u of |sum over cells c with prod r^c in S of prod_i Tent(r_i, a_i, u_i, c_i)|,
+    both over the exponent box; `Tent` is `tent_p` evaluated at the prime.
+    """
+    from itertools import product as cartesian
+
+    box = list(cartesian(*(range(a + 1) for a in exponents)))
+    chosen = []
+    for c in box:
+        value = 1
+        for r, e in zip(primes, c):
+            value *= r**e
+        if value in divisors:
+            chosen.append(c)
+    total = 0
+    for u in box:
+        entry = 0
+        for c in chosen:
+            term = 1
+            for r, a, ui, ci in zip(primes, exponents, u, c):
+                term *= peval(tent_p(a, ui, ci), r)
+            entry += term
+        total += abs(entry)
+    return total
+
+
 def model_energy(a, b, p, mask):
     """sum_e |sum_{k in mask} cellP k e (p)|: the energy of ICG(2^a p^b, S) for S's mask."""
     m = (a + 1) * (b + 1)
@@ -454,6 +482,7 @@ GENERAL = {
         "Solved.ICG.certifyAt_sound",
         "Solved.ICG.energy_le_of_certifyAt",
     ],
+    "formal/Formal/ICG/MultiBridge.lean": ["Solved.ICG.Multi.energy_icgAdj_multi"],
 }
 FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"
 
@@ -497,7 +526,7 @@ def render_axioms(records):
     """A test file that fails to build unless every theorem rests on the standard axioms only."""
     names = [n for module in registry(records)["modules"] for n in module["theorems"]]
     out = """\
-import Formal.ICG.EvenFamilies
+import Formal
 
 /-!
 # Axiom audit for the energy certificates

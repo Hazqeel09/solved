@@ -30,6 +30,12 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/MultiBridge.lean",
+      "theorems": [
+        "Solved.ICG.Multi.energy_icgAdj_multi"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

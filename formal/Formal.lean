@@ -14,3 +14,4 @@ import Formal.ICG.EvenPacked
 import Formal.ICG.EvenGraph
 import Formal.ICG.EvenAt
 import Formal.ICG.EvenFamilies
+import Formal.ICG.MultiBridge

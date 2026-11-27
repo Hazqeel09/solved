@@ -1,4 +1,4 @@
-import Formal.ICG.EvenFamilies
+import Formal
 
 /-!
 # Axiom audit for the energy certificates
@@ -27,6 +27,10 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 /-- info: 'Solved.ICG.energy_le_of_certifyAt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.energy_le_of_certifyAt
+
+/-- info: 'Solved.ICG.Multi.energy_icgAdj_multi' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.energy_icgAdj_multi
 
 /-- info: 'Solved.ICG.Families.energy_1_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
