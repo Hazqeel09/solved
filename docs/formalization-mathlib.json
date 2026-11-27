@@ -42,6 +42,12 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/MultiGraph.lean",
+      "theorems": [
+        "Solved.ICG.Multi.energy_le_of_certifyM"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",
