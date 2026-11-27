@@ -1,0 +1,58 @@
+{
+  "toolchain": "leanprover/lean4:v4.34.1",
+  "project": "formal",
+  "audit": "formal/FormalTests/Axioms.lean",
+  "scope": "Kernel-checked energy certificates for integral circulant graphs, built with Mathlib and H. Dong's ai4math-results bridge. The audit file fails the build unless each registered theorem depends only on propext, Classical.choice and Quot.sound.",
+  "modules": [
+    {
+      "file": "formal/Formal/ICG/EvenCert.lean",
+      "theorems": [
+        "Solved.ICG.certify_sound"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/EvenPacked.lean",
+      "theorems": [
+        "Solved.ICG.certifyP_sound"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/EvenGraph.lean",
+      "theorems": [
+        "Solved.ICG.energy_le_of_certifyP"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/EvenAt.lean",
+      "theorems": [
+        "Solved.ICG.certifyAt_sound",
+        "Solved.ICG.energy_le_of_certifyAt"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/EvenFamilies.lean",
+      "theorems": [
+        "Solved.ICG.Families.energy_1_1",
+        "Solved.ICG.Families.energy_1_2",
+        "Solved.ICG.Families.energy_1_3",
+        "Solved.ICG.Families.energy_1_4",
+        "Solved.ICG.Families.energy_1_5",
+        "Solved.ICG.Families.energy_1_6",
+        "Solved.ICG.Families.energy_1_7",
+        "Solved.ICG.Families.energy_2_1",
+        "Solved.ICG.Families.energy_2_2",
+        "Solved.ICG.Families.energy_2_3",
+        "Solved.ICG.Families.energy_2_4",
+        "Solved.ICG.Families.energy_3_1",
+        "Solved.ICG.Families.energy_3_1_at_3",
+        "Solved.ICG.Families.energy_3_2",
+        "Solved.ICG.Families.energy_3_3",
+        "Solved.ICG.Families.energy_4_1",
+        "Solved.ICG.Families.energy_4_2",
+        "Solved.ICG.Families.energy_5_1",
+        "Solved.ICG.Families.energy_6_1",
+        "Solved.ICG.Families.energy_7_1"
+      ]
+    }
+  ]
+}

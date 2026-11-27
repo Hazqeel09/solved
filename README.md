@@ -2,7 +2,7 @@
 
 A growing collection of mathematical problems, constructions, proof drafts and reproducible checks. Entries are organized by subject and can extend to any area of mathematics.
 
-**Current catalogue:** 32 entries, comprising 27 research proof drafts and 5 finite verification records. Twenty-seven Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, its computable-threshold extension, and the obstruction to marked-root reconstruction. Independent mathematical review remains pending.
+**Current catalogue:** 33 entries, comprising 28 research proof drafts and 5 finite verification records. Twenty-seven Lean modules include supporting lemmas and complete formalizations of the squaring counterexample, the main additive subtraction-gap theorem, its computable-threshold extension, and the obstruction to marked-root reconstruction. A separate Mathlib project, `formal/` (see the [verification guide](docs/verification.md#mathlib-project)), kernel-checks maximal-energy theorems for integral circulant graphs of order $2^ap^b$. Independent mathematical review remains pending.
 
 [Browse the catalogue](CONTENTS.md) · [Verification guide](docs/verification.md) · [Open questions](docs/open-questions.md) · [Contributing](CONTRIBUTING.md)
 
@@ -10,7 +10,7 @@ A growing collection of mathematical problems, constructions, proof drafts and r
 
 These are exact computer certificates in Python. They are **not claimed as results** until each has a Lean formalization and a statement correspondence. That work is in progress.
 
-- [Integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md): certificates for 49 order families. The 19 families $3^ap^b$ reproduce known theorems (Jiang–Yang, Dong). No earlier treatment was found for the other 30, which include every even order listed and a ratio-dependent maximiser for $2p^2q$.
+- [Integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md): certificates for 49 order families. The 19 families $3^ap^b$ reproduce known theorems (Jiang–Yang, Dong). No earlier treatment was found for the other 30, which include every even order listed and a ratio-dependent maximiser for $2p^2q$. The 19 families $2^ap^b$ among them are now [Lean-verified](results/icg-energy-even-orders/PROOF.md); the 11 orders with three or more primes still await Lean verification.
 - [Roldán's conjecture for ICG(p²q³)](results/icg-energy-p2q3/PROOF.md): an independent re-verification of a result already proved by Park, Schreib, Jiang–Yang and Dong.
 - [Matroid polynomial checks on q-uniform matroids](results/q-uniform-matroid-checks/PROOF.md): negative evidence on 9,371 matroids for open conjectures.
 
@@ -26,6 +26,7 @@ These are exact computer certificates in Python. They are **not claimed as resul
 | [A counterexample to universal AM squaring stability](results/square-instability/PROOF.md) | [✅ Complete](results/square-instability/FORMALIZATION.md) |
 | [Effective cutoffs for square-run arithmetic controls](results/effective-control-cutoffs/PROOF.md) | [✅ Complete](results/effective-control-cutoffs/FORMALIZATION.md) |
 | [An obstruction to simultaneous square-root retention](results/root-retention-obstruction/PROOF.md) | [✅ Complete](results/root-retention-obstruction/FORMALIZATION.md) |
+| [Maximal-energy integral circulant graphs of order 2^a p^b](results/icg-energy-even-orders/PROOF.md) | [✅ Complete](results/icg-energy-even-orders/FORMALIZATION.md) |
 | [An all-length block classification of two-small-step chains](results/two-small-steps/PROOF.md) | 🟡 Supporting lemmas |
 | [The counting exponent at every fixed AM defect](results/fixed-defect-counting/PROOF.md) | 🟡 Supporting lemmas |
 | [Well-ordering and global order type of real AM defects](results/am-defect-order/PROOF.md) | 🟡 Supporting lemmas |

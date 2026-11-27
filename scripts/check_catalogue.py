@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 STATUSES = {"open", "proof-draft", "finite-verification", "reviewed-proof", "withdrawn"}
 LEAN_BEGIN = "<!-- BEGIN GENERATED LEAN STATUS -->"
 LEAN_END = "<!-- END GENERATED LEAN STATUS -->"
+# Theorem registries: the Lean 4.8 core project lean/ and the Mathlib project formal/.
+REGISTRIES = ("docs/formalization.json", "docs/formalization-mathlib.json")
 
 
 def local_file(root, name):
@@ -92,10 +94,10 @@ def validate(data, root):
                 or any(not isinstance(n, str) for n in named)
             ):
                 raise ValueError(f"{slug}: complete formalization needs named theorem declarations")
-            registry = json.loads(local_file(root, "docs/formalization.json").read_text())
             declared = {
                 theorem
-                for module in registry["modules"]
+                for name in REGISTRIES
+                for module in json.loads(local_file(root, name).read_text())["modules"]
                 if module["file"] in files
                 for theorem in module["theorems"]
             }
@@ -129,7 +131,40 @@ def validate(data, root):
     actual = {p.relative_to(root).as_posix() for p in (root / "results").glob("*/PROOF.md")}
     if actual != {item["proof"] for item in entries}:
         raise ValueError("every manuscript must have exactly one catalogue entry")
+    validate_mathlib_registry(root)
     return entries
+
+
+def validate_mathlib_registry(root):
+    """Registered Mathlib-project theorems exist, are complete, and are all axiom-audited.
+
+    The audit itself runs when the Lean project builds: each `#guard_msgs` fails unless the
+    theorem depends exactly on propext, Classical.choice and Quot.sound.
+    """
+    registry = json.loads(local_file(root, REGISTRIES[1]).read_text())
+    names = []
+    for module in registry["modules"]:
+        source = local_file(root, module["file"]).read_text()
+        code = re.sub(r"--[^\n]*", "", re.sub(r"/-.*?-/", "", source, flags=re.S))
+        if re.search(r"\b(?:sorry|admit|native_decide)\b|^axiom ", code, re.M):
+            raise ValueError(f"unfinished proof or project axiom in {module['file']}")
+        namespaces = set(re.findall(r"^namespace ([A-Za-z_][\w.]*)$", source, re.M))
+        for name in module["theorems"]:
+            prefix, _, short = name.rpartition(".")
+            if prefix not in namespaces or not re.search(
+                rf"^theorem {re.escape(short)}\b", source, re.M
+            ):
+                raise ValueError(f"registered theorem not declared in {module['file']}: {name}")
+            names.append(name)
+    if len(set(names)) != len(names):
+        raise ValueError("duplicate registered theorem")
+    audit = local_file(root, registry["audit"]).read_text()
+    if set(re.findall(r"^#print axioms (\S+)$", audit, re.M)) != set(names):
+        raise ValueError("the axiom audit must cover exactly the registered theorems")
+    allowed = "[propext, Classical.choice, Quot.sound]"
+    expected = {f"/-- info: '{n}' depends on axioms: {allowed} -/" for n in names}
+    if set(re.findall(r"^/-- info: .* -/$", audit, re.M)) != expected:
+        raise ValueError("every audited theorem must be guarded against nonstandard axioms")
 
 
 def check_links(root):

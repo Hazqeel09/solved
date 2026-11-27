@@ -1,9 +1,12 @@
 import json
 import random
+import shutil
+import tempfile
 import unittest
 from itertools import product
+from pathlib import Path
 
-from scripts.check_catalogue import ROOT
+from scripts.check_catalogue import REGISTRIES, ROOT, validate_mathlib_registry
 from solved import lean_icg as li
 from solved.icg_energy import direct_energy
 
@@ -148,11 +151,62 @@ class Rendering(unittest.TestCase):
         self.assertEqual(
             (formal / "FormalTests/Axioms.lean").read_text(), li.render_axioms(RECORDS)
         )
+        self.assertEqual((ROOT / REGISTRIES[1]).read_text(), li.render_registry(RECORDS))
+        manuscript = (ROOT / "results/icg-energy-even-orders/PROOF.md").read_text()
+        self.assertEqual(manuscript, li.update_table(manuscript, RECORDS))
 
     def test_axiom_audit_lists_every_family(self):
         text = li.render_axioms(RECORDS)
         for a, b in EVEN:
             self.assertIn(f"#print axioms Solved.ICG.Families.energy_{a}_{b}\n", text)
+
+
+class Registry(unittest.TestCase):
+    """The repository check rejects registries the Lean audit would not back."""
+
+    def copy(self):
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp)
+        registry = json.loads((ROOT / REGISTRIES[1]).read_text())
+        for name in [REGISTRIES[1], registry["audit"]] + [m["file"] for m in registry["modules"]]:
+            (tmp / name).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(ROOT / name, tmp / name)
+        return tmp, registry
+
+    def test_current_registry_passes(self):
+        tmp, _ = self.copy()
+        validate_mathlib_registry(tmp)
+
+    def test_rejects_missing_audit_line(self):
+        tmp, registry = self.copy()
+        audit = tmp / registry["audit"]
+        name = registry["modules"][-1]["theorems"][0]
+        audit.write_text(audit.read_text().replace(f"#print axioms {name}\n", ""))
+        with self.assertRaises(ValueError):
+            validate_mathlib_registry(tmp)
+
+    def test_rejects_weakened_guard(self):
+        tmp, registry = self.copy()
+        audit = tmp / registry["audit"]
+        audit.write_text(audit.read_text().replace("Quot.sound]", "Quot.sound, sorryAx]", 1))
+        with self.assertRaises(ValueError):
+            validate_mathlib_registry(tmp)
+
+    def test_rejects_sorry_in_code_but_not_in_comments(self):
+        tmp, registry = self.copy()
+        module = tmp / registry["modules"][0]["file"]
+        module.write_text(module.read_text() + "\n-- a remark about sorry\n")
+        validate_mathlib_registry(tmp)
+        module.write_text(module.read_text() + "\ntheorem bad : False := sorry\n")
+        with self.assertRaises(ValueError):
+            validate_mathlib_registry(tmp)
+
+    def test_rejects_undeclared_theorem(self):
+        tmp, registry = self.copy()
+        registry["modules"][0]["theorems"].append("Solved.ICG.no_such_theorem")
+        (tmp / REGISTRIES[1]).write_text(json.dumps(registry))
+        with self.assertRaises(ValueError):
+            validate_mathlib_registry(tmp)
 
 
 if __name__ == "__main__":

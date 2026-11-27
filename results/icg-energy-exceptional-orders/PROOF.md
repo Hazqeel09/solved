@@ -1,6 +1,6 @@
 # Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3
 
-**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version.
+**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version. The 19 families $2^ap^b$ (with $n=24$ for the exceptional prime of $2^3p$) are now Lean theorems about graph energy: see [Maximal-energy integral circulant graphs of order $2^ap^b$](../icg-energy-even-orders/PROOF.md).
 
 ## Setting and prior results
 
@@ -14,7 +14,7 @@ Earlier work covers the following:
 - **Odd total exponent, any number of distinct odd primes, each odd-exponent prime at least 5.** The even-Ω set is the unique maximiser [JY26a, Thm A].
 - **Two distinct odd primes, same parity, $p,q\ge5$.** Exactly the odd-Ω set and the even-Ω set without $n$ [JY26b, Thm A].
 - **Two distinct odd primes with the prime 3.** Dong [D26] gives Lean-formalized theorems for all opposite-parity orders $p^{2r}3^{2s+1}$ and for all same-parity orders in which one prime is 3 or one exponent is at most 2. With [JY26a, JY26b], every order $p^aq^b$ with $p,q$ distinct odd primes is settled.
-- **The value for $pq$**, from Sander–Sander.
+- **The value for $pq$** with $p,q$ distinct odd primes: [SS11, §1] records $E_{\max}(pq)=E_{\max}(p)E_{\max}(q)$, a comparison of four divisor sets. It does not cover $2p$.
 - **Roldán's $p^2q^3$ case**, by Park, Schreib, the Omega Institute and Dong (see the companion entry).
 
 **Novelty of the rows below (literature checked 27 November 2026).** Rows for $3^ap^b$ reproduce theorems of [JY26a] and [D26]; they serve here only as independent consistency checks. For the remaining 30 order families, we found no earlier treatment in the papers and public repositories above, or by web search:

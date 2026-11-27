@@ -1173,7 +1173,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "Exact Python certificates (awaiting Lean verification) determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8.",
+      "statement": "Exact Python certificates determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. The 19 families 2^a p^b are Lean-verified in the entry icg-energy-even-orders; the others await Lean verification.",
       "proof": "results/icg-energy-exceptional-orders/PROOF.md",
       "tests": [
         "test_icg_families.py",
@@ -1218,6 +1218,85 @@
       ],
       "dependencies": [
         "icg-energy-p2q3"
+      ]
+    },
+    {
+      "id": "icg-energy-even-orders",
+      "title": "Maximal-energy integral circulant graphs of order 2^a p^b",
+      "subject": "Spectral graph theory",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For every odd prime p and n = 2^a p^b with a, b >= 1 and (a+1)(b+1) <= 16, every set S of proper divisors of n satisfies E(ICG(n, S)) <= E_max(p), with equality exactly for the listed divisor sets (19 families; 2^3 p is stated for p >= 5 and n = 24 separately). Kernel-checked in Lean from Mathlib's eigenvalues through H. Dong's spectral bridge. No earlier treatment was found beyond n = 2p, which is a hand computation; the search may be incomplete.",
+      "proof": "results/icg-energy-even-orders/PROOF.md",
+      "tests": [
+        "test_lean_icg.py"
+      ],
+      "implementation": [
+        "solved/lean_icg.py",
+        "scripts/lean_icg_families.py",
+        "checks/expected/icg-families.json"
+      ],
+      "formalization": {
+        "status": "complete",
+        "files": [
+          "formal/Formal/ICG/EvenFamilies.lean",
+          "formal/Formal/ICG/EvenGraph.lean",
+          "formal/Formal/ICG/EvenAt.lean",
+          "formal/Formal/ICG/EvenPacked.lean",
+          "formal/Formal/ICG/EvenCert.lean",
+          "formal/Formal/ICG/LocalPoly.lean",
+          "formal/Formal/Cert/PackedBB.lean",
+          "formal/Formal/Cert/Pack.lean",
+          "formal/Formal/Cert/BranchBound.lean",
+          "formal/FormalTests/Axioms.lean"
+        ],
+        "statement_correspondence": "results/icg-energy-even-orders/FORMALIZATION.md",
+        "theorems": [
+          "Solved.ICG.Families.energy_1_1",
+          "Solved.ICG.Families.energy_1_2",
+          "Solved.ICG.Families.energy_1_3",
+          "Solved.ICG.Families.energy_1_4",
+          "Solved.ICG.Families.energy_1_5",
+          "Solved.ICG.Families.energy_1_6",
+          "Solved.ICG.Families.energy_1_7",
+          "Solved.ICG.Families.energy_2_1",
+          "Solved.ICG.Families.energy_2_2",
+          "Solved.ICG.Families.energy_2_3",
+          "Solved.ICG.Families.energy_2_4",
+          "Solved.ICG.Families.energy_3_1",
+          "Solved.ICG.Families.energy_3_1_at_3",
+          "Solved.ICG.Families.energy_3_2",
+          "Solved.ICG.Families.energy_3_3",
+          "Solved.ICG.Families.energy_4_1",
+          "Solved.ICG.Families.energy_4_2",
+          "Solved.ICG.Families.energy_5_1",
+          "Solved.ICG.Families.energy_6_1",
+          "Solved.ICG.Families.energy_7_1",
+          "Solved.ICG.energy_le_of_certifyP",
+          "Solved.ICG.energy_le_of_certifyAt"
+        ],
+        "scope": "Every row of the table is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved end to end from Mathlib's eigenvalues through Dong's bridge and checked with decide +kernel, without native_decide. Odd orders, three or more primes, more than 16 exponent cells, closed forms in a or b, and novelty are outside this formalization."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1109.3616",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2608.29523",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://arxiv.org/abs/2610.36883",
+          "recorded": "2026-11-27"
+        },
+        {
+          "url": "https://github.com/Horace-Maxwell/ai4math-results/tree/6334a95f2e0c2396f492f3476c1d4ce80e4106ab/lean",
+          "recorded": "2026-11-27"
+        }
+      ],
+      "dependencies": [
+        "icg-energy-exceptional-orders"
       ]
     }
   ]

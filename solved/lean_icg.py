@@ -446,20 +446,22 @@ def render_from(path):
     return render(json.loads(Path(path).read_text()))
 
 
-GENERAL = [
-    "Solved.ICG.certify_sound",
-    "Solved.ICG.certifyP_sound",
-    "Solved.ICG.certifyAt_sound",
-    "Solved.ICG.energy_le_of_certifyP",
-    "Solved.ICG.energy_le_of_certifyAt",
-]
+GENERAL = {
+    "formal/Formal/ICG/EvenCert.lean": ["Solved.ICG.certify_sound"],
+    "formal/Formal/ICG/EvenPacked.lean": ["Solved.ICG.certifyP_sound"],
+    "formal/Formal/ICG/EvenGraph.lean": ["Solved.ICG.energy_le_of_certifyP"],
+    "formal/Formal/ICG/EvenAt.lean": [
+        "Solved.ICG.certifyAt_sound",
+        "Solved.ICG.energy_le_of_certifyAt",
+    ],
+}
+FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"
 
 AXIOMS = "[propext, Classical.choice, Quot.sound]"
 
 
-def render_axioms(records):
-    """A test file that fails to build unless every theorem rests on the standard axioms only."""
-    names = list(GENERAL)
+def family_theorems(records):
+    names = []
     for r in _even(records):
         a, b = r["order"][0][1], r["order"][1][1]
         names.append(f"Solved.ICG.Families.energy_{a}_{b}")
@@ -467,6 +469,33 @@ def render_axioms(records):
             f"Solved.ICG.Families.energy_{a}_{b}_at_{p}"
             for p in sorted(map(int, r["result"]["small_primes"]))
         ]
+    return names
+
+
+def registry(records):
+    """The theorem registry of the Mathlib project: exactly the theorems the audit covers."""
+    modules = [{"file": f, "theorems": names} for f, names in GENERAL.items()]
+    modules.append({"file": FAMILIES, "theorems": family_theorems(records)})
+    return {
+        "toolchain": "leanprover/lean4:v4.34.1",
+        "project": "formal",
+        "audit": "formal/FormalTests/Axioms.lean",
+        "scope": (
+            "Kernel-checked energy certificates for integral circulant graphs, built with Mathlib "
+            "and H. Dong's ai4math-results bridge. The audit file fails the build unless each "
+            "registered theorem depends only on propext, Classical.choice and Quot.sound."
+        ),
+        "modules": modules,
+    }
+
+
+def render_registry(records):
+    return json.dumps(registry(records), indent=2, ensure_ascii=False) + "\n"
+
+
+def render_axioms(records):
+    """A test file that fails to build unless every theorem rests on the standard axioms only."""
+    names = [n for module in registry(records)["modules"] for n in module["theorems"]]
     out = """\
 import Formal.ICG.EvenFamilies
 
@@ -489,3 +518,82 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 
 def axioms_from(path):
     return render_axioms(json.loads(Path(path).read_text()))
+
+
+def registry_from(path):
+    return render_registry(json.loads(Path(path).read_text()))
+
+
+# --- the results table of results/icg-energy-even-orders/PROOF.md ----------------------------
+
+TABLE_BEGIN = "<!-- BEGIN GENERATED TABLE -->"
+TABLE_END = "<!-- END GENERATED TABLE -->"
+
+
+def _divisor_text(c, e):
+    """2^c p^e in LaTeX, e.g. 4p^{2}."""
+    two = "" if c == 0 else str(2**c)
+    prime = "" if e == 0 else "p" if e == 1 else f"p^{{{e}}}"
+    return two + prime or "1"
+
+
+def _math_set(items):
+    return "$\\{" + ",".join(items) + "\\}$"
+
+
+def _poly_text(coeffs):
+    """A polynomial in p in LaTeX, highest degree first."""
+    terms = []
+    for i, c in reversed(list(enumerate(coeffs))):
+        if c == 0:
+            continue
+        mono = "" if i == 0 else "p" if i == 1 else f"p^{{{i}}}"
+        body = str(abs(c)) if i == 0 else mono if abs(c) == 1 else f"{abs(c)}{mono}"
+        terms.append(("-" if c < 0 else "+", body))
+    out = ("-" if terms[0][0] == "-" else "") + terms[0][1]
+    for sign, body in terms[1:]:
+        out += f"{sign}{body}"
+    return out
+
+
+def render_table(records):
+    rows = [
+        TABLE_BEGIN,
+        "",
+        "| Order | Primes | Maximal energy | Maximising divisor sets | Lean theorem |",
+        "|---|---|---|---|---|",
+    ]
+    for r in _even(records):
+        cert = family_certificate(r)
+        a, b = cert["a"], cert["b"]
+        order = ("2" if a == 1 else f"2^{{{a}}}") + ("p" if b == 1 else f"p^{{{b}}}")
+        sets = "; ".join(
+            _math_set(_divisor_text(c, e) for c, e in sorted(cs, key=lambda t: (t[1], t[0])))
+            for cs in cert["cells"]
+        )
+        rows.append(
+            f"| ${order}$ | $p\\ge{cert['p0']}$ | ${_poly_text(cert['energy'])}$ | {sets} "
+            f"| `energy_{a}_{b}` |"
+        )
+        for small in small_prime_certificates(r):
+            p = small["p"]
+            n = 2 ** small["a"] * p ** small["b"]
+            sets = "; ".join(
+                _math_set(map(str, sorted(2**c * p**e for c, e in cs))) for cs in small["cells"]
+            )
+            rows.append(
+                f"| ${n}$ | $p={p}$ | ${small['energy']}$ | {sets} | `energy_{a}_{b}_at_{p}` |"
+            )
+    rows.extend(["", TABLE_END])
+    return "\n".join(rows)
+
+
+def update_table(text, records):
+    if text.count(TABLE_BEGIN) != 1 or text.count(TABLE_END) != 1:
+        raise ValueError("the manuscript needs exactly one generated table")
+    start, end = text.index(TABLE_BEGIN), text.index(TABLE_END) + len(TABLE_END)
+    return text[:start] + render_table(records) + text[end:]
+
+
+def table_from(path, manuscript):
+    return update_table(Path(manuscript).read_text(), json.loads(Path(path).read_text()))

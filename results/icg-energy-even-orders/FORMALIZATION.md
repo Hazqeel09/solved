@@ -1,0 +1,25 @@
+# Formal statement correspondence
+
+The main claim is the table in [PROOF.md](PROOF.md): for each listed order $n=2^ap^b$ and every odd prime $p$ in the stated range, every set $S$ of proper divisors of $n$ satisfies $E(\mathrm{ICG}(n,S))\le E_{\max}$, with equality exactly for the listed sets. Each row is one theorem in [`formal/Formal/ICG/EvenFamilies.lean`](../../formal/Formal/ICG/EvenFamilies.lean), in the Lean 4.34.1 / Mathlib project `formal/`.
+
+| Mathematical object or step | Lean definition or theorem |
+|---|---|
+| The adjacency matrix of $\mathrm{ICG}(n,S)$: $A_{xy}=1$ iff $\gcd(y-x,n)\in S$, over `Fin n` | `ICGBridge.icgAdj n S` (H. Dong, ai4math-results) |
+| Its energy, the sum of the absolute values of its eigenvalues (Mathlib's spectral theorem) | `ICGBridge.energy (ICGBridge.icgAdj n S) (ICGBridge.icgAdj_isHermitian _ _)` |
+| $S$ is a set of proper divisors of $n$ | `S ⊆ (2 ^ a * p ^ b).properDivisors`, or `S ⊆ Nat.properDivisors 24` |
+| $p$ is a prime in the stated range | `hp : p.Prime`, `hp0 : p₀ ≤ p` |
+| The row for $2^ap^b$ | `Solved.ICG.Families.energy_a_b` |
+| The row for $n=24$ | `Solved.ICG.Families.energy_3_1_at_3` |
+| Energy as the $L^1$ norm of $T_a(2)\,Y\,T_b(p)^{\mathsf T}$ | `ICGGeneral.energy_icgAdj_pq` (Dong), specialized in `Solved.ICG.energy_eq_L1mat` |
+| Divisor sets as masks on the exponent box, and back | `maskOfDivs`, `divsOfMask`, `divsOfMask_maskOfDivs`, `maskOfDivs_divsOfMask` |
+| Entries as integer polynomials in $p$ | `entryP`, `eval_entryP`, `L1mat_eq` (local factors `tentP`, `eval_tentP` against Dong's `Tent`) |
+| The packed branch-and-bound certificate and its soundness | `certifyP`, `Solved.ICG.certifyP_sound`; search `Solved.Cert.Packed.bnbP`, `bnbP_sound`; node test `nodeTest_spec` |
+| The certificate at one prime and its soundness | `certifyAt`, `Solved.ICG.certifyAt_sound` |
+| From a certificate to graph energy | `Solved.ICG.energy_le_of_certifyP`, `Solved.ICG.energy_le_of_certifyAt` |
+| A successful check of each certificate | `cert_a_b`, `certAt_3_1_3`, by `decide +kernel` |
+
+The energy is Mathlib's sum of absolute eigenvalues of the real symmetric adjacency matrix, with multiplicity; it is not a formula assumed from the literature. The conversion to Ramanujan sums is Dong's proved bridge. Every row covers all subsets of proper divisors, the empty set included. The table's polynomials are stated over $\mathbb R$ as functions of the prime $p$.
+
+**Trust.** The checks are ordinary kernel reductions (`decide +kernel`), not `native_decide`. [`formal/FormalTests/Axioms.lean`](../../formal/FormalTests/Axioms.lean) fails the build unless every registered theorem depends exactly on `propext`, `Classical.choice` and `Quot.sound`. `python -m scripts.check_catalogue` checks that this audit covers exactly the theorems in [`docs/formalization-mathlib.json`](../../docs/formalization-mathlib.json). The data in the certificates comes from an untrusted generator; it cannot affect soundness.
+
+**Outside this formalization.** Orders with an odd part that is not a prime power, orders with three or more distinct primes, families with more than 16 exponent cells, closed forms in $a$ or $b$, and every claim about novelty or priority. The remaining 30 families of [the companion entry](../icg-energy-exceptional-orders/PROOF.md) (the 19 families $3^ap^b$ and 11 orders with three or more primes) remain Python certificates.

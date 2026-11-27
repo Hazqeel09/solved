@@ -16,13 +16,13 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.certifyP_sound
 
-/-- info: 'Solved.ICG.certifyAt_sound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
-#guard_msgs in
-#print axioms Solved.ICG.certifyAt_sound
-
 /-- info: 'Solved.ICG.energy_le_of_certifyP' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.energy_le_of_certifyP
+
+/-- info: 'Solved.ICG.certifyAt_sound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.certifyAt_sound
 
 /-- info: 'Solved.ICG.energy_le_of_certifyAt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

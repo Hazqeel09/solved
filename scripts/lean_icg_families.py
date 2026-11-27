@@ -1,19 +1,24 @@
 """Write the generated Lean energy certificates, or check that they are up to date (--check).
 
-Outputs formal/Formal/ICG/EvenFamilies.lean (certificates and graph-energy theorems) and
-formal/FormalTests/Axioms.lean (axiom audit), from checks/expected/icg-families.json.
+Outputs formal/Formal/ICG/EvenFamilies.lean (certificates and graph-energy theorems),
+formal/FormalTests/Axioms.lean (axiom audit), docs/formalization-mathlib.json (theorem
+registry of the Mathlib project) and the results table of
+results/icg-energy-even-orders/PROOF.md, from checks/expected/icg-families.json.
 """
 
 import argparse
 import sys
 
 from scripts.check_catalogue import ROOT
-from solved.lean_icg import axioms_from, render_from
+from solved.lean_icg import axioms_from, registry_from, render_from, table_from
 
 SOURCE = ROOT / "checks" / "expected" / "icg-families.json"
+MANUSCRIPT = ROOT / "results" / "icg-energy-even-orders" / "PROOF.md"
 TARGETS = {
     ROOT / "formal" / "Formal" / "ICG" / "EvenFamilies.lean": render_from,
     ROOT / "formal" / "FormalTests" / "Axioms.lean": axioms_from,
+    ROOT / "docs" / "formalization-mathlib.json": registry_from,
+    MANUSCRIPT: lambda source: table_from(source, MANUSCRIPT),
 }
 
 
