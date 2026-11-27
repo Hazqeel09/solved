@@ -10,7 +10,9 @@ from functools import lru_cache
 from math import isqrt
 
 from .chains import Chain, level
+from .chains import _ChainBuilder as _Builder
 from .menu_programs import shortest_from_menu, validate_limits
+from .power_roots import reduce_power_square
 from .seven_steps import catalogue as seven_catalogue
 from .square_controls import encode
 from .two_small_forms import square_run
@@ -26,28 +28,6 @@ class RootReduction:
     @property
     def saved_instructions(self):
         return self.source_length - len(self.chain.recipes)
-
-
-class _Builder:
-    def __init__(self, chain):
-        self.values = list(chain.values)
-        self.recipes = list(chain.recipes)
-        self.positions = {value: i for i, value in enumerate(self.values)}
-
-    def append(self, op, left, right):
-        if left not in self.positions or right not in self.positions:
-            raise ArithmeticError("root construction requests an unavailable operand")
-        value = left + right if op == "+" else left * right
-        if value <= self.values[-1]:
-            raise ArithmeticError("root construction is not strictly increasing")
-        a, b = sorted((self.positions[left], self.positions[right]))
-        self.recipes.append((op, a, b))
-        self.positions[value] = len(self.values)
-        self.values.append(value)
-        return value
-
-    def finish(self):
-        return Chain(tuple(self.values), tuple(self.recipes))
 
 
 def _prefix(chain, index):
@@ -176,8 +156,11 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
     source_length = len(recipes)
     word = "".join("S" if level(values[i]) == level(values[i - 1]) else "G" for i in events[2:])
     late_small = word in ("GGS", "GGSG")
-    if len(events) not in (3, 4, 7) and not late_small:
-        raise ValueError("supported sectors are three, four, seven, GGS and GGSG")
+    known_sector = len(events) in (3, 4, 7) or late_small
+    if not known_sector and not all(_power_of_two(v) for v in values):
+        raise ValueError(
+            "supported sectors are three, four, seven, GGS, GGSG and power-only histories"
+        )
 
     def result(output, rule):
         encode(output)
@@ -189,6 +172,8 @@ def reduce_square(chain, *, max_states=100_000, max_pairs=1_000_000):
 
     if values[-1] == values[-2] ** 2:
         return result(_prefix(chain, source_length - 1), "trailing_square")
+    if not known_sector:
+        return result(reduce_power_square(chain), "power_exponents")
     if len(events) == 4 or late_small:
         if root in values[:-1]:
             return result(_prefix(chain, values.index(root)), "retained_root")

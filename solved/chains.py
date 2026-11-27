@@ -17,6 +17,32 @@ class Chain:
     recipes: tuple[tuple[str, int, int], ...]
 
 
+class _ChainBuilder:
+    """Internal append-only builder, starting from an already validated chain."""
+
+    def __init__(self, chain):
+        self.values = list(chain.values)
+        self.recipes = list(chain.recipes)
+        self.positions = {value: i for i, value in enumerate(self.values)}
+
+    def append(self, op, left, right):
+        if op not in ("+", "*"):
+            raise ValueError("an AM operation is required")
+        if left not in self.positions or right not in self.positions:
+            raise ArithmeticError("chain construction requests an unavailable operand")
+        value = left + right if op == "+" else left * right
+        if value <= self.values[-1]:
+            raise ArithmeticError("chain construction is not strictly increasing")
+        a, b = sorted((self.positions[left], self.positions[right]))
+        self.recipes.append((op, a, b))
+        self.positions[value] = len(self.values)
+        self.values.append(value)
+        return value
+
+    def finish(self):
+        return Chain(tuple(self.values), tuple(self.recipes))
+
+
 def chains(limit: int, max_small: int = 2):
     """Visit every distinct value sequence once, retaining one recipe per step."""
     level(limit)

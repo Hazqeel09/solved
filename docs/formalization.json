@@ -328,6 +328,14 @@
       ]
     },
     {
+      "file": "lean/PowerChainLift.lean",
+      "theorems": [
+        "SolvedPowerLift.values_increasing",
+        "SolvedPowerLift.lift_endpoint",
+        "SolvedPowerLift.lift_root"
+      ]
+    },
+    {
       "file": "lean/RootSectorLemmas.lean",
       "theorems": [
         "SolvedRootBlocks.square_gap",

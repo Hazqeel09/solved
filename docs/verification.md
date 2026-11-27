@@ -55,6 +55,7 @@ This builds the complete import closure and prints the axiom dependencies of eve
 | [FiniteBasis](../lean/FiniteBasis.lean) | A total recursive reference search, strict box-rank descent, exact coverage and minimal-generator pruning. |
 | [ArithmeticBasis](../lean/ArithmeticBasis.lean) | Complete basis membership, exact-solution inclusion and safe per-domain cutoffs using the concrete arithmetic oracle. |
 | [RootSectorLemmas](../lean/RootSectorLemmas.lean) | Elementary square gaps, power-of-two factors, a complete three-operation/four-operation exchange identity, and paired-cofactor/boundary-square identities supporting the partial root-closure result. |
+| [PowerChainLift](../lean/PowerChainLift.lean) | A valid AM chain from any increasing addition-only chain, with the initial 2 write charged and the endpoint/root identity proved. The low-step classification and exponent extraction remain outside this formalization. |
 | [UniversalCutoff](../lean/UniversalCutoff.lean) | Finite clipping/control coverage and a computable universal threshold for arbitrary AM programs and the additive subtraction gap. |
 | [DirectedRecovery](../lean/DirectedRecovery.lean) | Agreement along functional paths and uniqueness under signed-cycle and seed coverage, given certified transport hypotheses. |
 | [ChainCoverage](../lean/ChainCoverage.lean) | Nonsquare-predecessor marking and reconstruction of gaps between marks in increasing AM chains. |

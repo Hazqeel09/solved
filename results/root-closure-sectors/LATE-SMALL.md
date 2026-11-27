@@ -234,8 +234,9 @@ GSG, SGGG or GSGG. Their elimination is not claimed here.
 ## 7. Verification and limits
 
 The existing shared-support solver is reused, without a second synthesis
-implementation. The API admits the two new event words and still rejects
-the other five-/six-event words. Configured resource exhaustion raises
+implementation. The API admits the two new event words. The later
+[power-only extension](POWER-HISTORIES.md) also admits other event words
+when every source value is a power of two; other histories remain rejected. Configured resource exhaustion raises
 `ResourceLimit`; it does not report mathematical infeasibility.
 
 The complete finite checker independently enumerates legal chains and

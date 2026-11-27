@@ -45,6 +45,7 @@ class RootSectorTests(unittest.TestCase):
                 "retained_root",
                 "four_event_menu",
                 "late_small_menu",
+                "power_exponents",
             },
         )
 

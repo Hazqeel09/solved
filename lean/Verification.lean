@@ -23,3 +23,4 @@ import FiniteBasis
 import ArithmeticBasis
 import UniversalCutoff
 import RootSectorLemmas
+import PowerChainLift
