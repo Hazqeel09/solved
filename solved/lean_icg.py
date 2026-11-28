@@ -490,6 +490,9 @@ GENERAL = {
         "Solved.ICG.Multi.Families.ratio_ne_zero",
         "Solved.ICG.Multi.Families.energy_2_p2_q_gt_A",
         "Solved.ICG.Multi.Families.energy_2_p2_q_gt_B",
+        "Solved.ICG.Multi.Families.ratio3_ne_zero",
+        "Solved.ICG.Multi.Families.energy_2_p3_q_gt_A",
+        "Solved.ICG.Multi.Families.energy_2_p3_q_gt_B",
     ],
 }
 FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"

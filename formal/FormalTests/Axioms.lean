@@ -56,6 +56,18 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.Multi.Families.energy_2_p2_q_gt_B
 
+/-- info: 'Solved.ICG.Multi.Families.ratio3_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.ratio3_ne_zero
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p3_q_gt_A' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p3_q_gt_A
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p3_q_gt_B' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p3_q_gt_B
+
 /-- info: 'Solved.ICG.Families.energy_1_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Families.energy_1_1

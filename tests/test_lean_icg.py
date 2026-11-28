@@ -240,6 +240,38 @@ class MultiCertificates(unittest.TestCase):
         ]
         # 2p - 3 divides 13: p in {1, 2, 8}, all excluded by p > q >= 3 and primality
         self.assertEqual(zeros, [(1, 1), (2, 4), (8, 8)])
+
+    def test_ratio_2p3q(self):
+        """MultiRatio: E_1 = E_3 = E_4 and E_1 - E_2 = 2(7p^3 - 9p^2q + 18pq - 16p - 9q + 8)."""
+        record = next(r for r in RECORDS if r["order"] == [[2, 1], ["p", 3], ["q", 1]])
+        cert = li.max_certificate(record)
+        e1, e2, e3, e4 = cert["Es"]
+        self.assertEqual(e1, e3)
+        self.assertEqual(e1, e4)
+        self.assertNotEqual(e1, e2)
+        primes = [n for n in range(3, 400) if all(n % d for d in range(2, int(n**0.5) + 1))]
+        seen = set()
+        for q in primes:
+            for p in primes:
+                if p <= q:
+                    continue
+                ea, eb = (
+                    sum(c * p**i * q**j for i, row in enumerate(E) for j, c in enumerate(row))
+                    for E in (e1, e2)
+                )
+                d = 7 * p**3 - 9 * p * p * q + 18 * p * q - 16 * p - 9 * q + 8
+                self.assertEqual(ea - eb, 2 * d)
+                self.assertNotEqual(d, 0)
+                seen.add(d > 0)
+        self.assertEqual(seen, {True, False})
+        # (p - 1)(9q(p - 1) - 7p^2 - 7p + 9) = -1 has no solution with p - 1 >= 3
+        zeros = [
+            (p, q)
+            for p in range(4, 300)
+            for q in range(0, 300)
+            if 7 * p**3 - 9 * p * p * q + 18 * p * q - 16 * p - 9 * q + 8 == 0
+        ]
+        self.assertEqual(zeros, [])
         self.assertEqual([p for p in range(2, 50) if 13 % (2 * p - 3) == 0], [2, 8])
 
     def test_masks_match_cells(self):

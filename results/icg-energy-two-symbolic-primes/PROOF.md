@@ -52,7 +52,9 @@ The twenty certificates check in about two minutes.
 
 *Proof* (`ratio_ne_zero`, `energy_2_p2_q_gt_A`, `energy_2_p2_q_gt_B`). The difference is a polynomial identity. A zero would give $(2p-3)(12q-10p-15)=13$ with $2p-3\ge7$, so $2p-3=13$ and $p=8$, which is not prime. The rest follows from the candidate row. $\square$
 
-For $2p^3q$ three of the four candidates share one energy polynomial, so the winning energy is the larger of two polynomials; its sign boundary is not worked out here.
+**Corollary.** Let $p,q$ be primes with $3\le q<p$ and $n=2p^3q$. Three candidates, $A_1=\{1,2p,p^2,2p^3,q,2q,p^2q,2p^2q\}$, $A_2=\{1,2,p^2,2p^2,2q,pq,2p^2q,p^3q\}$ and $A_3=\{2,p,2p^2,p^3,q,2q,p^2q,2p^2q\}$, share the energy $E_1$; the fourth is $B=\{1,2,p,2p^3,2pq,p^2q,2p^2q,p^3q\}$ with energy $E_2$. Then $E_1-E_2=2(7p^3-9p^2q+18pq-16p-9q+8)$, which never vanishes. If it is positive, the maximisers are exactly $A_1,A_2,A_3$; if negative, $B$ is the unique maximiser. $A$ wins at $(5,3)$ and $B$ at $(103,101)$.
+
+*Proof* (`ratio3_ne_zero`, `energy_2_p3_q_gt_A`, `energy_2_p3_q_gt_B`). A zero would give $(p-1)\bigl(9q(p-1)-7p^2-7p+9\bigr)=-1$ with $p-1\ge3$. $\square$
 
 ## Trusted base
 

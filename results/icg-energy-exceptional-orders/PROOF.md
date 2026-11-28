@@ -164,7 +164,7 @@ Conjectural generalizations of these tables are being checked for novelty. They 
 
 - The certificate covers the 49 listed orders, plus the stated residual enumerations.
 - The 17- and 19-cell cases cited under the conjectures came from exploratory runs of the same functions. They are not in the registered certificate.
-- The convex certificates show that the maximisers lie among the listed candidates. Which candidate wins at a given pair is decided by the explicit candidate energy polynomials stored in the certificate. For $2p^3q$ with $p>q$, those boundaries are not worked out in closed form here.
+- The convex certificates show that the maximisers lie among the listed candidates. Which candidate wins at a given pair is decided by the explicit candidate energy polynomials stored in the certificate. For $2p^3q$ with $p>q$ the boundary is the sign of $7p^3-9p^2q+18pq-16p-9q+8$, which never vanishes at primes; this is Lean-verified in the [two-symbolic-prime entry](../icg-energy-two-symbolic-primes/PROOF.md).
 
 ## References
 

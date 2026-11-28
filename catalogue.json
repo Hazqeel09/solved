@@ -1173,7 +1173,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "Exact Python certificates determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. The 19 families 2^a p^b are Lean-verified in the entry icg-energy-even-orders, and the two-symbolic-prime orders, including the 2p^2q sign rule, in icg-energy-two-symbolic-primes; the 3^a p^b rows reproduce known theorems.",
+      "statement": "Exact Python certificates determine every maximal-energy divisor set of ICG(n, D), for all admissible primes, for 49 order families: 2^a p^b and 3^a p^b with at most 15 divisor cells, and 2pq, 3pq, 2^2pq, 2p^2q, 3^2pq, 3p^2q, 2p^3q, 6pq, 3*5*7*p, 15pq, 35pq with symbolic primes. The 3^a p^b rows reproduce theorems of Jiang-Yang and Dong; for the other 30 families no earlier treatment was found. For n = 2p^2q the maximiser depends on the sign of 5p^2 - 6pq + 9q - 8. The 19 families 2^a p^b are Lean-verified in the entry icg-energy-even-orders, and the two-symbolic-prime orders, including the sign rules for 2p^2q and 2p^3q, in icg-energy-two-symbolic-primes; the 3^a p^b rows reproduce known theorems.",
       "proof": "results/icg-energy-exceptional-orders/PROOF.md",
       "tests": [
         "test_icg_families.py",
@@ -1305,7 +1305,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "For 2pq, 3pq, 4pq, 9pq, 3p^2q, 6pq, 15pq and 35pq with distinct primes p, q in the stated ranges, and for 2p^2q and 2p^3q with p < q, every set S of proper divisors satisfies E(ICG(n, S)) <= E_max(p, q), with equality exactly for the listed divisor sets. For 2p^2q and 2p^3q with p > q the maximisers lie among listed candidates with explicit energies; for 2p^2q with 3 <= q < p the unique maximiser is A or B according to the sign of 5p^2 - 6pq + 9q - 8, which never vanishes. Kernel-checked in Lean through a spectral bridge for k distinct primes. No earlier determination of these maximisers was found; the search may be incomplete.",
+      "statement": "For 2pq, 3pq, 4pq, 9pq, 3p^2q, 6pq, 15pq and 35pq with distinct primes p, q in the stated ranges, and for 2p^2q and 2p^3q with p < q, every set S of proper divisors satisfies E(ICG(n, S)) <= E_max(p, q), with equality exactly for the listed divisor sets. For 2p^2q and 2p^3q with p > q the maximisers lie among listed candidates with explicit energies; for 2p^2q with 3 <= q < p the unique maximiser is A or B according to the sign of 5p^2 - 6pq + 9q - 8, which never vanishes; for 2p^3q the maximisers are three sets sharing one energy or a fourth set, according to the sign of 7p^3 - 9p^2q + 18pq - 16p - 9q + 8. Kernel-checked in Lean through a spectral bridge for k distinct primes. No earlier determination of these maximisers was found; the search may be incomplete.",
       "proof": "results/icg-energy-two-symbolic-primes/PROOF.md",
       "tests": [
         "test_lean_icg.py"
@@ -1352,7 +1352,7 @@
           "Solved.ICG.Multi.energy_icgAdj_multi",
           "Solved.ICG.Multi.energy_le_of_certifyM"
         ],
-        "scope": "Every row of the table is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved from Mathlib's eigenvalues through a k-prime spectral bridge and checked with decide +kernel, without native_decide. Which candidate wins for 2p^3q with p > q, other orders, and novelty are outside this formalization."
+        "scope": "Every row of the table is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved from Mathlib's eigenvalues through a k-prime spectral bridge and checked with decide +kernel, without native_decide. Other orders and novelty are outside this formalization."
       },
       "sources": [
         {
