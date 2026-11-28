@@ -2,8 +2,9 @@
 
 The Lean build re-checks every certificate; these tests compare the generator's data with independent
 oracles: the exact chain recursion, the Ramanujan-sum energy (solved.icg_energy.direct_energy) and the
-eigenvalues of the adjacency matrix itself."""
+eigenvalues of the circulant adjacency matrix itself."""
 
+import cmath
 import random
 import re
 import unittest
@@ -12,7 +13,6 @@ from functools import lru_cache
 from itertools import combinations
 from math import gcd
 
-import numpy as np
 from sympy import Poly, Rational
 
 from scripts.check_catalogue import ROOT
@@ -108,19 +108,19 @@ class GraphEnergy(unittest.TestCase):
             self.assertEqual(direct_energy(n, sorted(lean_maximiser(p, b))), closed(p, b), (p, b))
 
     def test_adjacency_eigenvalues(self):
-        """The literal adjacency matrix of ICG(n, S*) has energy equal to the closed form."""
+        """The adjacency matrix of ICG(n, S*) has energy equal to the closed form. Its first row is
+        a_k = [k != 0 and gcd(k, n) in S*]; a circulant matrix has eigenvalues sum_k a_k w^(jk),
+        w = exp(2 pi i / n), computed here directly (independent of the Ramanujan-sum formula)."""
         for p, b in [(3, 2), (3, 3), (5, 2), (7, 1)]:
             n = 2 * p**b
             S = lean_maximiser(p, b)
-            A = np.array(
-                [
-                    [1.0 if i != j and gcd(i - j, n) in S else 0.0 for j in range(n)]
-                    for i in range(n)
-                ]
-            )
-            self.assertAlmostEqual(
-                float(np.abs(np.linalg.eigvalsh(A)).sum()), closed(p, b), places=6
-            )
+            row = [1 if k and gcd(k, n) in S else 0 for k in range(n)]
+            eig = [
+                sum(a * cmath.exp(2j * cmath.pi * j * k / n) for k, a in enumerate(row))
+                for j in range(n)
+            ]
+            self.assertTrue(all(abs(e.imag) < 1e-9 for e in eig))
+            self.assertAlmostEqual(sum(abs(e.real) for e in eig), closed(p, b), places=6)
 
 
 def lean_maximiser(p, b):
