@@ -40,6 +40,10 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.Multi.energy_le_of_certifyM
 
+/-- info: 'Solved.ICG.Multi.certifyMax_sound' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.certifyMax_sound
+
 /-- info: 'Solved.ICG.Families.energy_1_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Families.energy_1_1

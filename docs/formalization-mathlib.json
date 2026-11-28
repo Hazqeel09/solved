@@ -48,6 +48,12 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/MultiMax.lean",
+      "theorems": [
+        "Solved.ICG.Multi.certifyMax_sound"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

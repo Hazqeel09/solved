@@ -148,6 +148,30 @@ theorem inner_eq {s : Shape k} {Dx Dy : ℕ} {ks : List ℕ} (hperm : ks.Perm (L
     · simp
   rw [List.map_congr_left this, (hperm.map _).sum_eq, sum_map_range]
 
+/-- The value of entry `e` of the table a mask accumulates. -/
+theorem valueW_accT {s : Shape k} {Dx Dy : ℕ} {ks : List ℕ}
+    (hperm : ks.Perm (List.range (size s.a - 1)))
+    (hb : ∀ e < size s.a, ∀ kc ∈ ks, BPoly.bounded Dx Dy (s.cellB (dec s.a e) (dec s.a kc)) = true)
+    (L : List Bool) {e : ℕ} (he : e < size s.a) (x y : ℤ) :
+    valueW (Dx * Dy) (monos Dy x y) ((accT (tblM s Dx Dy) L ks).get e) =
+      ∑ kc ∈ range (size s.a - 1),
+        if bit L kc then BPoly.eval (s.cellB (dec s.a e) (dec s.a kc)) x y else 0 := by
+  rw [← inner_eq hperm hb L he x y, valueW]
+  refine sum_congr rfl fun d hd => ?_
+  rw [coeff_accT, chosenT]
+  congr 1
+  refine congrArg List.sum (List.map_congr_left fun kc _ => ?_)
+  rw [tabT_flat _ _ kc (mem_range.1 hd)]
+
+/-- The energy of a mask is the sum of the absolute values of its accumulated entries. -/
+theorem energyAt_eq {s : Shape k} {Dx Dy : ℕ} {ks : List ℕ}
+    (hperm : ks.Perm (List.range (size s.a - 1)))
+    (hb : ∀ e < size s.a, ∀ kc ∈ ks, BPoly.bounded Dx Dy (s.cellB (dec s.a e) (dec s.a kc)) = true)
+    (L : List Bool) (x y : ℤ) :
+    energyAt s L x y = ∑ e ∈ range (size s.a),
+      |valueW (Dx * Dy) (monos Dy x y) ((accT (tblM s Dx Dy) L ks).get e)| :=
+  sum_congr rfl fun e he => by rw [valueW_accT hperm hb L (mem_range.1 he)]
+
 /-- What a successful certificate proves, at every point `x, y ≥ 0` of the region. -/
 theorem certifyM_sound {s : Shape k} {w Dx Dy : ℕ} {E : BPoly} {ks : List ℕ} {star : List Bool}
     {others : List (List Bool)} (h : certifyM s w Dx Dy E ks star others = true) {x y : ℤ}
@@ -172,21 +196,9 @@ theorem certifyM_sound {s : Shape k} {w Dx Dy : ℕ} {E : BPoly} {ks : List ℕ}
   · -- the claimed maximisers, by coefficient signs
     obtain ⟨⟨hlen, hsigns⟩, hzero⟩ := hall L hL
     refine ⟨hlen, ?_⟩
-    have hsum : ∀ e < size s.a, valueW (Dx * Dy) (monos Dy x y) ((accT (tblM s Dx Dy) L ks).get e) =
-        ∑ kc ∈ range (size s.a - 1),
-          if bit L kc then BPoly.eval (s.cellB (dec s.a e) (dec s.a kc)) x y else 0 := by
-      intro e he
-      rw [← inner_eq hperm' hb' L he x y, valueW]
-      refine sum_congr rfl fun d hd => ?_
-      rw [coeff_accT, chosenT]
-      congr 1
-      refine congrArg List.sum (List.map_congr_left fun kc _ => ?_)
-      rw [tabT_flat _ _ kc (mem_range.1 hd)]
-    unfold energyAt
-    rw [← htarget, ← valueW_eq_of_allZero hzero, absSum, valueW_sumRange]
+    rw [energyAt_eq hperm' hb', ← htarget, ← valueW_eq_of_allZero hzero, absSum, valueW_sumRange]
     refine sum_congr rfl fun e he => ?_
-    rw [valueW_signed hω (List.all_eq_true.1 hsigns e (List.mem_range.2 (mem_range.1 he))),
-      hsum e (mem_range.1 he)]
+    rw [valueW_signed hω (List.all_eq_true.1 hsigns e (List.mem_range.2 (mem_range.1 he)))]
   · -- every other mask, by the packed search
     have hlenk : ∀ kc ∈ ks, ∀ f ∈ tblM s Dx Dy kc, f.length ≤ Dx * Dy := by
       intro kc _ f hf
