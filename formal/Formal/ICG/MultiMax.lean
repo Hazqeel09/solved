@@ -260,4 +260,55 @@ theorem certifyMax_sound {s : Shape k} {w Dx Dy G : ℕ} {Es : List BPoly} {i0 :
       simp only [zero_add]
       rw [inner_eq hperm' hb' L (mem_range.1 he) x y]
 
+/-! ## Graph energy -/
+
+theorem eval_target (s : Shape k) (E : BPoly) {p q : ℕ} {x y : ℤ} (h1 : s.σ1.val x y = p)
+    (h2 : s.σ2.val x y = q) : BPoly.eval (target s E) x y = BPoly.eval E p q := by
+  rw [target, BPoly.eval_subst]
+  have e1 : s.σ1.c0 + s.σ1.c1 * x + s.σ1.c2 * y = p := h1
+  have e2 : s.σ2.c0 + s.σ2.c1 * x + s.σ2.c2 * y = q := h2
+  rw [e1, e2]
+
+/-- What a successful candidate certificate proves about integral circulant graphs at the
+primes of a point of its region: a candidate's divisor set has exactly its energy, and every
+other set of proper divisors is strictly below one of the candidate energies. -/
+theorem energy_of_certifyMax {s : Shape k} {w Dx Dy G : ℕ} {Es : List BPoly} {i0 : ℕ}
+    {ks : List ℕ} {cands : List (List Bool)} {resid : List (List Bool × List ℕ)}
+    (h : certifyMax s w Dx Dy G Es i0 ks cands resid = true) {p q : ℕ} {x y : ℤ} (hx : 0 ≤ x)
+    (hy : 0 ≤ y) (h1 : s.σ1.val x y = p) (h2 : s.σ2.val x y = q) (hr : Primes (rOf s p q))
+    {S : Finset ℕ} (hS : S ⊆ (pw (rOf s p q) s.a).properDivisors) :
+    (∀ LE ∈ cands.zip Es, S = divsOfMask (rOf s p q) s.a LE.1 →
+      ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S)
+        (ICGBridge.icgAdj_isHermitian _ _) = ((BPoly.eval LE.2 p q : ℤ) : ℝ)) ∧
+    ((∀ L ∈ cands, S ≠ divsOfMask (rOf s p q) s.a L) →
+      ∃ E ∈ Es, ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S)
+        (ICGBridge.icgAdj_isHermitian _ _) < ((BPoly.eval E p q : ℤ) : ℝ)) := by
+  obtain ⟨-, hex, hlt⟩ := certifyMax_sound h hx hy
+  rw [energy_eq_energyAt s h1 h2 hr hS]
+  have hlen := length_maskOfDivs (rOf s p q) s.a S
+  refine ⟨fun LE hLE hSL => ?_, fun hne => ?_⟩
+  · obtain ⟨hl, he⟩ := hex LE hLE
+    have : maskOfDivs (rOf s p q) s.a S = LE.1 := by rw [hSL, maskOfDivs_divsOfMask hr hl]
+    rw [this, he, eval_target s LE.2 h1 h2]
+  · have hnot : maskOfDivs (rOf s p q) s.a S ∉ cands := fun hm =>
+      hne _ hm (divsOfMask_maskOfDivs hr hS).symm
+    obtain ⟨E, hE, hlt'⟩ := hlt _ hlen hnot
+    exact ⟨E, hE, by rw [← eval_target s E h1 h2]; exact_mod_cast hlt'⟩
+
+/-- The region `q ≥ q₀, p ≥ q + 2` for a candidate certificate. -/
+theorem energy_of_certifyMax_gt {s : Shape k} {w Dx Dy G : ℕ} {Es : List BPoly} {i0 : ℕ}
+    {ks : List ℕ} {cands : List (List Bool)} {resid : List (List Bool × List ℕ)}
+    (h : certifyMax s w Dx Dy G Es i0 ks cands resid = true) {q0 : ℕ}
+    (hσ1 : s.σ1 = ⟨(q0 : ℤ) + 2, 1, 1⟩) (hσ2 : s.σ2 = ⟨(q0 : ℤ), 0, 1⟩) {p q : ℕ} (hq0 : q0 ≤ q)
+    (hqp : q + 2 ≤ p) (hr : Primes (rOf s p q)) {S : Finset ℕ}
+    (hS : S ⊆ (pw (rOf s p q) s.a).properDivisors) :
+    (∀ LE ∈ cands.zip Es, S = divsOfMask (rOf s p q) s.a LE.1 →
+      ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S)
+        (ICGBridge.icgAdj_isHermitian _ _) = ((BPoly.eval LE.2 p q : ℤ) : ℝ)) ∧
+    ((∀ L ∈ cands, S ≠ divsOfMask (rOf s p q) s.a L) →
+      ∃ E ∈ Es, ICGBridge.energy (ICGBridge.icgAdj (pw (rOf s p q) s.a) S)
+        (ICGBridge.icgAdj_isHermitian _ _) < ((BPoly.eval E p q : ℤ) : ℝ)) :=
+  energy_of_certifyMax h (x := (p : ℤ) - q - 2) (y := (q : ℤ) - q0) (by omega) (by omega)
+    (by rw [hσ1, Affine.val]; ring) (by rw [hσ2, Affine.val]; ring) hr hS
+
 end Solved.ICG.Multi

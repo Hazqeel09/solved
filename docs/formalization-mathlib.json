@@ -54,6 +54,14 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/MultiRatio.lean",
+      "theorems": [
+        "Solved.ICG.Multi.Families.ratio_ne_zero",
+        "Solved.ICG.Multi.Families.energy_2_p2_q_gt_A",
+        "Solved.ICG.Multi.Families.energy_2_p2_q_gt_B"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",
@@ -88,11 +96,13 @@
         "Solved.ICG.Multi.Families.energy_4_p_q_lt",
         "Solved.ICG.Multi.Families.energy_4_p_q_gt",
         "Solved.ICG.Multi.Families.energy_2_p2_q_lt",
+        "Solved.ICG.Multi.Families.energy_2_p2_q_gt",
         "Solved.ICG.Multi.Families.energy_9_p_q_lt",
         "Solved.ICG.Multi.Families.energy_9_p_q_gt",
         "Solved.ICG.Multi.Families.energy_3_p2_q_lt",
         "Solved.ICG.Multi.Families.energy_3_p2_q_gt",
         "Solved.ICG.Multi.Families.energy_2_p3_q_lt",
+        "Solved.ICG.Multi.Families.energy_2_p3_q_gt",
         "Solved.ICG.Multi.Families.energy_6_p_q_lt",
         "Solved.ICG.Multi.Families.energy_6_p_q_gt",
         "Solved.ICG.Multi.Families.energy_15_p_q_lt",

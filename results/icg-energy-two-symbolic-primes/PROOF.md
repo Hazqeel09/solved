@@ -6,7 +6,7 @@
 
 For $n\ge2$ and a set $S$ of proper divisors of $n$, the integral circulant graph $\mathrm{ICG}(n,S)$ has vertex set $\mathbb Z_n$, with $x\sim y$ iff $\gcd(x-y,n)\in S$; its energy is the sum of the absolute values of the eigenvalues of its adjacency matrix.
 
-**Theorem.** For each row, let $p,q$ be distinct primes in the stated range. For every set $S$ of proper divisors of $n$ (the empty set included), $E(\mathrm{ICG}(n,S))$ is at most the listed polynomial in $p,q$, with equality exactly for the listed sets. Rows come in pairs for $p<q$ and $p>q$. For $2p^2q$ and $2p^3q$ only $p<q$ is formalized; for $p>q$ the maximiser depends on the ratio of the primes (see the [companion entry](../icg-energy-exceptional-orders/PROOF.md)), and that part remains a Python certificate.
+**Theorem.** For each row, let $p,q$ be distinct primes in the stated range. For every set $S$ of proper divisors of $n$ (the empty set included), $E(\mathrm{ICG}(n,S))$ is at most the listed polynomial in $p,q$, with equality exactly for the listed sets. Rows come in pairs for $p<q$ and $p>q$. For $2p^2q$ and $2p^3q$ with $p>q$ the maximiser depends on the primes. Those rows list candidate sets with their energies $E_j$: each candidate has energy $E_j$, and every other $S$ has energy below some $E_j$. The maximal energy is therefore $\max_jE_j$, attained exactly by the candidates whose energy equals it.
 
 <!-- BEGIN GENERATED MULTI TABLE -->
 
@@ -19,11 +19,13 @@ For $n\ge2$ and a set $S$ of proper divisors of $n$, the integral circulant grap
 | $4pq$ | $3\le p<q$ | $38pq-48p-48q+64$ | $\{1,2,4p,4q,pq,2pq\}$ | `energy_4_p_q_lt` |
 | $4pq$ | $3\le q<p$ | $38pq-48p-48q+64$ | $\{1,2,4p,4q,pq,2pq\}$ | `energy_4_p_q_gt` |
 | $2p^{2}q$ | $3\le p<q$ | $16p^{2}q-20p^{2}-12pq+16p-6q+8$ | $\{1,p,2p,2p^{2},2q,p^{2}q\}$ | `energy_2_p2_q_lt` |
+| $2p^{2}q$ | $3\le q<p$ | $\max\{E_1,E_2\}$ | $\{1,2,p^{2},2p^{2},q,2pq,p^{2}q\}$ with $E_1=16p^{2}q-10p^{2}-24pq+16p+12q-8$; $\{1,p,2p,2p^{2},2q,p^{2}q\}$ with $E_2=16p^{2}q-20p^{2}-12pq+16p-6q+8$ | `energy_2_p2_q_gt` |
 | $9pq$ | $5\le p<q$ | $112pq-140p-140q+180$ | $\{1,9,3p,3q,pq\}$; $\{3,p,9p,q,9q,3pq\}$ | `energy_9_p_q_lt` |
 | $9pq$ | $5\le q<p$ | $112pq-140p-140q+180$ | $\{1,9,3p,3q,pq\}$; $\{3,p,9p,q,9q,3pq\}$ | `energy_9_p_q_gt` |
 | $3p^{2}q$ | $5\le p<q$ | $38p^{2}q-48p^{2}-58pq+76p+28q-36$ | $\{1,3p,p^{2},3q,pq\}$; $\{3,p,3p^{2},q,3pq,p^{2}q\}$ | `energy_3_p2_q_lt` |
 | $3p^{2}q$ | $5\le q<p$ | $38p^{2}q-48p^{2}-58pq+76p+28q-36$ | $\{1,3p,p^{2},3q,pq\}$; $\{3,p,3p^{2},q,3pq,p^{2}q\}$ | `energy_3_p2_q_gt` |
 | $2p^{3}q$ | $3\le p<q$ | $22p^{3}q-28p^{3}-18p^{2}q+24p^{2}-12pq+16p+6q-8$ | $\{1,2,p,2p^{3},2pq,p^{2}q,2p^{2}q,p^{3}q\}$ | `energy_2_p3_q_lt` |
+| $2p^{3}q$ | $3\le q<p$ | $\max\{E_1,E_2,E_3,E_4\}$ | $\{1,2p,p^{2},2p^{3},q,2q,p^{2}q,2p^{2}q\}$ with $E_1=22p^{3}q-14p^{3}-36p^{2}q+24p^{2}+24pq-16p-12q+8$; $\{1,2,p,2p^{3},2pq,p^{2}q,2p^{2}q,p^{3}q\}$ with $E_2=22p^{3}q-28p^{3}-18p^{2}q+24p^{2}-12pq+16p+6q-8$; $\{1,2,p^{2},2p^{2},2q,pq,2p^{2}q,p^{3}q\}$ with $E_3=22p^{3}q-14p^{3}-36p^{2}q+24p^{2}+24pq-16p-12q+8$; $\{2,p,2p^{2},p^{3},q,2q,p^{2}q,2p^{2}q\}$ with $E_4=22p^{3}q-14p^{3}-36p^{2}q+24p^{2}+24pq-16p-12q+8$ | `energy_2_p3_q_gt` |
 | $6pq$ | $5\le p<q$ | $66pq-84p-84q+112$ | $\{1,2,3,6p,6q,pq,2pq,3pq\}$ | `energy_6_p_q_lt` |
 | $6pq$ | $5\le q<p$ | $66pq-84p-84q+112$ | $\{1,2,3,6p,6q,pq,2pq,3pq\}$ | `energy_6_p_q_gt` |
 | $15pq$ | $7\le p<q$ | $252pq-324p-324q+428$ | $\{1,15,3p,5p,3q,5q,pq\}$; $\{3,5,p,15p,q,15q,3pq,5pq\}$ | `energy_15_p_q_lt` |
@@ -40,8 +42,17 @@ The table and the Lean theorems are generated from `checks/expected/icg-families
 1. **Spectral bridge for $k$ primes.** `Solved.ICG.Multi.energy_icgAdj_multi` proves, for pairwise distinct primes $r_0,\dots,r_{k-1}$, that the energy of $\mathrm{ICG}(\prod r_i^{a_i},S)$ is $\sum_u\bigl|\sum_c[\prod r_i^{c_i}\in S]\prod_i T(r_i,a_i,u_i,c_i)\bigr|$ over the exponent box, with local Ramanujan factors $T$. It generalizes H. Dong's two-prime bridge, reusing its circulant-spectrum and character-sum lemmas, and replaces the two-prime steps by inclusion–exclusion over subsets of the primes.
 2. **Regions.** On $p<q$ the substitution $p=p_0+x$, $q=p_0+2+x+y$ covers every pair of distinct odd primes $p_0\le p<q$ by $x,y\ge0$; on $p>q$, $q=q_0+y$ and $p=q_0+2+x+y$. Every cell contribution becomes a polynomial in $x,y$, and a polynomial with nonnegative coefficients and a positive constant term is positive on the region.
 3. **Search.** The same proved packed branch-and-bound as for $2^ap^b$ runs on the coefficient tables, with monomial weights $x^iy^j$; the maximisers' exact energies are checked by coefficient signs.
+4. **Candidate regions.** For $2p^2q$ and $2p^3q$ with $p>q$, `certifyMax` runs the search against one candidate energy $E_{i_0}$, allowing every candidate and a list of residual sets to survive. For each residual set $R$ the kernel checks that $8$ times its coefficientwise absolute energy bound is below a mixture $\sum_jm_jE_j$ with $\sum_jm_j=8$, $m_j\ge0$, so $E(R)<\max_jE_j$. For $2p^2q$ no residual sets remain; for $2p^3q$ seven remain, five bounded by $E_2$ alone and two by $(E_1+3E_2)/4$.
 
-The eighteen certificates check in about two minutes.
+The twenty certificates check in about two minutes.
+
+## Which candidate wins for $2p^2q$
+
+**Corollary.** Let $p,q$ be primes with $3\le q<p$, and put $A=\{1,2,p^2,2p^2,q,2pq,p^2q\}$ and $B=\{1,p,2p,2p^2,2q,p^2q\}$. Then $E(A)-E(B)=2(5p^2-6pq+9q-8)$, and $5p^2-6pq+9q-8\ne0$. If it is positive, $A$ is the unique maximiser; if negative, $B$ is. Both cases occur: $A$ wins at $(p,q)=(5,3)$, and $B$ at $(103,101)$.
+
+*Proof* (`ratio_ne_zero`, `energy_2_p2_q_gt_A`, `energy_2_p2_q_gt_B`). The difference is a polynomial identity. A zero would give $(2p-3)(12q-10p-15)=13$ with $2p-3\ge7$, so $2p-3=13$ and $p=8$, which is not prime. The rest follows from the candidate row. $\square$
+
+For $2p^3q$ three of the four candidates share one energy polynomial, so the winning energy is the larger of two polynomials; its sign boundary is not worked out here.
 
 ## Trusted base
 

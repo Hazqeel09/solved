@@ -23,3 +23,4 @@ import Formal.ICG.MultiPacked
 import Formal.ICG.MultiGraph
 import Formal.ICG.MultiMax
 import Formal.ICG.MultiFamilies
+import Formal.ICG.MultiRatio

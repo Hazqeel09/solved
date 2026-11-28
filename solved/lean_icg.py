@@ -486,6 +486,11 @@ GENERAL = {
     "formal/Formal/ICG/MultiPacked.lean": ["Solved.ICG.Multi.certifyM_sound"],
     "formal/Formal/ICG/MultiGraph.lean": ["Solved.ICG.Multi.energy_le_of_certifyM"],
     "formal/Formal/ICG/MultiMax.lean": ["Solved.ICG.Multi.certifyMax_sound"],
+    "formal/Formal/ICG/MultiRatio.lean": [
+        "Solved.ICG.Multi.Families.ratio_ne_zero",
+        "Solved.ICG.Multi.Families.energy_2_p2_q_gt_A",
+        "Solved.ICG.Multi.Families.energy_2_p2_q_gt_B",
+    ],
 }
 FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"
 
@@ -510,7 +515,7 @@ def multi_theorems(records):
         if r["result"]["kind"] != "two-symbolic":
             continue
         for region, key in (("lt", "p<q"), ("gt", "p>q")):
-            if r["result"][key]["certificate"] == "exact":
+            if r["result"][key]["certificate"] == "exact" or region == "gt":
                 names.append(f"Solved.ICG.Multi.Families.energy_{multi_label(r['order'])}_{region}")
     return names
 
@@ -1004,7 +1009,7 @@ theorem energy_{label} {{p q : ℕ}} (hp : p.Prime) (hq : q.Prime) {hyps}{extra}
 
 
 MULTI_HEADER = """\
-import Formal.ICG.MultiGraph
+import Formal.ICG.MultiMax
 
 /-!
 # Maximal energy of multi-prime `ICG(n, S)`: kernel-checked region certificates
@@ -1036,6 +1041,9 @@ def render_multi(records):
         for region in ("lt", "gt"):
             key = "p<q" if region == "lt" else "p>q"
             if r["result"][key]["certificate"] != "exact":
+                if region == "gt":
+                    cert = max_certificate(r)
+                    body += render_max_cert(cert) + render_max_theorem(cert)
                 continue
             cert = multi_certificate(r, region)
             body += render_multi_cert(cert) + render_multi_theorem(cert)
@@ -1102,6 +1110,8 @@ def render_multi_table(records):
             continue
         for region, key in (("lt", "p<q"), ("gt", "p>q")):
             if r["result"][key]["certificate"] != "exact":
+                if region == "gt":
+                    rows.append(_max_table_row(max_certificate(r)))
                 continue
             cert = multi_certificate(r, region)
             order = cert["order"]
@@ -1125,6 +1135,23 @@ def render_multi_table(records):
     return "\n".join(rows)
 
 
+def _max_table_row(cert):
+    order = cert["order"]
+    names = [f"E_{j + 1}" for j in range(len(cert["Es"]))]
+    sets = "; ".join(
+        _math_set(
+            _math_cell(order, c) for c in sorted(cs, key=lambda c: mixed_enc(cert["shape"].a, c))
+        )
+        + f" with ${name}={_math_bivariate(E)}$"
+        for name, cs, E in zip(names, cert["cells"], cert["Es"])
+    )
+    label = multi_label(order) + "_gt"
+    return (
+        f"| ${_math_order(order)}$ | ${cert['p0']}\\le q<p$ | $\\max\\{{{','.join(names)}\\}}$ "
+        f"| {sets} | `energy_{label}` |"
+    )
+
+
 def update_multi_table(text, records):
     if text.count(MULTI_TABLE_BEGIN) != 1 or text.count(MULTI_TABLE_END) != 1:
         raise ValueError("the manuscript needs exactly one generated multi-prime table")
@@ -1135,3 +1162,207 @@ def update_multi_table(text, records):
 
 def multi_table_from(path, manuscript):
     return update_multi_table(Path(manuscript).read_text(), json.loads(Path(path).read_text()))
+
+
+# --- regions with several candidate maximisers (Formal/ICG/MultiMax.lean) -------------------
+
+MIX_GRID = 8
+
+
+def _poly_rows(terms):
+    deg = {}
+    for i, j, c in terms:
+        deg[(i, j)] = deg.get((i, j), 0) + c
+    return [
+        [deg.get((i, j), 0) for j in range(1 + max(j for _, j in deg))]
+        for i in range(1 + max(i for i, _ in deg))
+    ]
+
+
+def max_certificate(record):
+    """Lean data for certifyMax: a two-symbolic family on p > q with candidate maximisers."""
+    result = record["result"]
+    data = result["p>q"]
+    if data["certificate"] != "maximum-of-candidates":
+        raise ValueError("not a maximum-of-candidates region")
+    p0 = result["smallest_symbolic_prime"]
+    _, s1, s2 = next(r for r in regions(p0) if r[0] == "gt")
+    shape = MultiShape(record["order"], s1, s2)
+    N = shape.size
+    cells = [[shape.cell(e, kc) for e in range(N)] for kc in range(N - 1)]
+    Es = [_poly_rows(t) for t in data["candidate_energies"]]
+    tgs = [bsubst(E, s1, s2) for E in Es]
+    Dx = max([len(P) for row in cells for P in row] + [len(t) for t in tgs])
+    Dy = max([len(r) for row in cells for P in row for r in P] + [len(r) for t in tgs for r in t])
+    D = Dx * Dy
+    tables = [[bflat(Dx, Dy, P) for P in row] for row in cells]
+    flat_t = [bflat(Dx, Dy, t) for t in tgs]
+    masks = []
+    for divisor_set in data["candidates"]:
+        mask = [False] * (N - 1)
+        for c in divisor_set:
+            mask[mixed_enc(shape.a, c)] = True
+        masks.append(mask)
+    codes = {sum(1 << k for k, bit in enumerate(mk) if bit) for mk in masks}
+    order = list(range(N - 1))
+    k = len(Es)
+    mixes = [[MIX_GRID if a == i else 0 for a in range(k)] for i in range(k)]
+    mixes += [
+        [t if a == i else MIX_GRID - t if a == j else 0 for a in range(k)]
+        for i in range(k)
+        for j in range(i + 1, k)
+        for t in range(1, MIX_GRID)
+    ]
+    best = None
+    for i0 in range(k):
+        nodes, leaves = search_tables(tables, flat_t[i0], order, N, D)
+        if not codes <= set(leaves):
+            raise ValueError("a candidate was pruned")
+        resid = sorted(L for L in leaves if L not in codes)
+        if best is None or (len(resid), nodes) < (len(best[1]), best[2]):
+            best = (i0, resid, nodes)
+    i0, resid, nodes = best
+    residuals = []
+    for L in resid:
+        acc = [[0] * D for _ in range(N)]
+        for kc in range(N - 1):
+            if L >> kc & 1:
+                acc = [[x + y for x, y in zip(acc[e], tables[kc][e])] for e in range(N)]
+        bound = [MIX_GRID * sum(abs(acc[e][d]) for e in range(N)) for d in range(D)]
+        for m in mixes:
+            z = [sum(m[a] * flat_t[a][d] for a in range(k)) - bound[d] for d in range(D)]
+            if z[0] > 0 and all(v >= 0 for v in z):
+                residuals.append(([bool(L >> kc & 1) for kc in range(N - 1)], m))
+                break
+        else:
+            raise ValueError("a residual mask has no mixture certificate")
+    total = sum(abs(c) for kc in order for f in tables[kc] for c in f)
+    w = (4 * N * total + sum(abs(c) for c in flat_t[i0])).bit_length() + 1
+    return {
+        "order": record["order"],
+        "p0": p0,
+        "shape": shape,
+        "w": w,
+        "Dx": Dx,
+        "Dy": Dy,
+        "Es": Es,
+        "i0": i0,
+        "ks": order,
+        "nodes": nodes,
+        "masks": masks,
+        "cells": data["candidates"],
+        "residuals": residuals,
+    }
+
+
+def render_max_cert(cert):
+    s = cert["shape"]
+    label = multi_label(cert["order"]) + "_gt"
+    Es = (
+        "["
+        + ", ".join("[" + ", ".join(_lean_list(map(str, r)) for r in E) + "]" for E in cert["Es"])
+        + "]"
+    )
+    resid = _lean_list(
+        f"({_lean_bools(L)}, {_lean_list(map(str, m))})" for L, m in cert["residuals"]
+    )
+    return f"""\
+/-- The order `{multi_label(cert["order"]).replace("_", " ")}` on the region `q ≥ {cert["p0"]}, p ≥ q + 2`,
+where the maximiser depends on the primes. -/
+def shape_{label} : Shape {len(s.a)} :=
+  ⟨{_lean_vec(s.a)}, {_lean_vec(s.slot)}, {_lean_vec(s.fixed)}, ⟨{s.s1[0]}, {s.s1[1]}, {s.s1[2]}⟩,
+    ⟨{s.s2[0]}, {s.s2[1]}, {s.s2[2]}⟩⟩
+
+/-- The certificate for `{label}` ({cert["nodes"]} search nodes, {len(cert["residuals"])} residual masks). -/
+theorem cert_{label} : certifyMax shape_{label} {cert["w"]} {cert["Dx"]} {cert["Dy"]} {MIX_GRID}
+    {Es} {cert["i0"]}
+    {_lean_list(map(str, cert["ks"]))}
+    {_lean_list(_lean_bools(mk) for mk in cert["masks"])}
+    {resid} = true := by
+  decide +kernel
+
+"""
+
+
+def render_max_theorem(cert):
+    order, p0 = cert["order"], cert["p0"]
+    label = multi_label(order) + "_gt"
+    shape = f"shape_{label}"
+    n = _order_text(order)
+    k = len(cert["Es"])
+    texts, codes_l = [], []
+    for cells in cert["cells"]:
+        coded = sorted(cells, key=lambda c: mixed_enc(cert["shape"].a, c))
+        codes_l.append([mixed_enc(cert["shape"].a, c) for c in coded])
+        texts.append("{" + ", ".join(_cell_text(order, c) for c in coded) + "}")
+    energies = [_bivariate_text(E) for E in cert["Es"]]
+    graph = f"ICGBridge.energy (ICGBridge.icgAdj ({n}) S) (ICGBridge.icgAdj_isHermitian _ _)"
+    big = [r for r, _ in order if isinstance(r, int) and r >= p0]
+    extra = "".join(f" (hp{f} : p ≠ {f}) (hq{f} : q ≠ {f})" for f in big)
+    claims = [f"(S = {t} → {graph} = {e})" for t, e in zip(texts, energies)]
+    others = " → ".join(f"S ≠ {t}" for t in texts)
+    below = " ∨ ".join(f"{graph} < {e}" for e in energies)
+    docs = "; ".join(
+        f"`{t}` with energy `{e.replace('(p : ℝ)', 'p').replace('(q : ℝ)', 'q')}`"
+        for t, e in zip(texts, energies)
+    )
+    haves = ""
+    for j, (mask, t, codes, E, e) in enumerate(
+        zip(cert["masks"], texts, codes_l, cert["Es"], energies)
+    ):
+        El = "[" + ", ".join(_lean_list(map(str, r)) for r in E) + "]"
+        haves += f"""\
+  have h{j} : divsOfMask (rOf {shape} p q) {shape}.a {_lean_bools(mask)} = {t} := by
+    rw [divsOfMask, show List.filter (bit {_lean_bools(mask)})
+      (List.range (size {shape}.a - 1)) = {_lean_list(map(str, codes))} from rfl]
+    simp [pw, rOf, {shape}, Fin.prod_univ_succ, dec, stride, rad] <;> ring_nf
+  have e{j} : ((BPoly.eval {El} (p : ℤ) (q : ℤ) : ℤ) : ℝ) = {e} := by
+    simp only [BPoly.eval_cons, BPoly.eval_nil, UPoly.eval_cons, UPoly.eval_nil]; push_cast; ring
+"""
+    parts = []
+    for j in range(k):
+        parts.append(
+            f"fun hS{j} => by\n      have := hc (_, _) (List.mem_iff_getElem.2 ⟨{j}, by decide, rfl⟩)"
+            f" (hS{j}.trans h{j}.symm)\n      rwa [e{j}] at this"
+        )
+    rcases_l = " | ".join("rfl" for _ in range(k))
+    nots = " ".join(f"n{j}" for j in range(k))
+    ne_cases = "\n".join(f"    · rw [h{j}]; exact n{j}" for j in range(k))
+
+    def disj(j):
+        inner = f"(by rwa [e{j}] at hlt)"
+        out = inner if j == k - 1 else f"Or.inl {inner}"
+        for _ in range(j):
+            out = f"Or.inr ({out})"
+        return out
+
+    e_cases = "\n".join(f"  · exact {disj(j)}" for j in range(k))
+    return f"""\
+/-- **`n = {n}`, `{p0} ≤ q < p`.** Here the maximiser depends on the primes. For all primes
+`p, q` with `{p0} ≤ q < p` and every set `S` of proper divisors of `n`, the candidates are {docs};
+every other `S` has energy below one of these, so the maximal energy is the largest of them. -/
+theorem energy_{label} {{p q : ℕ}} (hp : p.Prime) (hq : q.Prime) (hq0 : {p0} ≤ q) (hqp : q < p){extra}
+    {{S : Finset ℕ}} (hS : S ⊆ ({n}).properDivisors) :
+    {" ∧\n    ".join(claims)} ∧
+    ({others} →
+      {below}) := by
+  have hgap : q + 2 ≤ p := add_two_le_of_lt hq hp (by omega) (by omega) hqp
+  have hn : pw (rOf {shape} p q) {shape}.a = {n} := by
+    simp [pw, rOf, {shape}, Fin.prod_univ_succ]; ring
+  have hr : Primes (rOf {shape} p q) := by
+    refine ⟨fun i => ?_, fun i j hij => ?_⟩
+    · fin_cases i <;> simp [rOf, {shape}] <;> first | assumption | norm_num
+    · fin_cases i <;> fin_cases j <;> simp [rOf, {shape}] at hij ⊢ <;> omega
+  have h := energy_of_certifyMax_gt cert_{label} rfl rfl hq0 hgap hr (S := S) (by rw [hn]; exact hS)
+  rw [hn] at h
+  obtain ⟨hc, hl⟩ := h
+{haves}  refine ⟨{", ".join(parts)}, fun {nots} => ?_⟩
+  obtain ⟨E, hE, hlt⟩ := hl fun L hL => by
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hL
+    rcases hL with {rcases_l}
+{ne_cases}
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at hE
+  rcases hE with {rcases_l}
+{e_cases}
+
+"""

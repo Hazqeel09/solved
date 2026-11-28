@@ -10,6 +10,14 @@ from scripts.check_catalogue import REGISTRIES, ROOT, validate_mathlib_registry
 from solved import lean_icg as li
 from solved.icg_energy import direct_energy
 
+
+def _prod(values):
+    out = 1
+    for v in values:
+        out *= v
+    return out
+
+
 RECORDS = json.loads((ROOT / "checks" / "expected" / "icg-families.json").read_text())
 EVEN = {
     (r["order"][0][1], r["order"][1][1]): r
@@ -148,6 +156,91 @@ class MultiCertificates(unittest.TestCase):
                         self.assertEqual(top, energy, (record["order"], p, q))
                         winners = {sub for sub, v in values.items() if v == top}
                         self.assertEqual(winners, claimed, (record["order"], p, q))
+
+    def test_candidate_regions_exhaustively(self):
+        """certifyMax data: candidates attain their energies, every other set is below one."""
+        found = 0
+        for record in RECORDS:
+            result = record["result"]
+            if result["kind"] != "two-symbolic" or result["p>q"]["certificate"] == "exact":
+                continue
+            found += 1
+            cert = li.max_certificate(record)
+            exps = [e for _, e in record["order"]]
+            self.assertEqual(len(cert["masks"]), len(cert["Es"]))
+            for p, q in [(5, 3), (7, 3), (7, 5), (11, 3), (13, 11), (23, 3)]:
+                if q < cert["p0"]:
+                    continue
+                primes = [p if r == "p" else q if r == "q" else r for r, _ in record["order"]]
+                full = list(product(*(range(a + 1) for a in exps)))
+                box = full[:-1]
+
+                def pw(c, primes=primes):
+                    value = 1
+                    for r, e in zip(primes, c):
+                        value *= r**e
+                    return value
+
+                tent = [
+                    [
+                        _prod(
+                            li.peval(li.tent_p(a, ui, ci), r)
+                            for r, a, ui, ci in zip(primes, exps, u, c)
+                        )
+                        for c in box
+                    ]
+                    for u in full
+                ]
+                values = {}
+                for code in range(1 << len(box)):
+                    chosen = [i for i in range(len(box)) if code >> i & 1]
+                    values[frozenset(box[i] for i in chosen)] = sum(
+                        abs(sum(row[i] for i in chosen)) for row in tent
+                    )
+                energies = [
+                    sum(c * p**i * q**j for i, row in enumerate(E) for j, c in enumerate(row))
+                    for E in cert["Es"]
+                ]
+                cand = [frozenset(map(tuple, cs)) for cs in cert["cells"]]
+                self.assertEqual(len(set(cand)), len(cand))
+                for cells, energy in zip(cand, energies):
+                    self.assertEqual(values[cells], energy, (record["order"], p, q))
+                    divisors = [pw(c) for c in cells]
+                    self.assertEqual(li.multi_energy(primes, exps, divisors), energy)
+                    self.assertEqual(direct_energy(pw(full[-1]), divisors), energy)
+                for cells, value in values.items():
+                    if cells not in cand:
+                        self.assertLess(value, max(energies), (record["order"], p, q, cells))
+        self.assertEqual(found, 2)
+
+    def test_ratio_2p2q(self):
+        """MultiRatio: E(A) - E(B) = 2(5p^2 - 6pq + 9q - 8), never zero at primes 3 <= q < p."""
+        record = next(r for r in RECORDS if r["order"] == [[2, 1], ["p", 2], ["q", 1]])
+        cert = li.max_certificate(record)
+        primes = [n for n in range(3, 400) if all(n % d for d in range(2, int(n**0.5) + 1))]
+        seen = set()
+        for q in primes:
+            for p in primes:
+                if p <= q:
+                    continue
+                ea, eb = (
+                    sum(c * p**i * q**j for i, row in enumerate(E) for j, c in enumerate(row))
+                    for E in cert["Es"]
+                )
+                d = 5 * p * p - 6 * p * q + 9 * q - 8
+                self.assertEqual(ea - eb, 2 * d)
+                self.assertNotEqual(d, 0)
+                seen.add(d > 0)
+        self.assertEqual(seen, {True, False})  # both theorems have instances
+        zeros = [
+            (p, q)
+            for p in range(1, 200)
+            for q in range(1, 200)
+            if 5 * p * p - 6 * p * q + 9 * q - 8 == 0
+        ]
+        # 2p - 3 divides 13: p in {1, 2, 8}, all excluded by p > q >= 3 and primality
+        self.assertEqual(zeros, [(1, 1), (2, 4), (8, 8)])
+        self.assertEqual([p for p in range(2, 50) if 13 % (2 * p - 3) == 0], [2, 8])
 
     def test_masks_match_cells(self):
         record = next(r for r in RECORDS if r["order"] == [[2, 1], ["p", 1], ["q", 1]])

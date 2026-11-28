@@ -44,6 +44,18 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.Multi.certifyMax_sound
 
+/-- info: 'Solved.ICG.Multi.Families.ratio_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.ratio_ne_zero
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p2_q_gt_A' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p2_q_gt_A
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p2_q_gt_B' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p2_q_gt_B
+
 /-- info: 'Solved.ICG.Families.energy_1_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Families.energy_1_1
@@ -152,6 +164,10 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.Multi.Families.energy_2_p2_q_lt
 
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p2_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p2_q_gt
+
 /-- info: 'Solved.ICG.Multi.Families.energy_9_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Multi.Families.energy_9_p_q_lt
@@ -171,6 +187,10 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 /-- info: 'Solved.ICG.Multi.Families.energy_2_p3_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Multi.Families.energy_2_p3_q_lt
+
+/-- info: 'Solved.ICG.Multi.Families.energy_2_p3_q_gt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.Multi.Families.energy_2_p3_q_gt
 
 /-- info: 'Solved.ICG.Multi.Families.energy_6_p_q_lt' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

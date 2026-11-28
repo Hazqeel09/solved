@@ -1,6 +1,6 @@
 # Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3
 
-**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version. The 19 families $2^ap^b$ (with $n=24$ for the exceptional prime of $2^3p$) are now Lean theorems about graph energy: see [Maximal-energy integral circulant graphs of order $2^ap^b$](../icg-energy-even-orders/PROOF.md). So are the orders with two symbolic primes, except $2p^2q$ and $2p^3q$ with $p>q$: see [two symbolic primes](../icg-energy-two-symbolic-primes/PROOF.md).
+**Status:** proof draft awaiting Lean verification and independent review. Each row is backed by an exact Python certificate; nothing here is claimed as a result until it is formalized in Lean. No conjectures are stated in this version. The 19 families $2^ap^b$ (with $n=24$ for the exceptional prime of $2^3p$) are now Lean theorems about graph energy: see [Maximal-energy integral circulant graphs of order $2^ap^b$](../icg-energy-even-orders/PROOF.md). So are the orders with two symbolic primes, including the candidate sets for $2p^2q$ and $2p^3q$ with $p>q$ and the theorem on $2p^2q$ below: see [two symbolic primes](../icg-energy-two-symbolic-primes/PROOF.md).
 
 ## Setting and prior results
 
@@ -152,7 +152,7 @@ These are not covered by any published theorem. The certificate also proves, wit
 $$A=\{1,q,p^2,p^2q,2,2pq,2p^2\},\qquad B=\{1,p,p^2q,2q,2p,2p^2\}.$$
 If $p<q$, $B$ is the unique maximiser. If $p>q$, then $E(A)-E(B)=2(5p^2-6pq+9q-8)$. The unique maximiser is $A$ when $5p^2-6pq+9q-8>0$, roughly $p>\tfrac65q$, and $B$ otherwise. Equality never occurs.
 
-*Proof.* The cases $p<q$ and $p>q$ are the two $2\cdot p^2\cdot q$ rows above (exact and convex certificates). The energy difference is a polynomial identity on the region. A tie would need $(6p-9)\mid(5p^2-8)$. Since $5p^2-8\equiv 13/4\pmod{2p-3}$, this forces $2p-3\mid 13$, so $p\in\{2,8\}$, which is impossible. $\square$
+*Proof.* The cases $p<q$ and $p>q$ are the two $2\cdot p^2\cdot q$ rows above (exact and convex certificates). The energy difference is a polynomial identity on the region. A tie would need $(6p-9)\mid(5p^2-8)$. Since $5p^2-8\equiv 13/4\pmod{2p-3}$, this forces $2p-3\mid 13$, so $p\in\{1,2,8\}$, which is impossible. $\square$ This theorem is Lean-verified as `energy_2_p2_q_gt_A`, `energy_2_p2_q_gt_B` and `ratio_ne_zero` (the case $p<q$ is `energy_2_p2_q_lt`).
 
 For example, $B$ wins at $(p,q)=(103,101)$ and $(127,109)$, and $A$ wins at $(131,107)$ and $(151,127)$, as the direct definition confirms. Order $2p^3q$ shows the same phenomenon with four candidates. In every proved case before this work, the maximiser was independent of the primes in its range. These examples show that even orders lose that universality.
 
