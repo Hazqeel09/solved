@@ -65,6 +65,13 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/TwoPowGraph.lean",
+      "theorems": [
+        "Solved.ICG.TwoPow.energy_le",
+        "Solved.ICG.TwoPow.energy_max"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

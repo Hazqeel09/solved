@@ -1226,7 +1226,7 @@
       "subject": "Spectral graph theory",
       "status": "proof-draft",
       "review": "independent-review-pending",
-      "statement": "For every odd prime p and n = 2^a p^b with a, b >= 1 and (a+1)(b+1) <= 16, every set S of proper divisors of n satisfies E(ICG(n, S)) <= E_max(p), with equality exactly for the listed divisor sets (19 families; 2^3 p is stated for p >= 5 and n = 24 separately). Kernel-checked in Lean from Mathlib's eigenvalues through H. Dong's spectral bridge. No earlier treatment was found beyond n = 2p, which is a hand computation; the search may be incomplete.",
+      "statement": "For every odd prime p and n = 2^a p^b with a, b >= 1 and (a+1)(b+1) <= 16, every set S of proper divisors of n satisfies E(ICG(n, S)) <= E_max(p), with equality exactly for the listed divisor sets (19 families; 2^3 p is stated for p >= 5 and n = 24 separately). For every a >= 2 and prime p >= 5, max_S E(ICG(2^a p, S)) = c_a p - d_a with c_a = (2^a(3a+4) + 2(-1)^a)/3 and d_a = (2^a(12a+10) + 8(-1)^a)/9, and the maximum is attained. Kernel-checked in Lean from Mathlib's eigenvalues through H. Dong's spectral bridge. No earlier treatment was found beyond n = 2p, which is a hand computation; the search may be incomplete.",
       "proof": "results/icg-energy-even-orders/PROOF.md",
       "tests": [
         "test_lean_icg.py"
@@ -1275,7 +1275,7 @@
           "Solved.ICG.energy_le_of_certifyP",
           "Solved.ICG.energy_le_of_certifyAt"
         ],
-        "scope": "Every row of the table is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved end to end from Mathlib's eigenvalues through Dong's bridge and checked with decide +kernel, without native_decide. Odd orders, three or more primes, more than 16 exponent cells, closed forms in a or b, and novelty are outside this formalization."
+        "scope": "Every row of the table, and the maximal energy of 2^a p for every a >= 2 and prime p >= 5 (energy_max), is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved end to end from Mathlib's eigenvalues through Dong's bridge; certificates are checked with decide +kernel, without native_decide. Odd orders, three or more primes, more than 16 exponent cells outside 2^a p, the maximisers of 2^a p for a >= 8, p = 3 for a >= 8, closed forms in b, and novelty are outside this formalization."
       },
       "sources": [
         {

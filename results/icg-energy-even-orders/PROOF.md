@@ -37,6 +37,10 @@ For $n\ge2$ and a set $S$ of proper divisors of $n$, the integral circulant grap
 
 The table is generated from `checks/expected/icg-families.json` by `python -m scripts.lean_icg_families`, which also writes the Lean theorems, so the two cannot drift apart.
 
+**Theorem (every $a$, $b=1$).** Let $p\ge5$ be prime and $a\ge2$. Then
+$$\max_S E(\mathrm{ICG}(2^ap,S))=c_a\,p-d_a,\qquad c_a=\frac{2^a(3a+4)+2(-1)^a}{3},\quad d_a=\frac{2^a(12a+10)+8(-1)^a}{9},$$
+over all sets $S$ of proper divisors, and the maximum is attained. For $a\le7$ this agrees with the rows above, which also cover $p=3$ and list every maximiser. Lean: `Solved.ICG.TwoPow.energy_max`; the proof is in *Proof for every $a$* below.
+
 ## Method
 
 1. **Spectral bridge.** H. Dong's Lean theorem `ICGGeneral.energy_icgAdj_pq` ([ai4math-results](https://github.com/Horace-Maxwell/ai4math-results/tree/6334a95f2e0c2396f492f3476c1d4ce80e4106ab/lean), Apache-2.0) identifies the energy of $\mathrm{ICG}(r^aq^b,S)$, for distinct primes $r,q$, with $\sum_{u,v}|M_{uv}|$. Here $M=T_a(r)\,Y\,T_b(q)^{\mathsf T}$, the matrix $Y$ is the indicator of $S$ on the exponent box $[0,a]\times[0,b]$, and $T$ holds local Ramanujan sums. The bridge assumes only that the primes are distinct, so it applies with $r=2$.
@@ -44,6 +48,20 @@ The table is generated from `checks/expected/icg-families.json` by `python -m sc
 3. **Branch and bound.** The divisor sets are searched one cell at a time. At each node, every completion's coefficients lie between the current values plus the sums of the negative parts and of the positive parts of the undecided cells. This bounds the energy of the whole subtree by a polynomial $\beta$, and the subtree is closed once $E(p)-\beta$ is certified positive. At the leaves a set either has smaller energy or is one of the claimed maximisers, whose energy is computed exactly from certified signs.
 4. **Kernel efficiency.** Kernel reduction costs about 100 µs per list element but a few µs per arithmetic operation on natural-number literals, which the kernel evaluates with GMP. The search therefore stores each coefficient table in one natural number with offset-encoded fields of $w$ bits. A node test is about twenty such operations: the fieldwise positive part takes two bitwise ands, a shift and a multiplication, and the block sums one multiplication. One global size condition, checked by the kernel, keeps every field inside its bits. All nineteen families and $n=24$ check in about one minute.
 5. **One prime.** The order $24$ uses the same search with constant tables.
+
+## Proof for every $a$ ($b=1$)
+
+Write $z_k,w_k\in\{0,1\}$ for the indicators of $2^k\in S$ and $2^kp\in S$ ($w_a=0$, since $2^ap=n$). Dong's path identity for $T_a(2)$ (`ICGGeneral.L1mat_path`) and $\|T_1(p)(\alpha,\beta)\|_1=F(\alpha,\beta):=(p-1)|\beta-\alpha|+|(p-1)\alpha+\beta|$ give
+$$E(\mathrm{ICG}(2^ap,S))=2^a\Bigl(F(\sigma_0,\tau_0)+\sum_{k<a}F(\sigma_k-\sigma_{k+1},\tau_k-\tau_{k+1})\Bigr),$$
+with $\sigma_a=z_a$, $\tau_a=0$, $\sigma_k=(\sigma_{k+1}+z_k)/2$ and $\tau_k=(\tau_{k+1}+w_k)/2$. The energy is thus a sum along a chain whose state $(\sigma,\tau)\in[0,1]^2$ moves by averaging with the next bits. Put $A=\tfrac43(p-1)$, $B=\tfrac23(p-2)$, $g=2p-\tfrac83$, $C=2p-\tfrac89$, $r=-\tfrac12$, and
+$$\Phi(s,t)=\max\bigl(Bt-As,\;As-Bt-(A-B)\bigr),\qquad W_n(s,t)=\tfrac12\bigl(ng+C+\tfrac89r^n+(1-r^{n-1})\Phi(s,t)\bigr).$$
+
+1. **Step.** For $s,t\in[0,1]$, bits $z,w$ and $n\ge1$: $F(\tfrac{z-s}2,\tfrac{w-t}2)+W_n(\tfrac{s+z}2,\tfrac{t+w}2)\le W_{n+1}(s,t)$. Both sides are affine in $\mu=r^{n-1}\in[-\tfrac12,1]$, so the two endpoints suffice; each endpoint is a piecewise linear inequality in $s,t$ with coefficients affine in $p$ (`step_one`, `step_half`, `step`).
+2. **Base.** Every chain of length two is at most $W_2$: sixteen bit patterns, each a piecewise linear inequality (`base_two`).
+3. **Induction.** Every chain of length $n\ge2$ below a top state is at most $W_n$ of that state (`chain_le`). At the top state $(z_a,0)$, $2^aW_a$ is largest for $z_a=1$, where it equals $c_ap-d_a$ (`Wb_top`).
+4. **Attainment.** Choosing $(z,w)=(1,0)$ where $\Phi$ takes its first branch and $(0,1)$ otherwise makes each step an equality, and $(z_0,w_0)=(1,0)$ makes the base an equality (`step_ge`, `base_ge_L`, `base_ge_R`, `chain_attain`). The bits define a set $S\ni 2^a$ of proper divisors whose energy is $c_ap-d_a$ (`setOf`, `Ys_setOf`, `energy_max`).
+
+$W_n$ is the exact value function of this chain for $n\ge2$; it was found by value iteration and checked in exact arithmetic before the Lean proof. The same kind of argument, a per-step potential along Dong's path, is how Dong proves the $q=3$ case [D26, Theorem 5]; here the potential is two-dimensional and depends on the remaining length.
 
 ## Trusted base
 
@@ -57,17 +75,17 @@ Literature checked 27 November 2026:
 - **Two distinct odd primes.** [SS11, §1] attributes the identity $E_{\max}(pq)=E_{\max}(p)E_{\max}(q)$ for distinct odd primes to earlier work and notes that it is a direct comparison of four divisor sets. It does not apply to $2p$: here $E_{\max}(2p)=4p-2$, whereas $E_{\max}(2)E_{\max}(p)=4p-4$. In any case $n=2p$ has only eight divisor sets, so that row is a hand computation.
 - **Two distinct odd primes in general.** Jiang and Yang [JY26a, JY26b] and Dong [D26] together settle $p^aq^b$ for distinct odd primes; Dong's theorems are Lean-formalized, and his spectral bridge is reused here.
 
-We found no earlier determination of the maximisers for the other even families, in the papers above, Dong's repository or by web search. This search may be incomplete. The claimed energies and maximisers come from the exact Python certificates of [the companion entry](../icg-energy-exceptional-orders/PROOF.md); the Lean proofs check those claims without trusting the Python code.
+We found no earlier determination of the maximisers for the other even families, or of $E_{\max}(2^ap)$ for general $a$, in the papers above, Dong's repository (to release v1.26.0, 23 November 2026), the Omega Institute's issue tracker or by web search (28 November 2026). Le and Sander (Linear Algebra Appl. 437 (2012)) bound extremal energies of arbitrary order through multiplicative divisor sets; we could not obtain the paper and know it from the citing papers. The maximisers here are not multiplicative (for $2^4p$ the set $\{1,2,16,4p,8p\}$ is not a product of a set of powers of 2 and a set of powers of $p$; a test checks this for every maximiser), so such sets do not attain the maximum. This search may be incomplete. The claimed energies and maximisers come from the exact Python certificates of [the companion entry](../icg-energy-exceptional-orders/PROOF.md); the Lean proofs check those claims without trusting the Python code.
 
 ## Observations, not claims
 
-For $n=2^ap$ the maximal energies $4p-2$, $14p-16$, $34p-40$, $86p-104$, $202p-248$, $470p-584$, $1066p-1336$ suggest a closed form in $a$, and the maximisers alternate between two patterns. Neither is proved here for general $a$.
+For $n=2^ap$ with $a\le7$ the maximisers alternate between two patterns. Which sets are maximisers for general $a$, and the closed form for $p=3$, are not proved here.
 
 ## Reproduction
 
 ```sh
 python -m scripts.lean_icg_families --check   # generated Lean files, registry and this table are current
-python -m unittest tests.test_lean_icg        # generator tests against the definitional energy
+python -m unittest tests.test_lean_icg        # generator tests and the closed form against the definitional energy
 cd formal && lake exe cache get && lake build # kernel-checks every certificate, theorem and audit
 ```
 

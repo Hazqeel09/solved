@@ -17,9 +17,13 @@ The main claim is the table in [PROOF.md](PROOF.md): for each listed order $n=2^
 | The certificate at one prime and its soundness | `certifyAt`, `Solved.ICG.certifyAt_sound` |
 | From a certificate to graph energy | `Solved.ICG.energy_le_of_certifyP`, `Solved.ICG.energy_le_of_certifyAt` |
 | A successful check of each certificate | `cert_a_b`, `certAt_3_1_3`, by `decide +kernel` |
+| $\max_S E(\mathrm{ICG}(2^ap,S))=c_ap-d_a$ for every $a\ge2$, prime $p\ge5$ | `Solved.ICG.TwoPow.energy_max` (bound `energy_le`, closed form `Emax`) in [`TwoPowGraph.lean`](../../formal/Formal/ICG/TwoPowGraph.lean) |
+| Energy as a chain along Dong's $2$-adic path | `energy_eq_chain`, from `ICGGeneral.L1mat_path` and `L1_one` |
+| The value function, its step and base | `Wb`, `Phi`, `step`, `base_two`, `chain_le`, `Wb_top` in [`TwoPowChain.lean`](../../formal/Formal/ICG/TwoPowChain.lean) |
+| Attainment | `step_ge`, `base_ge_L`, `base_ge_R`, `chain_attain`, `setOf`, `Ys_setOf` |
 
 The energy is Mathlib's sum of absolute eigenvalues of the real symmetric adjacency matrix, with multiplicity; it is not a formula assumed from the literature. The conversion to Ramanujan sums is Dong's proved bridge. Every row covers all subsets of proper divisors, the empty set included. The table's polynomials are stated over $\mathbb R$ as functions of the prime $p$.
 
 **Trust.** The checks are ordinary kernel reductions (`decide +kernel`), not `native_decide`. [`formal/FormalTests/Axioms.lean`](../../formal/FormalTests/Axioms.lean) fails the build unless every registered theorem depends exactly on `propext`, `Classical.choice` and `Quot.sound`. `python -m scripts.check_catalogue` checks that this audit covers exactly the theorems in [`docs/formalization-mathlib.json`](../../docs/formalization-mathlib.json). The data in the certificates comes from an untrusted generator; it cannot affect soundness.
 
-**Outside this formalization.** Orders with an odd part that is not a prime power, orders with three or more distinct primes, families with more than 16 exponent cells, closed forms in $a$ or $b$, and every claim about novelty or priority. The remaining 30 families of [the companion entry](../icg-energy-exceptional-orders/PROOF.md) (the 19 families $3^ap^b$ and 11 orders with three or more primes) remain Python certificates.
+**Outside this formalization.** Orders with an odd part that is not a prime power, orders with three or more distinct primes, families with more than 16 exponent cells, closed forms in $b$, the set of maximisers of $2^ap$ for $a\ge8$, $2^ap$ with $p=3$ for $a\ge8$, and every claim about novelty or priority. The remaining 30 families of [the companion entry](../icg-energy-exceptional-orders/PROOF.md) (the 19 families $3^ap^b$ and 11 orders with three or more primes) remain Python certificates.

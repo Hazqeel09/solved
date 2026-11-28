@@ -24,3 +24,5 @@ import Formal.ICG.MultiGraph
 import Formal.ICG.MultiMax
 import Formal.ICG.MultiFamilies
 import Formal.ICG.MultiRatio
+import Formal.ICG.TwoPowChain
+import Formal.ICG.TwoPowGraph

@@ -283,6 +283,53 @@ class MultiCertificates(unittest.TestCase):
             self.assertNotIn(cert["shape"].size - 1, chosen)
 
 
+class TwoPowAllExponents(unittest.TestCase):
+    """Solved.ICG.TwoPow.energy_max: max_S E(ICG(2^a p, S)) = c_a p - d_a for p >= 5, a >= 2."""
+
+    @staticmethod
+    def closed_form(a, p):
+        c = (2**a * (3 * a + 4) + 2 * (-1) ** a) // 3
+        d = (2**a * (12 * a + 10) + 8 * (-1) ** a) // 9
+        return c * p - d
+
+    def test_closed_form_is_integral(self):
+        for a in range(2, 40):
+            self.assertEqual((2**a * (3 * a + 4) + 2 * (-1) ** a) % 3, 0)
+            self.assertEqual((2**a * (12 * a + 10) + 8 * (-1) ** a) % 9, 0)
+
+    def test_against_exhaustive_definition(self):
+        """Exhaustive over every divisor set with the definitional model energy (a <= 6)."""
+        for a in range(2, 7):
+            cells = 2 * (a + 1) - 1
+            for p in (5, 7, 11, 13):
+                best = max(
+                    li.model_energy(a, 1, p, mask) for mask in product([False, True], repeat=cells)
+                )
+                self.assertEqual(best, self.closed_form(a, p), (a, p))
+
+    def test_matches_certified_rows(self):
+        """The kernel-checked rows energy_<a>_1 (a <= 7) agree with the closed form."""
+        for a in range(2, 8):
+            terms = EVEN[(a, 1)]["result"]["energy"]  # [[degree in p, 0, coefficient], ...]
+            for p in (5, 7, 101):
+                self.assertEqual(sum(c * p**i for i, _, c in terms), self.closed_form(a, p), (a, p))
+
+    def test_maximisers_are_not_multiplicative(self):
+        """A maximiser for 2^4 p is not a product of a 2-power set and a p-power set."""
+        a, p = 4, 7
+        sets = []
+        cells = 2 * (a + 1) - 1
+        top = self.closed_form(a, p)
+        for mask in product([False, True], repeat=cells):
+            if li.model_energy(a, 1, p, mask) == top:
+                sets.append({(k // 2, k % 2) for k, bit in enumerate(mask) if bit})
+        self.assertTrue(sets)
+        for cs in sets:
+            twos = {c for c, _ in cs}
+            ps = {e for _, e in cs}
+            self.assertNotEqual(cs, {(c, e) for c in twos for e in ps})
+
+
 class Certificates(unittest.TestCase):
     def test_maximal_at_small_primes(self):
         """E(p) is the maximum over all masks, attained exactly by the maximisers, for p >= p0."""

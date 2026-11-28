@@ -494,6 +494,10 @@ GENERAL = {
         "Solved.ICG.Multi.Families.energy_2_p3_q_gt_A",
         "Solved.ICG.Multi.Families.energy_2_p3_q_gt_B",
     ],
+    "formal/Formal/ICG/TwoPowGraph.lean": [
+        "Solved.ICG.TwoPow.energy_le",
+        "Solved.ICG.TwoPow.energy_max",
+    ],
 }
 FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"
 
