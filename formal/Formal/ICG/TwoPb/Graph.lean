@@ -50,25 +50,25 @@ theorem start_W {y : ℝ} (hy : 0 ≤ y) {b : ℕ} (hb : 2 ≤ b) {z : ℝ} (hz 
   unfold Wh tauN mk
   rw [Ssum_closed, Kg_eq hy, betaS_mod]
   rcases mod4_cases b with h | h | h | h
-  · rw [MxN_0 h, if_pos h, h]
+  · rw [MxN_0 h, ite_eq_left h, h]
     have hs := start_0 hy (by positivity) (pow_le_one₀ hx0 (x_le_one hy)) hz (τ := (1 / (y + 3)) ^ (b - 4))
     rw [KS_0_eq hy, mul_assoc, ← pow_add, show 4 + (b - 4) = b by omega] at hs
-    push_cast; nlinarith [Kc_pos hy]
-  · rw [MxN_1 h, if_neg (by omega), h]
+    nlinarith [Kc_pos hy]
+  · rw [MxN_1 h, ite_eq_right (by omega), h]
     have hτ : (y + 3) ^ 4 * (1 / (y + 3)) ^ (b - 1) ≤ 1 := by
       rw [show b - 1 = 4 + (b - 5) by omega, pow_add, ← mul_assoc, ← mul_pow, hxy, one_pow, one_mul]
       exact pow_le_one₀ hx0 (x_le_one hy)
     have hs := start_1 hy (by positivity) hτ hz
     rw [KS_1_eq hy, mul_assoc, ← pow_add, show 1 + (b - 1) = b by omega] at hs
-    push_cast; nlinarith [Kc_pos hy]
-  · rw [MxN_2 h, if_neg (by omega), h]
+    nlinarith [Kc_pos hy]
+  · rw [MxN_2 h, ite_eq_right (by omega), h]
     have hs := start_2 hy (by positivity) (pow_le_one₀ hx0 (x_le_one hy)) hz (τ := (1 / (y + 3)) ^ (b - 2))
     rw [KS_2_eq hy, mul_assoc, ← pow_add, show 2 + (b - 2) = b by omega] at hs
-    push_cast; nlinarith [Kc_pos hy]
-  · rw [MxN_3 h, if_neg (by omega), h]
+    nlinarith [Kc_pos hy]
+  · rw [MxN_3 h, ite_eq_right (by omega), h]
     have hs := start_3 hy (by positivity) (pow_le_one₀ hx0 (x_le_one hy)) hz (τ := (1 / (y + 3)) ^ (b - 3))
     rw [KS_3_eq hy, mul_assoc, ← pow_add, show 3 + (b - 3) = b by omega] at hs
-    push_cast; nlinarith [Kc_pos hy]
+    nlinarith [Kc_pos hy]
 
 theorem three_le {p : ℕ} (hp : p.Prime) (hp2 : p ≠ 2) : (3 : ℝ) ≤ p := by
   have := hp.two_le

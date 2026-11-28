@@ -496,6 +496,7 @@ def render_all(source=SOURCE):
             out[OUT / f"{name}.lean"] = text
     out[OUT / "Steps.lean"] = steps_module(model)
     out[OUT / "Start.lean"] = start_module(model)
+    out[OUT / "AttainSteps.lean"] = attain_module(model)
     return out
 
 
@@ -757,5 +758,107 @@ def start_module(model):
         if ("base",) + key not in seen:
             seen.add(("base",) + key)
             L += [att_lemma(model, *key, base=True), ""]
+    L.append(f"end {NS}")
+    return "\n".join(L) + "\n"
+
+
+def _cyc_def(name, comp):
+    """cycZ / cycW: coordinate `comp` of the maximiser corner `cyc_{bm}[r mod 4]` (forward for bm = 0, 3)."""
+    f1 = [r for r in range(4) if FWD[r][comp] == 1]
+    r1 = [r for r in range(4) if REV[r][comp] == 1]
+
+    def cond(rs):
+        return " ∨ ".join(f"r % 4 = {r}" for r in rs)
+    return (f"/-- Coordinate {comp} of the maximiser corner `r` steps below the top. -/\n"
+            f"def {name} (bm r : ℕ) : ℝ :=\n"
+            f"  if bm % 4 = 0 ∨ bm % 4 = 3 then (if {cond(f1)} then 1 else 0) else (if {cond(r1)} then 1 else 0)")
+
+
+def attain_module(model):
+    """`cycZ`, `cycW`, the path pieces `QL` and the tight steps `lower_step`, `lower_base`."""
+    start_piece, table, base = attain_data(model)
+    L = [HEADER, "import Formal.ICG.TwoPb.Chain", "", "set_option linter.unusedVariables false",
+         "set_option maxHeartbeats 4000000", "", "noncomputable section", "", f"namespace {NS}", "",
+         _cyc_def("cycZ", 0), "", _cyc_def("cycW", 1), ""]
+    # QL bm nm: the piece of residue nm used along the maximiser for b = bm (mod 4)
+    body = []
+    for bm in range(4):
+        inner = " else ".join(f"if nm % 4 = {nm} then Qh_{nm}_{table[(bm, nm)]['l']} y τ s t" for nm in range(3))
+        inner += f" else Qh_3_{table[(bm, 3)]['l']} y τ s t"
+        body.append((bm, inner))
+    txt = " else ".join(f"if bm % 4 = {bm} then ({inner})" for bm, inner in body[:3]) + f" else ({body[3][1]})"
+    L += ["/-- The piece of residue `nm` along the maximiser for `b ≡ bm (mod 4)`. -/",
+          f"def QL (bm nm : ℕ) (y τ s t : ℝ) : ℝ :=\n  {txt}", ""]
+    box = "(hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t) (ht1 : t ≤ 1)"
+    absl = ["  have a0 : |(0:ℝ) - s| = s := by rw [zero_sub, abs_neg, abs_of_nonneg hs0]",
+            "  have a1 : |(1:ℝ) - s| = 1 - s := abs_of_nonneg (by linarith only [hs1])",
+            "  have b0 : |(0:ℝ) - t| = t := by rw [zero_sub, abs_neg, abs_of_nonneg ht0]",
+            "  have b1 : |(1:ℝ) - t| = 1 - t := abs_of_nonneg (by linarith only [ht1])"]
+    L += ["/-- One tight step along the maximiser: the path piece at `n + 1` steps left is at most the gain",
+          "plus the path piece at `n` steps left. -/",
+          f"theorem lower_step {{y s t s' t' : ℝ}} {{b n : ℕ}} (hy : 0 ≤ y) (hn : 1 ≤ n) (hnb : n + 1 ≤ b) {box}",
+          "    (hs' : (y + 3) * s' = s + (y + 2) * cycZ (b % 4) (b - (n + 1)))",
+          "    (ht' : (y + 3) * t' = t + (y + 2) * cycW (b % 4) (b - (n + 1))) :",
+          "    QL (b % 4) ((n + 1) % 4) y (tauN y (n + 1)) s t ≤",
+          "      max (Kgain y * |cycZ (b % 4) (b - (n + 1)) - s|) (Kgain y * |cycW (b % 4) (b - (n + 1)) - t|) +",
+          "        QL (b % 4) (n % 4) y (tauN y n) s' t' - Kg y := by"]
+    L += absl
+    L.append("  rcases mod4_cases b with hb | hb | hb | hb <;> rcases mod4_cases n with hn4 | hn4 | hn4 | hn4")
+    for bm in range(4):
+        for nk in range(4):
+            nm = (nk + 1) % 4  # residue of the state with n + 1 steps left
+            v = table[(bm, nm)]
+            c, i, j, l_ = v["c"], v["i"], v["j"], v["l"]
+            k = nk  # residue of the next state (n steps left) = residue of the parent piece
+            r = (bm - nm) % 4  # (b - (n + 1)) mod 4
+            cyc = FWD if bm in (0, 3) else REV
+            assert cyc[r] == c
+            tau_rel = ("tauN_succ_0 hy hn hn4" if nk == 0 else "tauN_succ hn (by omega)")
+            pick = "le_max_left" if j == 0 else "le_max_right"
+            L += ["  · have hr : (b - (n + 1)) % 4 = " + str(r) + " := by omega",
+                  f"    have hz : cycZ (b % 4) (b - (n + 1)) = {c[0]} := by simp [cycZ, hb, hr]",
+                  f"    have hw : cycW (b % 4) (b - (n + 1)) = {c[1]} := by simp [cycW, hb, hr]",
+                  f"    have hn1 : (n + 1) % 4 = {nm} := by omega",
+                  f"    have q1 : QL (b % 4) ((n + 1) % 4) y (tauN y (n + 1)) s t = Qh_{nm}_{l_} y (tauN y (n + 1)) s t := by",
+                  "      simp [QL, hb, hn1]",
+                  f"    have q0 : QL (b % 4) (n % 4) y (tauN y n) s' t' = Qh_{k}_{i} y (tauN y n) s' t' := by",
+                  "      simp [QL, hb, hn4]",
+                  "    rw [hz] at hs'", "    rw [hw] at ht'", "    rw [hz, hw]",
+                  "    rw [q1, q0]",
+                  f"    have h := {att_name(k, i, c, j, l_)} (τ := tauN y n) (τ' := tauN y (n + 1)) hy hs' ht' ({tau_rel})",
+                  f"    have hm := {pick} (Kgain y * |({c[0]}:ℝ) - s|) (Kgain y * |({c[1]}:ℝ) - t|)",
+                  f"    rw [a{c[0]}, b{c[1]}] at hm ⊢",
+                  "    linarith only [h, hm]"]
+    L.append("")
+    # base: n = 1 steps left -> V_0
+    L += ["/-- The last tight step along the maximiser. -/",
+          f"theorem lower_base {{y s t s' t' : ℝ}} {{b : ℕ}} (hy : 0 ≤ y) (hb1 : 1 ≤ b) {box}",
+          "    (hs' : (y + 3) * s' = s + (y + 2) * cycZ (b % 4) (b - 1))",
+          "    (ht' : (y + 3) * t' = t + (y + 2) * cycW (b % 4) (b - 1)) :",
+          "    QL (b % 4) 1 y 1 s t ≤",
+          "      max (Kgain y * |cycZ (b % 4) (b - 1) - s|) (Kgain y * |cycW (b % 4) (b - 1) - t|) +",
+          "        max (2 * Kc y * s') (2 * Kc y * t') - Kg y := by"]
+    L += absl
+    L.append("  rcases mod4_cases b with hb | hb | hb | hb")
+    for bm in range(4):
+        v = base[bm]
+        c, i, j, l_ = v["c"], v["i"], v["j"], v["l"]
+        r = (bm - 1) % 4
+        cyc = FWD if bm in (0, 3) else REV
+        assert cyc[r] == c
+        pick = "le_max_left" if j == 0 else "le_max_right"
+        tpick = "le_max_left" if i == 0 else "le_max_right"
+        L += ["  · have hr : (b - 1) % 4 = " + str(r) + " := by omega",
+              f"    have hz : cycZ (b % 4) (b - 1) = {c[0]} := by simp [cycZ, hb, hr]",
+              f"    have hw : cycW (b % 4) (b - 1) = {c[1]} := by simp [cycW, hb, hr]",
+              f"    have q1 : QL (b % 4) 1 y 1 s t = Qh_1_{l_} y 1 s t := by simp [QL, hb]",
+              "    rw [hz] at hs'", "    rw [hw] at ht'", "    rw [hz, hw]",
+              "    rw [q1]",
+              f"    have h := {att_name(0, i, c, j, l_, base=True)} hy hs' ht'",
+              f"    have hm := {pick} (Kgain y * |({c[0]}:ℝ) - s|) (Kgain y * |({c[1]}:ℝ) - t|)",
+              f"    rw [a{c[0]}, b{c[1]}] at hm ⊢",
+              f"    have hv := {tpick} (2 * Kc y * s') (2 * Kc y * t')",
+              "    linarith only [h, hm, hv]"]
+    L.append("")
     L.append(f"end {NS}")
     return "\n".join(L) + "\n"
