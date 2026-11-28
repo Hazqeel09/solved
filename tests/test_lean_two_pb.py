@@ -35,8 +35,11 @@ def chain_exact(p, n):
     def V(m, s, t):
         if m == 0:
             return 2 * max(s, t)
-        return max(2 * (1 - x) * max(abs(c - s), abs(d - t)) + V(m - 1, x * s + (1 - x) * c, x * t + (1 - x) * d)
-                   for c, d in CORNERS)
+        return max(
+            2 * (1 - x) * max(abs(c - s), abs(d - t))
+            + V(m - 1, x * s + (1 - x) * c, x * t + (1 - x) * d)
+            for c, d in CORNERS
+        )
 
     return lambda s, t: V(n, s, t)
 
@@ -96,7 +99,11 @@ class GraphEnergy(unittest.TestCase):
         for p, b in [(3, 1), (3, 2), (3, 3), (3, 4), (5, 1), (5, 2), (5, 3), (7, 2), (11, 1)]:
             n = 2 * p**b
             divs = [d for d in range(1, n) if n % d == 0]
-            best = max(direct_energy(n, list(S)) for r in range(1, len(divs) + 1) for S in combinations(divs, r))
+            best = max(
+                direct_energy(n, list(S))
+                for r in range(1, len(divs) + 1)
+                for S in combinations(divs, r)
+            )
             self.assertEqual(best, closed(p, b), (p, b))
             self.assertEqual(direct_energy(n, sorted(lean_maximiser(p, b))), closed(p, b), (p, b))
 
@@ -105,8 +112,15 @@ class GraphEnergy(unittest.TestCase):
         for p, b in [(3, 2), (3, 3), (5, 2), (7, 1)]:
             n = 2 * p**b
             S = lean_maximiser(p, b)
-            A = np.array([[1.0 if i != j and gcd(i - j, n) in S else 0.0 for j in range(n)] for i in range(n)])
-            self.assertAlmostEqual(float(np.abs(np.linalg.eigvalsh(A)).sum()), closed(p, b), places=6)
+            A = np.array(
+                [
+                    [1.0 if i != j and gcd(i - j, n) in S else 0.0 for j in range(n)]
+                    for i in range(n)
+                ]
+            )
+            self.assertAlmostEqual(
+                float(np.abs(np.linalg.eigvalsh(A)).sum()), closed(p, b), places=6
+            )
 
 
 def lean_maximiser(p, b):
@@ -138,7 +152,9 @@ class Certificates(unittest.TestCase):
         self.assertEqual(set(base), {0, 1, 2, 3})
 
     def test_generated_modules_have_no_untrusted_tactics(self):
-        bad = re.compile(r"\b(sorry|native_decide|admit|implemented_by|unsafe)\b|debug\.skipKernelTC")
+        bad = re.compile(
+            r"\b(sorry|native_decide|admit|implemented_by|unsafe)\b|debug\.skipKernelTC"
+        )
         for path in g.OUT.glob("*.lean"):
             self.assertIsNone(bad.search(path.read_text()), path.name)
 

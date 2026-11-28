@@ -52,6 +52,7 @@ FIELDS = ("const", "const_xn", "s", "s_xn", "t", "t_xn")
 
 # --- data -------------------------------------------------------------------------------------
 
+
 def load(source=SOURCE):
     return json.loads(Path(source).read_text())
 
@@ -94,8 +95,13 @@ class Model:
                 raise ValueError(f"unexpected denominator factor {fac}")
         self.Kg = self._poly(self.K * self.g)
         self.Kgain = self._poly(self.K * self.gain)
-        self.Qh = {k: [self._poly(self.K * (a0 + a1 * tau + (b0 + b1 * tau) * s + (c0 + c1 * tau) * t))
-                       for a0, a1, b0, b1, c0, c1 in self.raw[k]] for k in range(4)}
+        self.Qh = {
+            k: [
+                self._poly(self.K * (a0 + a1 * tau + (b0 + b1 * tau) * s + (c0 + c1 * tau) * t))
+                for a0, a1, b0, b1, c0, c1 in self.raw[k]
+            ]
+            for k in range(4)
+        }
         self.sigma = {k: self._swap_permutation(self.Qh[k]) for k in range(4)}
 
     @staticmethod
@@ -164,8 +170,13 @@ def bernstein(e):
     d = P.degree() if P.degree() > 0 else 0
     a = [P.coeff_monomial(tau**i) for i in range(d + 1)]  # power basis
     # power -> Bernstein: b_j = sum_{i <= j} C(j, i)/C(d, i) a_i, then term b_j C(d, j) tau^j (1-tau)^(d-j)
-    b = [expand(sum(Rational(comb(j, i), comb(d, i)) * a[i] for i in range(j + 1)) * comb(d, j)) for j in range(d + 1)]
-    assert expand(sum(bj * tau**j * (1 - tau) ** (d - j) for j, bj in enumerate(b)) - expand(e)) == 0
+    b = [
+        expand(sum(Rational(comb(j, i), comb(d, i)) * a[i] for i in range(j + 1)) * comb(d, j))
+        for j in range(d + 1)
+    ]
+    assert (
+        expand(sum(bj * tau**j * (1 - tau) ** (d - j) for j, bj in enumerate(b)) - expand(e)) == 0
+    )
     return d, b
 
 
@@ -185,11 +196,17 @@ def bern_proof(name, e, strict=False, indent="  "):
             if p0 == 0:
                 return [f"{indent}have {name} : (0:ℝ) ≤ 0 := le_refl 0"]
             return [f"{indent}have {name} : (0:ℝ) ≤ {lean_poly(p0)} := by positivity"]
-        one = (f"(by have h : (0:ℝ) ≤ {lean_poly(expand(p0 + q0))} := (by positivity); linarith only [h])"
-               if expand(p0 + q0) != 0 else "(by linarith only [])")
+        one = (
+            f"(by have h : (0:ℝ) ≤ {lean_poly(expand(p0 + q0))} := (by positivity); linarith only [h])"
+            if expand(p0 + q0) != 0
+            else "(by linarith only [])"
+        )
         zero = "(by positivity)" if p0 != 0 else "le_rfl"
-        return [f"{indent}have {name} : (0:ℝ) ≤ ({lean_poly(p0)}) + ({lean_poly(q0)}) * τ :=",
-                f"{indent}  lin_tau hτ0 hτ1 {zero}", f"{indent}    {one}"]
+        return [
+            f"{indent}have {name} : (0:ℝ) ≤ ({lean_poly(p0)}) + ({lean_poly(q0)}) * τ :=",
+            f"{indent}  lin_tau hτ0 hτ1 {zero}",
+            f"{indent}    {one}",
+        ]
     if P.degree() <= 0 and strict:
         if Poly(e, y).eval(0) <= 0 or not nonneg_coeffs_y(e):
             raise ValueError(f"{name}: not positive")
@@ -230,21 +247,25 @@ def bern_proof(name, e, strict=False, indent="  "):
             if d - j:
                 pf = f"(mul_nonneg {pf} (pow_nonneg hσ {d - j}))"
             return pf
+
         # `a + b + c` is `(a + b) + c`: nest add_nonneg to the left
         proof = term(terms[0][0])
         for j, _ in terms[1:]:
             proof = f"(add_nonneg {proof} {term(j)})"
     if expand(e) == 0 and not strict:
         return [f"{indent}have {name} : (0:ℝ) ≤ 0 := le_refl 0"]
-    lines = [f"{indent}have {name} : (0:ℝ) ≤ {target} := by",
-             f"{indent}  rw [show {target} = {expr_txt} by ring]",
-             f"{indent}  exact {proof}"]
+    lines = [
+        f"{indent}have {name} : (0:ℝ) ≤ {target} := by",
+        f"{indent}  rw [show {target} = {expr_txt} by ring]",
+        f"{indent}  exact {proof}",
+    ]
     if strict:
         lines.append(f"{indent}have {name}' : 0 < {lean_poly(e)} := by linarith only [{name}]")
     return lines
 
 
 # --- candidate lemmas -------------------------------------------------------------------------
+
 
 def dist_expr(c, j):
     u = (s, t)[j]
@@ -253,7 +274,10 @@ def dist_expr(c, j):
 
 def weights_y(model, k, weights):
     """Weights rational in (x, mu) -> numerators N_l(y, tau) and common denominator M(y, tau) > 0."""
-    lam = {int(li): cancel(together(sympify(w).subs(mu, tau * x ** model.m[k]).subs(x, X))) for li, w in weights.items()}
+    lam = {
+        int(li): cancel(together(sympify(w).subs(mu, tau * x ** model.m[k]).subs(x, X)))
+        for li, w in weights.items()
+    }
     M = reduce(lambda a, b: lcm(a, b), [fraction(v)[1] for v in lam.values()])
     N = {li: expand(cancel(v * M)) for li, v in lam.items()}
     M = expand(M)
@@ -277,12 +301,16 @@ def candidate(model, k, i, c, j, weights, base=False):
     rhs = sum(N[li] * model.Qh[kn][li].subs(tau, tau1) for li in N)
     F = expand(E * (rhs - M * cand))
     sub = {s1: (s + (y + 2) * c[0]) / (y + 3), t1: (t + (y + 2) * c[1]) / (y + 3)}
-    sub[tau1] = (1 if base else tau / (y + 3) ** e)
+    sub[tau1] = 1 if base else tau / (y + 3) ** e
     D = expand(cancel(together(F.subs(sub))))
     PD = Poly(D, s, t)
     if PD.total_degree() > 1 or PD.coeff_monomial(s * t) != 0:
         raise ValueError("D is not affine in (s, t)")
-    A, B, C = (expand(PD.coeff_monomial(1)), expand(PD.coeff_monomial(s)), expand(PD.coeff_monomial(t)))
+    A, B, C = (
+        expand(PD.coeff_monomial(1)),
+        expand(PD.coeff_monomial(s)),
+        expand(PD.coeff_monomial(t)),
+    )
     # F - (A + B s + C t) = e1 ((y+3) s' - s - (y+2) c0) + e2 (...) + e3 ((y+3)^e tau' - tau)
     Fs, Ft, Fu = (expand(F.diff(v)) for v in (s1, t1, tau1))
     e1, e2 = cancel(Fs / (y + 3)), cancel(Ft / (y + 3))
@@ -290,17 +318,34 @@ def candidate(model, k, i, c, j, weights, base=False):
     for v in (e1, e2, e3):
         if fraction(cancel(v))[1].free_symbols:
             raise ValueError("non-polynomial linear_combination coefficient")
-    resid = expand(F - (A + B * s + C * t) - e1 * ((y + 3) * s1 - s - (y + 2) * c[0])
-                   - e2 * ((y + 3) * t1 - t - (y + 2) * c[1])
-                   - e3 * (((y + 3) ** e * tau1 - tau) if not base else (tau1 - 1)))
+    resid = expand(
+        F
+        - (A + B * s + C * t)
+        - e1 * ((y + 3) * s1 - s - (y + 2) * c[0])
+        - e2 * ((y + 3) * t1 - t - (y + 2) * c[1])
+        - e3 * (((y + 3) ** e * tau1 - tau) if not base else (tau1 - 1))
+    )
     if resid != 0:
         raise ValueError("linear_combination does not close")
-    return dict(N=N, M=M, E=E, e=e, A=A, B=B, C=C, e1=expand(e1), e2=expand(e2), e3=expand(e3), cand=cand,
-                kn=kn, q=q)
+    return dict(
+        N=N,
+        M=M,
+        E=E,
+        e=e,
+        A=A,
+        B=B,
+        C=C,
+        e1=expand(e1),
+        e2=expand(e2),
+        e3=expand(e3),
+        cand=cand,
+        kn=kn,
+        q=q,
+    )
 
 
 def cand_name(k, i, c, j, base=False):
-    return (f"base_{i}_{c[0]}{c[1]}_{j}" if base else f"cand_{k}_{i}_{c[0]}{c[1]}_{j}")
+    return f"base_{i}_{c[0]}{c[1]}_{j}" if base else f"cand_{k}_{i}_{c[0]}{c[1]}_{j}"
 
 
 def candidate_lemma(model, k, i, c, j, weights, base=False):
@@ -308,18 +353,27 @@ def candidate_lemma(model, k, i, c, j, weights, base=False):
     d = candidate(model, k, i, c, j, weights, base)
     name = cand_name(k, i, c, j, base)
     kn = d["kn"]
-    dist = (f"(1 - {'s' if j == 0 else 't'})" if c[j] == 1 else ("s" if j == 0 else "t"))
+    dist = f"(1 - {'s' if j == 0 else 't'})" if c[j] == 1 else ("s" if j == 0 else "t")
     src = f"2 * Kc y * {'s' if i == 0 else 't'}'" if base else f"Qh_{k}_{i} y τ s' t'"
     tau_arg = "1" if base else "τ'"
     hyps = ["(hy : 0 ≤ y)"] + ([] if base else ["(hτ0 : 0 ≤ τ)", "(hτ1 : τ ≤ 1)"])
-    hyps += ["(hs0 : 0 ≤ s)", "(hs1 : s ≤ 1)", "(ht0 : 0 ≤ t)", "(ht1 : t ≤ 1)",
-             f"(hs' : (y + 3) * s' = s + (y + 2) * {c[0]})", f"(ht' : (y + 3) * t' = t + (y + 2) * {c[1]})"]
+    hyps += [
+        "(hs0 : 0 ≤ s)",
+        "(hs1 : s ≤ 1)",
+        "(ht0 : 0 ≤ t)",
+        "(ht1 : t ≤ 1)",
+        f"(hs' : (y + 3) * s' = s + (y + 2) * {c[0]})",
+        f"(ht' : (y + 3) * t' = t + (y + 2) * {c[1]})",
+    ]
     if not base:
         hyps.append("(hτ' : (y + 3) ^ 4 * τ' = τ)" if d["e"] == 4 else "(hτ' : τ' = τ)")
     tvars = "{y s t s' t' : ℝ}" if base else "{y τ s t s' t' τ' : ℝ}"
     cand_txt = f"Kgain y * {dist} + {src} - Kg y"
-    L = [f"theorem {name} {tvars}", "    " + " ".join(hyps) + " :",
-         f"    {cand_txt} ≤ Mx_{kn} y {tau_arg} s t := by"]
+    L = [
+        f"theorem {name} {tvars}",
+        "    " + " ".join(hyps) + " :",
+        f"    {cand_txt} ≤ Mx_{kn} y {tau_arg} s t := by",
+    ]
     if not base:
         L.append("  have hσ : 0 ≤ 1 - τ := by linarith only [hτ1]")
     N, M = d["N"], d["M"]
@@ -328,8 +382,12 @@ def candidate_lemma(model, k, i, c, j, weights, base=False):
     lc = [f"({lean_poly(d['e1'])}) * hs'", f"({lean_poly(d['e2'])}) * ht'"]
     if not base:
         lc.append(f"({lean_poly(d['e3'])}) * hτ'")
-    unf = sorted({f"Qh_{kn}_{li}" for li in ls} | (set() if base else {f"Qh_{k}_{i}"}) | {"Kgain", "Kg"}
-                 | ({"Kc"} if base else set()))
+    unf = sorted(
+        {f"Qh_{kn}_{li}" for li in ls}
+        | (set() if base else {f"Qh_{k}_{i}"})
+        | {"Kgain", "Kg"}
+        | ({"Kc"} if base else set())
+    )
     A, B, C = d["A"], d["B"], d["C"]
     L.append(f"  have hD : ({lean_poly(d['E'])}) * (({rhs}) - ({lean_poly(M)}) * ({cand_txt})) =")
     L.append(f"      ({lean_poly(A)}) + ({lean_poly(B)}) * s + ({lean_poly(C)}) * t := by")
@@ -341,17 +399,28 @@ def candidate_lemma(model, k, i, c, j, weights, base=False):
     L += bern_proof("c11", expand(A + B + C))
     L.append(f"  have hDn := aff_nonneg hs0 hs1 ht0 ht1 (A := {lean_poly(A)})")
     L.append(f"    (B := {lean_poly(B)}) (C := {lean_poly(C)})")
-    L.append("    (by linarith only [c00]) (by linarith only [c10]) (by linarith only [c01])"
-             " (by linarith only [c11])")
+    L.append(
+        "    (by linarith only [c00]) (by linarith only [c10]) (by linarith only [c01])"
+        " (by linarith only [c11])"
+    )
     L.append("  rw [← hD] at hDn")
-    L.append(f"  have hR := nonneg_of_mul_nonneg_right' (by positivity : (0 : ℝ) < {lean_poly(d['E'])}) hDn")
+    L.append(
+        f"  have hR := nonneg_of_mul_nonneg_right' (by positivity : (0 : ℝ) < {lean_poly(d['E'])}) hDn"
+    )
     for li in ls:
         L += bern_proof(f"w{li}", N[li])
-        L.append(f"  have p{li} := mul_le_mul_of_nonneg_left (Qh_{kn}_{li}_le y {tau_arg} s t) w{li}")
+        L.append(
+            f"  have p{li} := mul_le_mul_of_nonneg_left (Qh_{kn}_{li}_le y {tau_arg} s t) w{li}"
+        )
     L += bern_proof("wM", M, strict=True)
-    L.append(f"  have hsum : ({lean_poly(M)}) * Mx_{kn} y {tau_arg} s t = "
-             + " + ".join(f"({lean_poly(N[li])}) * Mx_{kn} y {tau_arg} s t" for li in ls) + " := by ring")
-    L.append(f"  have hfin : ({lean_poly(M)}) * ({cand_txt}) ≤ ({lean_poly(M)}) * Mx_{kn} y {tau_arg} s t := by")
+    L.append(
+        f"  have hsum : ({lean_poly(M)}) * Mx_{kn} y {tau_arg} s t = "
+        + " + ".join(f"({lean_poly(N[li])}) * Mx_{kn} y {tau_arg} s t" for li in ls)
+        + " := by ring"
+    )
+    L.append(
+        f"  have hfin : ({lean_poly(M)}) * ({cand_txt}) ≤ ({lean_poly(M)}) * Mx_{kn} y {tau_arg} s t := by"
+    )
     L.append("    linarith only [" + ", ".join(["hR", "hsum"] + [f"p{li}" for li in ls]) + "]")
     L.append("  exact le_of_mul_le_mul_left hfin wM'")
     return "\n".join(L)
@@ -367,19 +436,29 @@ def mirror_lemma(model, k, i, c, base=False):
     src = f"2 * Kc y * {'s' if i == 0 else 't'}'" if base else f"Qh_{k}_{i} y τ s' t'"
     tau_arg = "1" if base else "τ'"
     hyps = ["(hy : 0 ≤ y)"] + ([] if base else ["(hτ0 : 0 ≤ τ)", "(hτ1 : τ ≤ 1)"])
-    hyps += ["(hs0 : 0 ≤ s)", "(hs1 : s ≤ 1)", "(ht0 : 0 ≤ t)", "(ht1 : t ≤ 1)",
-             f"(hs' : (y + 3) * s' = s + (y + 2) * {c[0]})", f"(ht' : (y + 3) * t' = t + (y + 2) * {c[1]})"]
+    hyps += [
+        "(hs0 : 0 ≤ s)",
+        "(hs1 : s ≤ 1)",
+        "(ht0 : 0 ≤ t)",
+        "(ht1 : t ≤ 1)",
+        f"(hs' : (y + 3) * s' = s + (y + 2) * {c[0]})",
+        f"(ht' : (y + 3) * t' = t + (y + 2) * {c[1]})",
+    ]
     if not base:
         hyps.append("(hτ' : (y + 3) ^ 4 * τ' = τ)" if k == 0 else "(hτ' : τ' = τ)")
     tvars = "{y s t s' t' : ℝ}" if base else "{y τ s t s' t' τ' : ℝ}"
-    args = ("hy ht0 ht1 hs0 hs1 ht' hs'" if base else "hy hτ0 hτ1 ht0 ht1 hs0 hs1 ht' hs' hτ'")
+    args = "hy ht0 ht1 hs0 hs1 ht' hs'" if base else "hy hτ0 hτ1 ht0 ht1 hs0 hs1 ht' hs' hτ'"
     rw = [f"Mx_{kn}_swap"] if base else [f"Qh_{k}_{ri}_swap", f"Mx_{kn}_swap"]
-    return "\n".join([
-        f"theorem {name} {tvars}", "    " + " ".join(hyps) + " :",
-        f"    Kgain y * {dist} + {src} - Kg y ≤ Mx_{kn} y {tau_arg} s t := by",
-        f"  have h := {rep} (s := t) (t := s) (s' := t') (t' := s') {args}",
-        f"  rw [{', '.join(rw)}] at h",
-        "  exact h"])
+    return "\n".join(
+        [
+            f"theorem {name} {tvars}",
+            "    " + " ".join(hyps) + " :",
+            f"    Kgain y * {dist} + {src} - Kg y ≤ Mx_{kn} y {tau_arg} s t := by",
+            f"  have h := {rep} (s := t) (t := s) (s' := t') (t' := s') {args}",
+            f"  rw [{', '.join(rw)}] at h",
+            "  exact h",
+        ]
+    )
 
 
 # --- modules ----------------------------------------------------------------------------------
@@ -391,13 +470,24 @@ GENERATED by solved/lean_two_pb.py from checks/expected/two-pb-certificates.json
 
 
 def pieces_module(model):
-    L = [HEADER, "import Formal.ICG.TwoPb.Cert", "", "noncomputable section", "", f"namespace {NS}", "",
-         "/-- The common denominator `K(y)` of the value-function pieces. -/",
-         f"def Kc (y : ℝ) : ℝ := {lean_poly(model.K)}", "",
-         "/-- `K g`, `g = 2(1 - x)/(1 + x^2)`, `x = 1/(y + 3)`. -/",
-         f"def Kg (y : ℝ) : ℝ := {lean_poly(model.Kg)}", "",
-         "/-- `K 2 (1 - x)`. -/",
-         f"def Kgain (y : ℝ) : ℝ := {lean_poly(model.Kgain)}", ""]
+    L = [
+        HEADER,
+        "import Formal.ICG.TwoPb.Cert",
+        "",
+        "noncomputable section",
+        "",
+        f"namespace {NS}",
+        "",
+        "/-- The common denominator `K(y)` of the value-function pieces. -/",
+        f"def Kc (y : ℝ) : ℝ := {lean_poly(model.K)}",
+        "",
+        "/-- `K g`, `g = 2(1 - x)/(1 + x^2)`, `x = 1/(y + 3)`. -/",
+        f"def Kg (y : ℝ) : ℝ := {lean_poly(model.Kg)}",
+        "",
+        "/-- `K 2 (1 - x)`. -/",
+        f"def Kgain (y : ℝ) : ℝ := {lean_poly(model.Kgain)}",
+        "",
+    ]
     for k in range(4):
         for i, q in enumerate(model.Qh[k]):
             L.append(f"/-- Piece {i} of residue {k}, scaled by `K`. -/")
@@ -415,25 +505,41 @@ def pieces_module(model):
             proof = "le_max_left _ _" if i < n - 1 else "le_rfl"
             for _ in range(i):
                 proof = f"({proof}).trans (le_max_right _ _)"
-            L.append(f"theorem Qh_{k}_{i}_le (y τ s t : ℝ) : Qh_{k}_{i} y τ s t ≤ Mx_{k} y τ s t := by")
+            L.append(
+                f"theorem Qh_{k}_{i}_le (y τ s t : ℝ) : Qh_{k}_{i} y τ s t ≤ Mx_{k} y τ s t := by"
+            )
             L.append(f"  unfold Mx_{k}; exact {proof}")
             L.append("")
         hs = " ".join(f"(h{i} : Qh_{k}_{i} y τ s t ≤ c)" for i in range(n))
         body = f"h{n - 1}"
         for i in range(n - 2, -1, -1):
             body = f"max_le h{i} ({body})"
-        L += [f"theorem Mx_{k}_le {{y τ s t c : ℝ}} {hs} :", f"    Mx_{k} y τ s t ≤ c := by",
-              f"  unfold Mx_{k}; exact {body}", ""]
+        L += [
+            f"theorem Mx_{k}_le {{y τ s t c : ℝ}} {hs} :",
+            f"    Mx_{k} y τ s t ≤ c := by",
+            f"  unfold Mx_{k}; exact {body}",
+            "",
+        ]
         sig = model.sigma[k]
         for i in range(n):
-            L.append(f"theorem Qh_{k}_{i}_swap (y τ s t : ℝ) : Qh_{k}_{i} y τ t s = Qh_{k}_{sig[i]} y τ s t := by")
+            L.append(
+                f"theorem Qh_{k}_{i}_swap (y τ s t : ℝ) : Qh_{k}_{i} y τ t s = Qh_{k}_{sig[i]} y τ s t := by"
+            )
             L.append(f"  unfold Qh_{k}_{i} Qh_{k}_{sig[i]}; ring")
             L.append("")
-        fwd = " ".join(f"(by rw [Qh_{k}_{i}_swap]; exact Qh_{k}_{sig[i]}_le y τ s t)" for i in range(n))
-        bwd = " ".join(f"(by rw [← Qh_{k}_{sig[i]}_swap]; exact Qh_{k}_{sig[i]}_le y τ t s)" for i in range(n))
-        L += [f"/-- `Mx_{k}` is symmetric in `(s, t)`. -/",
-              f"theorem Mx_{k}_swap (y τ s t : ℝ) : Mx_{k} y τ t s = Mx_{k} y τ s t :=",
-              f"  le_antisymm (Mx_{k}_le {fwd})", f"    (Mx_{k}_le {bwd})", ""]
+        fwd = " ".join(
+            f"(by rw [Qh_{k}_{i}_swap]; exact Qh_{k}_{sig[i]}_le y τ s t)" for i in range(n)
+        )
+        bwd = " ".join(
+            f"(by rw [← Qh_{k}_{sig[i]}_swap]; exact Qh_{k}_{sig[i]}_le y τ t s)" for i in range(n)
+        )
+        L += [
+            f"/-- `Mx_{k}` is symmetric in `(s, t)`. -/",
+            f"theorem Mx_{k}_swap (y τ s t : ℝ) : Mx_{k} y τ t s = Mx_{k} y τ s t :=",
+            f"  le_antisymm (Mx_{k}_le {fwd})",
+            f"    (Mx_{k}_le {bwd})",
+            "",
+        ]
     L.append(f"end {NS}")
     return "\n".join(L) + "\n"
 
@@ -442,9 +548,20 @@ CHUNK = 8  # candidate proofs per module: about 1.9 GB per Lean process, so 4 pa
 
 
 def _module(imports, lemmas):
-    L = [HEADER] + [f"import {m}" for m in imports] + ["", "set_option linter.unusedVariables false",
-                                                       "set_option maxHeartbeats 4000000", "",
-                                                       "noncomputable section", "", f"namespace {NS}", ""]
+    L = (
+        [HEADER]
+        + [f"import {m}" for m in imports]
+        + [
+            "",
+            "set_option linter.unusedVariables false",
+            "set_option maxHeartbeats 4000000",
+            "",
+            "noncomputable section",
+            "",
+            f"namespace {NS}",
+            "",
+        ]
+    )
     for lemma in lemmas:
         L += [lemma, ""]
     L.append(f"end {NS}")
@@ -458,21 +575,35 @@ def step_modules(model, k, certs):
     out, names = {}, []
     for part in range(0, len(reps), CHUNK):
         name = f"Step{k}_{part // CHUNK}"
-        lemmas = [candidate_lemma(model, k, c["piece"], tuple(c["corner"]), 0, c["weights"])
-                  for c in reps[part:part + CHUNK]]
+        lemmas = [
+            candidate_lemma(model, k, c["piece"], tuple(c["corner"]), 0, c["weights"])
+            for c in reps[part : part + CHUNK]
+        ]
         # each chunk imports the previous one: one build chain per residue, so at most four chunk
         # processes run at once whatever the machine's parallelism
         prev = f"Formal.ICG.TwoPb.{names[-1]}" if names else "Formal.ICG.TwoPb.Pieces"
         out[name] = _module([prev], lemmas)
         names.append(name)
-    out[f"Step{k}M"] = _module([f"Formal.ICG.TwoPb.{names[-1]}"],
-                               [mirror_lemma(model, k, c["piece"], tuple(c["corner"])) for c in mirrors])
+    out[f"Step{k}M"] = _module(
+        [f"Formal.ICG.TwoPb.{names[-1]}"],
+        [mirror_lemma(model, k, c["piece"], tuple(c["corner"])) for c in mirrors],
+    )
     return out
 
 
 def base_module(model, certs):
-    L = [HEADER, "import Formal.ICG.TwoPb.Pieces", "", "set_option linter.unusedVariables false",
-         "set_option maxHeartbeats 4000000", "", "noncomputable section", "", f"namespace {NS}", ""]
+    L = [
+        HEADER,
+        "import Formal.ICG.TwoPb.Pieces",
+        "",
+        "set_option linter.unusedVariables false",
+        "set_option maxHeartbeats 4000000",
+        "",
+        "noncomputable section",
+        "",
+        f"namespace {NS}",
+        "",
+    ]
     # representatives (coordinate 0) first: a mirror refers to the representative of the swapped piece
     for cert in sorted(certs, key=lambda c: c["coord"]):
         i, c = cert["piece"], tuple(cert["corner"])
@@ -489,7 +620,10 @@ def render_all(source=SOURCE):
     """All generated modules: {path: text}."""
     data = load(source)
     model = Model(data)
-    out = {OUT / "Pieces.lean": pieces_module(model), OUT / "Base.lean": base_module(model, data["base"])}
+    out = {
+        OUT / "Pieces.lean": pieces_module(model),
+        OUT / "Base.lean": base_module(model, data["base"]),
+    }
     for k in range(4):
         certs = [c for c in data["steps"] if c["residue"] == k]
         for name, text in step_modules(model, k, certs).items():
@@ -507,8 +641,11 @@ def _dists(c):
 def steps_module(model):
     """`Mx_k_le`, the one-step theorems `step_k_c` and the base theorems `base_c`, assembled from the
     candidate lemmas."""
-    L = [HEADER] + [f"import Formal.ICG.TwoPb.Step{k}M" for k in range(4)] + ["import Formal.ICG.TwoPb.Base", "",
-         "noncomputable section", "", f"namespace {NS}", ""]
+    L = (
+        [HEADER]
+        + [f"import Formal.ICG.TwoPb.Step{k}M" for k in range(4)]
+        + ["import Formal.ICG.TwoPb.Base", "", "noncomputable section", "", f"namespace {NS}", ""]
+    )
     box = "(hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t) (ht1 : t ≤ 1)"
     for k in range(4):
         kn = (k + 1) % 4
@@ -517,16 +654,26 @@ def steps_module(model):
             d = _dists(c)
             args = "hy hτ0 hτ1 hs0 hs1 ht0 ht1 hs' ht' hτ'"
             L.append(f"/-- One step from residue {k}, corner {c}. -/")
-            L.append(f"theorem step_{k}_{c[0]}{c[1]} {{y τ s t s' t' τ' : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) "
-                     "(hτ1 : τ ≤ 1)")
+            L.append(
+                f"theorem step_{k}_{c[0]}{c[1]} {{y τ s t s' t' τ' : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) "
+                "(hτ1 : τ ≤ 1)"
+            )
             L.append(f"    {box}")
-            L.append(f"    (hs' : (y + 3) * s' = s + (y + 2) * {c[0]}) (ht' : (y + 3) * t' = t + (y + 2) * {c[1]})")
+            L.append(
+                f"    (hs' : (y + 3) * s' = s + (y + 2) * {c[0]}) (ht' : (y + 3) * t' = t + (y + 2) * {c[1]})"
+            )
             L.append(f"    {rel} :")
-            L.append(f"    max (Kgain y * {d[0]}) (Kgain y * {d[1]}) + Mx_{k} y τ s' t' ≤ Kg y + Mx_{kn} y τ' s t := by")
+            L.append(
+                f"    max (Kgain y * {d[0]}) (Kgain y * {d[1]}) + Mx_{k} y τ s' t' ≤ Kg y + Mx_{kn} y τ' s t := by"
+            )
             for j in range(2):
-                parts = " ".join(f"(by linarith only [cand_{k}_{i}_{c[0]}{c[1]}_{j} {args}])"
-                                 for i in range(len(model.Qh[k])))
-                L.append(f"  have h{j} : Mx_{k} y τ s' t' ≤ Kg y + Mx_{kn} y τ' s t - Kgain y * {d[j]} :=")
+                parts = " ".join(
+                    f"(by linarith only [cand_{k}_{i}_{c[0]}{c[1]}_{j} {args}])"
+                    for i in range(len(model.Qh[k]))
+                )
+                L.append(
+                    f"  have h{j} : Mx_{k} y τ s' t' ≤ Kg y + Mx_{kn} y τ' s t - Kgain y * {d[j]} :="
+                )
                 L.append(f"    Mx_{k}_le {parts}")
             L.append(f"  rcases le_total (Kgain y * {d[0]}) (Kgain y * {d[1]}) with h | h")
             L.append("  · rw [max_eq_right h]; linarith only [h1]")
@@ -537,40 +684,56 @@ def steps_module(model):
         args = "hy hs0 hs1 ht0 ht1 hs' ht'"
         L.append(f"/-- The last step (to `V_0 = 2 max(s, t)`), corner {c}. -/")
         L.append(f"theorem base_{c[0]}{c[1]} {{y s t s' t' : ℝ}} (hy : 0 ≤ y) {box}")
-        L.append(f"    (hs' : (y + 3) * s' = s + (y + 2) * {c[0]}) (ht' : (y + 3) * t' = t + (y + 2) * {c[1]}) :")
-        L.append(f"    max (Kgain y * {d[0]}) (Kgain y * {d[1]}) + max (2 * Kc y * s') (2 * Kc y * t') ≤")
+        L.append(
+            f"    (hs' : (y + 3) * s' = s + (y + 2) * {c[0]}) (ht' : (y + 3) * t' = t + (y + 2) * {c[1]}) :"
+        )
+        L.append(
+            f"    max (Kgain y * {d[0]}) (Kgain y * {d[1]}) + max (2 * Kc y * s') (2 * Kc y * t') ≤"
+        )
         L.append("      Kg y + Mx_1 y 1 s t := by")
         for j in range(2):
-            L.append(f"  have h{j} : max (2 * Kc y * s') (2 * Kc y * t') ≤ Kg y + Mx_1 y 1 s t - Kgain y * {d[j]} :=")
-            L.append(f"    max_le (by linarith only [base_0_{c[0]}{c[1]}_{j} {args}]) "
-                     f"(by linarith only [base_1_{c[0]}{c[1]}_{j} {args}])")
+            L.append(
+                f"  have h{j} : max (2 * Kc y * s') (2 * Kc y * t') ≤ Kg y + Mx_1 y 1 s t - Kgain y * {d[j]} :="
+            )
+            L.append(
+                f"    max_le (by linarith only [base_0_{c[0]}{c[1]}_{j} {args}]) "
+                f"(by linarith only [base_1_{c[0]}{c[1]}_{j} {args}])"
+            )
         L.append(f"  rcases le_total (Kgain y * {d[0]}) (Kgain y * {d[1]}) with h | h")
         L.append("  · rw [max_eq_right h]; linarith only [h1]")
         L.append("  · rw [max_eq_left h]; linarith only [h0]")
         L.append("")
-    abs_lines = ["  have a0 : |(0:ℝ) - s| = s := by rw [zero_sub, abs_neg, abs_of_nonneg hs0]",
-                 "  have a1 : |(1:ℝ) - s| = 1 - s := abs_of_nonneg (by linarith only [hs1])",
-                 "  have b0 : |(0:ℝ) - t| = t := by rw [zero_sub, abs_neg, abs_of_nonneg ht0]",
-                 "  have b1 : |(1:ℝ) - t| = 1 - t := abs_of_nonneg (by linarith only [ht1])",
-                 "  rcases hz with rfl | rfl <;> rcases hw with rfl | rfl"]
+    abs_lines = [
+        "  have a0 : |(0:ℝ) - s| = s := by rw [zero_sub, abs_neg, abs_of_nonneg hs0]",
+        "  have a1 : |(1:ℝ) - s| = 1 - s := abs_of_nonneg (by linarith only [hs1])",
+        "  have b0 : |(0:ℝ) - t| = t := by rw [zero_sub, abs_neg, abs_of_nonneg ht0]",
+        "  have b1 : |(1:ℝ) - t| = 1 - t := abs_of_nonneg (by linarith only [ht1])",
+        "  rcases hz with rfl | rfl <;> rcases hw with rfl | rfl",
+    ]
     order = [(0, 0), (0, 1), (1, 0), (1, 1)]  # rcases order: z = 0, 1 outer; w = 0, 1 inner
     bits = "(hz : z = 0 ∨ z = 1) (hw : w = 0 ∨ w = 1)"
     lin = "(hs' : (y + 3) * s' = s + (y + 2) * z) (ht' : (y + 3) * t' = t + (y + 2) * w)"
     for k in range(4):
         kn = (k + 1) % 4
         rel = "(hτ' : (y + 3) ^ 4 * τ' = τ)" if k == 0 else "(hτ' : τ' = τ)"
-        L += [f"/-- One step from residue {k}, any corner. -/",
-              f"theorem step_{k} {{y τ s t s' t' τ' z w : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) (hτ1 : τ ≤ 1) {box}",
-              f"    {bits} {lin} {rel} :",
-              f"    max (Kgain y * |z - s|) (Kgain y * |w - t|) + Mx_{k} y τ s' t' ≤ Kg y + Mx_{kn} y τ' s t := by"]
+        L += [
+            f"/-- One step from residue {k}, any corner. -/",
+            f"theorem step_{k} {{y τ s t s' t' τ' z w : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) (hτ1 : τ ≤ 1) {box}",
+            f"    {bits} {lin} {rel} :",
+            f"    max (Kgain y * |z - s|) (Kgain y * |w - t|) + Mx_{k} y τ s' t' ≤ Kg y + Mx_{kn} y τ' s t := by",
+        ]
         L += abs_lines
         for c in order:
-            L.append(f"  · rw [a{c[0]}, b{c[1]}]; exact step_{k}_{c[0]}{c[1]} hy hτ0 hτ1 hs0 hs1 ht0 ht1 hs' ht' hτ'")
+            L.append(
+                f"  · rw [a{c[0]}, b{c[1]}]; exact step_{k}_{c[0]}{c[1]} hy hτ0 hτ1 hs0 hs1 ht0 ht1 hs' ht' hτ'"
+            )
         L.append("")
-    L += ["/-- The last step, any corner. -/",
-          f"theorem base_any {{y s t s' t' z w : ℝ}} (hy : 0 ≤ y) {box} {bits} {lin} :",
-          "    max (Kgain y * |z - s|) (Kgain y * |w - t|) + max (2 * Kc y * s') (2 * Kc y * t') ≤",
-          "      Kg y + Mx_1 y 1 s t := by"]
+    L += [
+        "/-- The last step, any corner. -/",
+        f"theorem base_any {{y s t s' t' z w : ℝ}} (hy : 0 ≤ y) {box} {bits} {lin} :",
+        "    max (Kgain y * |z - s|) (Kgain y * |w - t|) + max (2 * Kc y * s') (2 * Kc y * t') ≤",
+        "      Kg y + Mx_1 y 1 s t := by",
+    ]
     L += abs_lines
     for c in order:
         L.append(f"  · rw [a{c[0]}, b{c[1]}]; exact base_{c[0]}{c[1]} hy hs0 hs1 ht0 ht1 hs' ht'")
@@ -583,8 +746,12 @@ def steps_module(model):
 
 # S(b) = b g + alpha + x^b beta_{b mod 4} (formal/Formal/ICG/TwoPb/Sum.lean, `Ssum_closed`)
 ALPHA = 2 * (1 + 3 * x**2 - 2 * x**3) / (x**2 + 1) ** 2
-BETA = [2 * x**2 * (x**2 + 2 * x - 1) / (x**2 + 1) ** 2, -2 * x**2 * (x**2 - 2 * x - 1) / (x**2 + 1) ** 2,
-        -2 * x**2 * (x**2 + 2 * x - 1) / (x**2 + 1) ** 2, 2 * x**2 * (x**2 - 2 * x - 1) / (x**2 + 1) ** 2]
+BETA = [
+    2 * x**2 * (x**2 + 2 * x - 1) / (x**2 + 1) ** 2,
+    -2 * x**2 * (x**2 - 2 * x - 1) / (x**2 + 1) ** 2,
+    -2 * x**2 * (x**2 + 2 * x - 1) / (x**2 + 1) ** 2,
+    2 * x**2 * (x**2 - 2 * x - 1) / (x**2 + 1) ** 2,
+]
 START_N0 = 2  # the start identity holds for b >= 2
 # The top-bit-1 maximiser walks the corner 4-cycle: forward for b = 0, 3 (mod 4), reversed otherwise.
 FWD = [(0, 0), (0, 1), (1, 1), (1, 0)]
@@ -621,34 +788,50 @@ def start_lemmas(model, k):
             if not (nonneg_coeffs_y(ps) and nonneg_coeffs_y(expand(ps + qs))):
                 raise ValueError(f"start {k} {i} {z}: negative coefficient")
             name = f"start_{k}_{i}_{z}"
-            L += [f"theorem {name} {{y τ : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) {tau_h} :",
-                  f"    Qh_{k}_{i} y τ {z} 0 ≤ KS_{k} y τ := by"]
+            L += [
+                f"theorem {name} {{y τ : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) {tau_h} :",
+                f"    Qh_{k}_{i} y τ {z} 0 ≤ KS_{k} y τ := by",
+            ]
             tt = "τ" if e == 0 else f"((y + 3) ^ {e} * τ)"
-            L += [f"  have h0 : (0:ℝ) ≤ {tt} := by positivity",
-                  f"  have h := lin_tau h0 hτ1 (p := {lean_poly(ps)}) (q := {lean_poly(qs)})",
-                  "    (by positivity) (by have h' : (0:ℝ) ≤ "
-                  f"{lean_poly(expand(ps + qs))} := (by positivity); linarith only [h'])"]
-            L += [f"  have hE : (0:ℝ) < (y + 3) ^ {e} := by positivity",
-                  f"  have key : (y + 3) ^ {e} * (KS_{k} y τ - Qh_{k}_{i} y τ {z} 0) = "
-                  f"{lean_poly(ps)} + ({lean_poly(qs)}) * {tt} := by",
-                  f"    unfold KS_{k} Qh_{k}_{i}; ring",
-                  "  rw [← key] at h",
-                  "  linarith only [nonneg_of_mul_nonneg_right' hE h]", ""]
+            L += [
+                f"  have h0 : (0:ℝ) ≤ {tt} := by positivity",
+                f"  have h := lin_tau h0 hτ1 (p := {lean_poly(ps)}) (q := {lean_poly(qs)})",
+                "    (by positivity) (by have h' : (0:ℝ) ≤ "
+                f"{lean_poly(expand(ps + qs))} := (by positivity); linarith only [h'])",
+            ]
+            L += [
+                f"  have hE : (0:ℝ) < (y + 3) ^ {e} := by positivity",
+                f"  have key : (y + 3) ^ {e} * (KS_{k} y τ - Qh_{k}_{i} y τ {z} 0) = "
+                f"{lean_poly(ps)} + ({lean_poly(qs)}) * {tt} := by",
+                f"    unfold KS_{k} Qh_{k}_{i}; ring",
+                "  rw [← key] at h",
+                "  linarith only [nonneg_of_mul_nonneg_right' hE h]",
+                "",
+            ]
     zs = " ".join(f"(start_{k}_{i}_0 hy hτ0 hτ1)" for i in range(len(model.Qh[k])))
     os_ = " ".join(f"(start_{k}_{i}_1 hy hτ0 hτ1)" for i in range(len(model.Qh[k])))
-    L += [f"theorem start_{k} {{y τ z : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) {tau_h} (hz : z = 0 ∨ z = 1) :",
-          f"    Mx_{k} y τ z 0 ≤ KS_{k} y τ := by",
-          "  rcases hz with rfl | rfl",
-          f"  · exact Mx_{k}_le {zs}", f"  · exact Mx_{k}_le {os_}", ""]
+    L += [
+        f"theorem start_{k} {{y τ z : ℝ}} (hy : 0 ≤ y) (hτ0 : 0 ≤ τ) {tau_h} (hz : z = 0 ∨ z = 1) :",
+        f"    Mx_{k} y τ z 0 ≤ KS_{k} y τ := by",
+        "  rcases hz with rfl | rfl",
+        f"  · exact Mx_{k}_le {zs}",
+        f"  · exact Mx_{k}_le {os_}",
+        "",
+    ]
     return L
 
 
 def attain_data(model):
     """Per (b mod 4, n mod 4): the exact parent identity used along the maximiser at n steps left."""
+
     def cand_poly(k, i, c, j, base):
         sp, tp = (s + (y + 2) * c[0]) / (y + 3), (t + (y + 2) * c[1]) / (y + 3)
         d = (1 - (s, t)[j]) if c[j] == 1 else (s, t)[j]
-        q = (2 * model.K * (sp if i == 0 else tp)) if base else model.Qh[k][i].subs({s: sp, t: tp}, simultaneous=True)
+        q = (
+            (2 * model.K * (sp if i == 0 else tp))
+            if base
+            else model.Qh[k][i].subs({s: sp, t: tp}, simultaneous=True)
+        )
         return expand(cancel(together(model.Kgain * d + q - model.Kg)))
 
     def target(kn, l_, k, base):
@@ -703,7 +886,9 @@ def attain_data(model):
 
 
 def att_name(k, i, c, j, l_, base=False):
-    return (f"att_base_{i}_{c[0]}{c[1]}_{j}" if base else f"att_{k}_{i}_{c[0]}{c[1]}_{j}") + f"_to_{l_}"
+    return (
+        f"att_base_{i}_{c[0]}{c[1]}_{j}" if base else f"att_{k}_{i}_{c[0]}{c[1]}_{j}"
+    ) + f"_to_{l_}"
 
 
 def att_lemma(model, k, i, c, j, l_, base=False):
@@ -712,10 +897,13 @@ def att_lemma(model, k, i, c, j, l_, base=False):
     if any(expand(v) != 0 for v in (d["A"], d["B"], d["C"])):
         raise ValueError("not an exact parent identity")
     kn = 1 if base else (k + 1) % 4
-    dist = (f"(1 - {'s' if j == 0 else 't'})" if c[j] == 1 else ("s" if j == 0 else "t"))
+    dist = f"(1 - {'s' if j == 0 else 't'})" if c[j] == 1 else ("s" if j == 0 else "t")
     src = f"2 * Kc y * {'s' if i == 0 else 't'}'" if base else f"Qh_{k}_{i} y τ s' t'"
     tau_arg = "1" if base else "τ'"
-    hyps = [f"(hs' : (y + 3) * s' = s + (y + 2) * {c[0]})", f"(ht' : (y + 3) * t' = t + (y + 2) * {c[1]})"]
+    hyps = [
+        f"(hs' : (y + 3) * s' = s + (y + 2) * {c[0]})",
+        f"(ht' : (y + 3) * t' = t + (y + 2) * {c[1]})",
+    ]
     if not base:
         hyps.append("(hτ' : (y + 3) ^ 4 * τ' = τ)" if d["e"] == 4 else "(hτ' : τ' = τ)")
     tvars = "{y s t s' t' : ℝ}" if base else "{y τ s t s' t' τ' : ℝ}"
@@ -724,29 +912,50 @@ def att_lemma(model, k, i, c, j, l_, base=False):
         lc.append(f"({lean_poly(d['e3'])}) * hτ'")
     unf = sorted({f"Qh_{kn}_{l_}", "Kgain", "Kg"} | ({"Kc"} if base else {f"Qh_{k}_{i}"}))
     E = lean_poly(d["E"])
-    return "\n".join([
-        f"theorem {att_name(k, i, c, j, l_, base)} {tvars} (hy : 0 ≤ y) " + " ".join(hyps) + " :",
-        f"    Qh_{kn}_{l_} y {tau_arg} s t = Kgain y * {dist} + {src} - Kg y := by",
-        f"  have h : ({E}) * (Qh_{kn}_{l_} y {tau_arg} s t - (Kgain y * {dist} + {src} - Kg y)) = 0 := by",
-        f"    unfold {' '.join(unf)}",
-        "    linear_combination " + " + ".join(lc),
-        f"  have hE : ({E}) ≠ 0 := by positivity",
-        "  have := (mul_eq_zero.1 h).resolve_left hE",
-        "  linarith only [this]"])
+    return "\n".join(
+        [
+            f"theorem {att_name(k, i, c, j, l_, base)} {tvars} (hy : 0 ≤ y) "
+            + " ".join(hyps)
+            + " :",
+            f"    Qh_{kn}_{l_} y {tau_arg} s t = Kgain y * {dist} + {src} - Kg y := by",
+            f"  have h : ({E}) * (Qh_{kn}_{l_} y {tau_arg} s t - (Kgain y * {dist} + {src} - Kg y)) = 0 := by",
+            f"    unfold {' '.join(unf)}",
+            "    linear_combination " + " + ".join(lc),
+            f"  have hE : ({E}) ≠ 0 := by positivity",
+            "  have := (mul_eq_zero.1 h).resolve_left hE",
+            "  linarith only [this]",
+        ]
+    )
 
 
 def start_module(model):
     """KS_k, the start bounds `start_k`, the equality cases `start_eq_k` and the attainment identities."""
     start_piece, table, base = attain_data(model)
-    L = [HEADER, "import Formal.ICG.TwoPb.Pieces", "", "set_option linter.unusedVariables false",
-         "set_option maxHeartbeats 4000000", "", "noncomputable section", "", f"namespace {NS}", ""]
+    L = [
+        HEADER,
+        "import Formal.ICG.TwoPb.Pieces",
+        "",
+        "set_option linter.unusedVariables false",
+        "set_option maxHeartbeats 4000000",
+        "",
+        "noncomputable section",
+        "",
+        f"namespace {NS}",
+        "",
+    ]
     for k in range(4):
-        L += [f"/-- `K (α + β_{k} x^{model.m[k]} τ)`: the start bound for `b ≡ {k} (mod 4)`. -/",
-              f"def KS_{k} (y τ : ℝ) : ℝ := {lean_poly(ks_poly(model, k))}", ""]
+        L += [
+            f"/-- `K (α + β_{k} x^{model.m[k]} τ)`: the start bound for `b ≡ {k} (mod 4)`. -/",
+            f"def KS_{k} (y τ : ℝ) : ℝ := {lean_poly(ks_poly(model, k))}",
+            "",
+        ]
     for k in range(4):
         L += start_lemmas(model, k)
-        L += [f"theorem start_eq_{k} (y τ : ℝ) : Qh_{k}_{start_piece[k]} y τ 1 0 = KS_{k} y τ := by",
-              f"  unfold Qh_{k}_{start_piece[k]} KS_{k}; ring", ""]
+        L += [
+            f"theorem start_eq_{k} (y τ : ℝ) : Qh_{k}_{start_piece[k]} y τ 1 0 = KS_{k} y τ := by",
+            f"  unfold Qh_{k}_{start_piece[k]} KS_{k}; ring",
+            "",
+        ]
     seen = set()
     for (bm, nm), v in sorted(table.items()):
         key = ((nm - 1) % 4, v["i"], v["c"], v["j"], v["l"])
@@ -769,41 +978,71 @@ def _cyc_def(name, comp):
 
     def cond(rs):
         return " ∨ ".join(f"r % 4 = {r}" for r in rs)
-    return (f"/-- Coordinate {comp} of the maximiser corner `r` steps below the top. -/\n"
-            f"def {name} (bm r : ℕ) : ℝ :=\n"
-            f"  if bm % 4 = 0 ∨ bm % 4 = 3 then (if {cond(f1)} then 1 else 0) else (if {cond(r1)} then 1 else 0)")
+
+    return (
+        f"/-- Coordinate {comp} of the maximiser corner `r` steps below the top. -/\n"
+        f"def {name} (bm r : ℕ) : ℝ :=\n"
+        f"  if bm % 4 = 0 ∨ bm % 4 = 3 then (if {cond(f1)} then 1 else 0) else (if {cond(r1)} then 1 else 0)"
+    )
 
 
 def attain_module(model):
     """`cycZ`, `cycW`, the path pieces `QL` and the tight steps `lower_step`, `lower_base`."""
     start_piece, table, base = attain_data(model)
-    L = [HEADER, "import Formal.ICG.TwoPb.Chain", "", "set_option linter.unusedVariables false",
-         "set_option maxHeartbeats 4000000", "", "noncomputable section", "", f"namespace {NS}", "",
-         _cyc_def("cycZ", 0), "", _cyc_def("cycW", 1), ""]
+    L = [
+        HEADER,
+        "import Formal.ICG.TwoPb.Chain",
+        "",
+        "set_option linter.unusedVariables false",
+        "set_option maxHeartbeats 4000000",
+        "",
+        "noncomputable section",
+        "",
+        f"namespace {NS}",
+        "",
+        _cyc_def("cycZ", 0),
+        "",
+        _cyc_def("cycW", 1),
+        "",
+    ]
     # QL bm nm: the piece of residue nm used along the maximiser for b = bm (mod 4)
     body = []
     for bm in range(4):
-        inner = " else ".join(f"if nm % 4 = {nm} then Qh_{nm}_{table[(bm, nm)]['l']} y τ s t" for nm in range(3))
+        inner = " else ".join(
+            f"if nm % 4 = {nm} then Qh_{nm}_{table[(bm, nm)]['l']} y τ s t" for nm in range(3)
+        )
         inner += f" else Qh_3_{table[(bm, 3)]['l']} y τ s t"
         body.append((bm, inner))
-    txt = " else ".join(f"if bm % 4 = {bm} then ({inner})" for bm, inner in body[:3]) + f" else ({body[3][1]})"
-    L += ["/-- The piece of residue `nm` along the maximiser for `b ≡ bm (mod 4)`. -/",
-          f"def QL (bm nm : ℕ) (y τ s t : ℝ) : ℝ :=\n  {txt}", ""]
+    txt = (
+        " else ".join(f"if bm % 4 = {bm} then ({inner})" for bm, inner in body[:3])
+        + f" else ({body[3][1]})"
+    )
+    L += [
+        "/-- The piece of residue `nm` along the maximiser for `b ≡ bm (mod 4)`. -/",
+        f"def QL (bm nm : ℕ) (y τ s t : ℝ) : ℝ :=\n  {txt}",
+        "",
+    ]
     box = "(hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t) (ht1 : t ≤ 1)"
-    absl = ["  have a0 : |(0:ℝ) - s| = s := by rw [zero_sub, abs_neg, abs_of_nonneg hs0]",
-            "  have a1 : |(1:ℝ) - s| = 1 - s := abs_of_nonneg (by linarith only [hs1])",
-            "  have b0 : |(0:ℝ) - t| = t := by rw [zero_sub, abs_neg, abs_of_nonneg ht0]",
-            "  have b1 : |(1:ℝ) - t| = 1 - t := abs_of_nonneg (by linarith only [ht1])"]
-    L += ["/-- One tight step along the maximiser: the path piece at `n + 1` steps left is at most the gain",
-          "plus the path piece at `n` steps left. -/",
-          f"theorem lower_step {{y s t s' t' : ℝ}} {{b n : ℕ}} (hy : 0 ≤ y) (hn : 1 ≤ n) (hnb : n + 1 ≤ b) {box}",
-          "    (hs' : (y + 3) * s' = s + (y + 2) * cycZ (b % 4) (b - (n + 1)))",
-          "    (ht' : (y + 3) * t' = t + (y + 2) * cycW (b % 4) (b - (n + 1))) :",
-          "    QL (b % 4) ((n + 1) % 4) y (tauN y (n + 1)) s t ≤",
-          "      max (Kgain y * |cycZ (b % 4) (b - (n + 1)) - s|) (Kgain y * |cycW (b % 4) (b - (n + 1)) - t|) +",
-          "        QL (b % 4) (n % 4) y (tauN y n) s' t' - Kg y := by"]
+    absl = [
+        "  have a0 : |(0:ℝ) - s| = s := by rw [zero_sub, abs_neg, abs_of_nonneg hs0]",
+        "  have a1 : |(1:ℝ) - s| = 1 - s := abs_of_nonneg (by linarith only [hs1])",
+        "  have b0 : |(0:ℝ) - t| = t := by rw [zero_sub, abs_neg, abs_of_nonneg ht0]",
+        "  have b1 : |(1:ℝ) - t| = 1 - t := abs_of_nonneg (by linarith only [ht1])",
+    ]
+    L += [
+        "/-- One tight step along the maximiser: the path piece at `n + 1` steps left is at most the gain",
+        "plus the path piece at `n` steps left. -/",
+        f"theorem lower_step {{y s t s' t' : ℝ}} {{b n : ℕ}} (hy : 0 ≤ y) (hn : 1 ≤ n) (hnb : n + 1 ≤ b) {box}",
+        "    (hs' : (y + 3) * s' = s + (y + 2) * cycZ (b % 4) (b - (n + 1)))",
+        "    (ht' : (y + 3) * t' = t + (y + 2) * cycW (b % 4) (b - (n + 1))) :",
+        "    QL (b % 4) ((n + 1) % 4) y (tauN y (n + 1)) s t ≤",
+        "      max (Kgain y * |cycZ (b % 4) (b - (n + 1)) - s|) (Kgain y * |cycW (b % 4) (b - (n + 1)) - t|) +",
+        "        QL (b % 4) (n % 4) y (tauN y n) s' t' - Kg y := by",
+    ]
     L += absl
-    L.append("  rcases mod4_cases b with hb | hb | hb | hb <;> rcases mod4_cases n with hn4 | hn4 | hn4 | hn4")
+    L.append(
+        "  rcases mod4_cases b with hb | hb | hb | hb <;> rcases mod4_cases n with hn4 | hn4 | hn4 | hn4"
+    )
     for bm in range(4):
         for nk in range(4):
             nm = (nk + 1) % 4  # residue of the state with n + 1 steps left
@@ -813,31 +1052,37 @@ def attain_module(model):
             r = (bm - nm) % 4  # (b - (n + 1)) mod 4
             cyc = FWD if bm in (0, 3) else REV
             assert cyc[r] == c
-            tau_rel = ("tauN_succ_0 hy hn hn4" if nk == 0 else "tauN_succ hn (by omega)")
+            tau_rel = "tauN_succ_0 hy hn hn4" if nk == 0 else "tauN_succ hn (by omega)"
             pick = "le_max_left" if j == 0 else "le_max_right"
-            L += ["  · have hr : (b - (n + 1)) % 4 = " + str(r) + " := by omega",
-                  f"    have hz : cycZ (b % 4) (b - (n + 1)) = {c[0]} := by simp [cycZ, hb, hr]",
-                  f"    have hw : cycW (b % 4) (b - (n + 1)) = {c[1]} := by simp [cycW, hb, hr]",
-                  f"    have hn1 : (n + 1) % 4 = {nm} := by omega",
-                  f"    have q1 : QL (b % 4) ((n + 1) % 4) y (tauN y (n + 1)) s t = Qh_{nm}_{l_} y (tauN y (n + 1)) s t := by",
-                  "      simp [QL, hb, hn1]",
-                  f"    have q0 : QL (b % 4) (n % 4) y (tauN y n) s' t' = Qh_{k}_{i} y (tauN y n) s' t' := by",
-                  "      simp [QL, hb, hn4]",
-                  "    rw [hz] at hs'", "    rw [hw] at ht'", "    rw [hz, hw]",
-                  "    rw [q1, q0]",
-                  f"    have h := {att_name(k, i, c, j, l_)} (τ := tauN y n) (τ' := tauN y (n + 1)) hy hs' ht' ({tau_rel})",
-                  f"    have hm := {pick} (Kgain y * |({c[0]}:ℝ) - s|) (Kgain y * |({c[1]}:ℝ) - t|)",
-                  f"    rw [a{c[0]}, b{c[1]}] at hm ⊢",
-                  "    linarith only [h, hm]"]
+            L += [
+                "  · have hr : (b - (n + 1)) % 4 = " + str(r) + " := by omega",
+                f"    have hz : cycZ (b % 4) (b - (n + 1)) = {c[0]} := by simp [cycZ, hb, hr]",
+                f"    have hw : cycW (b % 4) (b - (n + 1)) = {c[1]} := by simp [cycW, hb, hr]",
+                f"    have hn1 : (n + 1) % 4 = {nm} := by omega",
+                f"    have q1 : QL (b % 4) ((n + 1) % 4) y (tauN y (n + 1)) s t = Qh_{nm}_{l_} y (tauN y (n + 1)) s t := by",
+                "      simp [QL, hb, hn1]",
+                f"    have q0 : QL (b % 4) (n % 4) y (tauN y n) s' t' = Qh_{k}_{i} y (tauN y n) s' t' := by",
+                "      simp [QL, hb, hn4]",
+                "    rw [hz] at hs'",
+                "    rw [hw] at ht'",
+                "    rw [hz, hw]",
+                "    rw [q1, q0]",
+                f"    have h := {att_name(k, i, c, j, l_)} (τ := tauN y n) (τ' := tauN y (n + 1)) hy hs' ht' ({tau_rel})",
+                f"    have hm := {pick} (Kgain y * |({c[0]}:ℝ) - s|) (Kgain y * |({c[1]}:ℝ) - t|)",
+                f"    rw [a{c[0]}, b{c[1]}] at hm ⊢",
+                "    linarith only [h, hm]",
+            ]
     L.append("")
     # base: n = 1 steps left -> V_0
-    L += ["/-- The last tight step along the maximiser. -/",
-          f"theorem lower_base {{y s t s' t' : ℝ}} {{b : ℕ}} (hy : 0 ≤ y) (hb1 : 1 ≤ b) {box}",
-          "    (hs' : (y + 3) * s' = s + (y + 2) * cycZ (b % 4) (b - 1))",
-          "    (ht' : (y + 3) * t' = t + (y + 2) * cycW (b % 4) (b - 1)) :",
-          "    QL (b % 4) 1 y 1 s t ≤",
-          "      max (Kgain y * |cycZ (b % 4) (b - 1) - s|) (Kgain y * |cycW (b % 4) (b - 1) - t|) +",
-          "        max (2 * Kc y * s') (2 * Kc y * t') - Kg y := by"]
+    L += [
+        "/-- The last tight step along the maximiser. -/",
+        f"theorem lower_base {{y s t s' t' : ℝ}} {{b : ℕ}} (hy : 0 ≤ y) (hb1 : 1 ≤ b) {box}",
+        "    (hs' : (y + 3) * s' = s + (y + 2) * cycZ (b % 4) (b - 1))",
+        "    (ht' : (y + 3) * t' = t + (y + 2) * cycW (b % 4) (b - 1)) :",
+        "    QL (b % 4) 1 y 1 s t ≤",
+        "      max (Kgain y * |cycZ (b % 4) (b - 1) - s|) (Kgain y * |cycW (b % 4) (b - 1) - t|) +",
+        "        max (2 * Kc y * s') (2 * Kc y * t') - Kg y := by",
+    ]
     L += absl
     L.append("  rcases mod4_cases b with hb | hb | hb | hb")
     for bm in range(4):
@@ -848,17 +1093,21 @@ def attain_module(model):
         assert cyc[r] == c
         pick = "le_max_left" if j == 0 else "le_max_right"
         tpick = "le_max_left" if i == 0 else "le_max_right"
-        L += ["  · have hr : (b - 1) % 4 = " + str(r) + " := by omega",
-              f"    have hz : cycZ (b % 4) (b - 1) = {c[0]} := by simp [cycZ, hb, hr]",
-              f"    have hw : cycW (b % 4) (b - 1) = {c[1]} := by simp [cycW, hb, hr]",
-              f"    have q1 : QL (b % 4) 1 y 1 s t = Qh_1_{l_} y 1 s t := by simp [QL, hb]",
-              "    rw [hz] at hs'", "    rw [hw] at ht'", "    rw [hz, hw]",
-              "    rw [q1]",
-              f"    have h := {att_name(0, i, c, j, l_, base=True)} hy hs' ht'",
-              f"    have hm := {pick} (Kgain y * |({c[0]}:ℝ) - s|) (Kgain y * |({c[1]}:ℝ) - t|)",
-              f"    rw [a{c[0]}, b{c[1]}] at hm ⊢",
-              f"    have hv := {tpick} (2 * Kc y * s') (2 * Kc y * t')",
-              "    linarith only [h, hm, hv]"]
+        L += [
+            "  · have hr : (b - 1) % 4 = " + str(r) + " := by omega",
+            f"    have hz : cycZ (b % 4) (b - 1) = {c[0]} := by simp [cycZ, hb, hr]",
+            f"    have hw : cycW (b % 4) (b - 1) = {c[1]} := by simp [cycW, hb, hr]",
+            f"    have q1 : QL (b % 4) 1 y 1 s t = Qh_1_{l_} y 1 s t := by simp [QL, hb]",
+            "    rw [hz] at hs'",
+            "    rw [hw] at ht'",
+            "    rw [hz, hw]",
+            "    rw [q1]",
+            f"    have h := {att_name(0, i, c, j, l_, base=True)} hy hs' ht'",
+            f"    have hm := {pick} (Kgain y * |({c[0]}:ℝ) - s|) (Kgain y * |({c[1]}:ℝ) - t|)",
+            f"    rw [a{c[0]}, b{c[1]}] at hm ⊢",
+            f"    have hv := {tpick} (2 * Kc y * s') (2 * Kc y * t')",
+            "    linarith only [h, hm, hv]",
+        ]
     L.append("")
     L.append(f"end {NS}")
     return "\n".join(L) + "\n"

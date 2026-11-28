@@ -504,10 +504,16 @@ GENERAL = {
         "Solved.ICG.TwoPow.energy_max_odd",
     ],
     "formal/Formal/ICG/TwoPb/Bridge.lean": ["Solved.ICG.TwoPb.energy_eq_chain"],
-    "formal/Formal/ICG/TwoPb/Sum.lean": ["Solved.ICG.TwoPb.Ssum_closed", "Solved.ICG.TwoPb.Ssum_eq_poly"],
+    "formal/Formal/ICG/TwoPb/Sum.lean": [
+        "Solved.ICG.TwoPb.Ssum_closed",
+        "Solved.ICG.TwoPb.Ssum_eq_poly",
+    ],
     "formal/Formal/ICG/TwoPb/Chain.lean": ["Solved.ICG.TwoPb.chain_le"],
     "formal/Formal/ICG/TwoPb/Graph.lean": ["Solved.ICG.TwoPb.energy_le"],
-    "formal/Formal/ICG/TwoPb/Attain.lean": ["Solved.ICG.TwoPb.lower_chain", "Solved.ICG.TwoPb.energy_max"],
+    "formal/Formal/ICG/TwoPb/Attain.lean": [
+        "Solved.ICG.TwoPb.lower_chain",
+        "Solved.ICG.TwoPb.energy_max",
+    ],
     "formal/Formal/ICG/TwoPb/Max.lean": [
         "Solved.ICG.TwoPb.closed_form_eq_family",
         "Solved.ICG.TwoPb.energy_max_all",
