@@ -498,6 +498,7 @@ GENERAL = {
         "Solved.ICG.TwoPow.energy_le",
         "Solved.ICG.TwoPow.energy_max",
     ],
+    "formal/Formal/ICG/TwoPowMax.lean": ["Solved.ICG.TwoPow.energy_eq_max_iff"],
 }
 FAMILIES = "formal/Formal/ICG/EvenFamilies.lean"
 

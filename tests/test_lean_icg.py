@@ -314,6 +314,47 @@ class TwoPowAllExponents(unittest.TestCase):
             for p in (5, 7, 101):
                 self.assertEqual(sum(c * p**i for i, _, c in terms), self.closed_form(a, p), (a, p))
 
+    @staticmethod
+    def local_rule(a, cells):
+        """Solved.ICG.TwoPow.energy_eq_max_iff, on exponent cells (c, e) for 2^c p^e."""
+        has = lambda c, e: (c, e) in cells  # noqa: E731
+        return (
+            has(a, 0)
+            and has(a - 1, 1)
+            and not has(a - 1, 0)
+            and has(0, 0)
+            and not has(0, 1)
+            and all(has(k, 0) != has(k, 1) for k in range(1, a - 1))
+            and all(has(k, 0) != has(k + 1, 0) for k in range(1, a - 2))
+        )
+
+    def test_maximisers_follow_local_rule(self):
+        """The maximisers are exactly the sets of the local rule (exhaustive, a <= 6)."""
+        for a in range(2, 7):
+            cells = 2 * (a + 1) - 1
+            masks = list(product([False, True], repeat=cells))
+            sets = [frozenset((k // 2, k % 2) for k, bit in enumerate(m) if bit) for m in masks]
+            for p in (5, 7, 11, 13):
+                values = [li.model_energy(a, 1, p, m) for m in masks]
+                top = self.closed_form(a, p)
+                winners = {cs for cs, v in zip(sets, values) if v == top}
+                ruled = {cs for cs in sets if self.local_rule(a, cs)}
+                self.assertEqual(winners, ruled, (a, p))
+                self.assertEqual(len(winners), 1 if a == 2 else 2)
+
+    def test_local_rule_matches_certified_maximisers(self):
+        """For a <= 7 the rule gives the kernel-checked maximiser lists of energy_<a>_1."""
+        for a in range(2, 8):
+            record = EVEN[(a, 1)]
+            cells = 2 * (a + 1) - 1
+            ruled = {
+                frozenset((k // 2, k % 2) for k, bit in enumerate(m) if bit)
+                for m in product([False, True], repeat=cells)
+                if self.local_rule(a, {(k // 2, k % 2) for k, bit in enumerate(m) if bit})
+            }
+            certified = {frozenset(map(tuple, cs)) for cs in record["result"]["maximisers"]}
+            self.assertEqual(ruled, certified, a)
+
     def test_maximisers_are_not_multiplicative(self):
         """A maximiser for 2^4 p is not a product of a 2-power set and a p-power set."""
         a, p = 4, 7

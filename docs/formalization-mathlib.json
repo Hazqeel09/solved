@@ -72,6 +72,12 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/TwoPowMax.lean",
+      "theorems": [
+        "Solved.ICG.TwoPow.energy_eq_max_iff"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

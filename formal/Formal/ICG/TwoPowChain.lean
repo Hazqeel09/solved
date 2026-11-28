@@ -364,8 +364,14 @@ theorem Wb_top {P : ℝ} (hP : 5 ≤ P) {a : ℕ} (ha : 1 ≤ a) {z : ℝ} (hz :
 
 /-! ## Attainment -/
 
-/-- Region of the first branch of `Φ`. -/
+/-- Region of the first branch of `Φ` (closed). -/
 def Left (P s t : ℝ) : Prop := Aq P * s - Bq P * t - (Aq P - Bq P) ≤ Bq P * t - Aq P * s
+
+/-- Region of the second branch of `Φ` (closed); `Left` and `Right` meet on the kink of `Φ`. -/
+def Right (P s t : ℝ) : Prop := Bq P * t - Aq P * s ≤ Aq P * s - Bq P * t - (Aq P - Bq P)
+
+theorem right_of_not_left {P s t : ℝ} (h : ¬ Left P s t) : Right P s t := by
+  unfold Left at h; unfold Right; push Not at h; exact h.le
 
 set_option maxHeartbeats 4000000 in
 theorem step_one_ge_left {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t)
@@ -398,32 +404,30 @@ theorem step_half_ge_left {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s 
 
 set_option maxHeartbeats 4000000 in
 theorem step_one_ge_right {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t)
-    (ht1 : t ≤ 1) (hR : ¬ Left P s t) :
+    (ht1 : t ≤ 1) (hR : Right P s t) :
     gq P + 2 / 3 + 3 / 2 * Phi P s t ≤ 2 * Fp P ((0 - s) / 2) ((1 - t) / 2) := by
   have h1 := mul_nonneg (sub_nonneg.2 hP) hs0
   have h2 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 hs1)
   have h3 := mul_nonneg (sub_nonneg.2 hP) ht0
   have h4 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 ht1)
-  unfold Left at hR
-  push Not at hR
+  unfold Right at hR
   unfold Fp Phi Aq Bq gq at *
-  rw [max_eq_right hR.le]
+  rw [max_eq_right hR]
   simp only [abs_eq_max_neg, max_def]
   split_ifs <;> first | linarith | nlinarith
 
 set_option maxHeartbeats 4000000 in
 theorem step_half_ge_right {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t)
-    (ht1 : t ≤ 1) (hR : ¬ Left P s t) :
+    (ht1 : t ≤ 1) (hR : Right P s t) :
     gq P - 1 / 3 + 3 / 4 * Phi P s t ≤
       2 * Fp P ((0 - s) / 2) ((1 - t) / 2) + 3 / 2 * Phi P ((s + 0) / 2) ((t + 1) / 2) := by
   have h1 := mul_nonneg (sub_nonneg.2 hP) hs0
   have h2 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 hs1)
   have h3 := mul_nonneg (sub_nonneg.2 hP) ht0
   have h4 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 ht1)
-  unfold Left at hR
-  push Not at hR
+  unfold Right at hR
   unfold Fp Phi Aq Bq gq at *
-  rw [max_eq_right hR.le]
+  rw [max_eq_right hR]
   simp only [abs_eq_max_neg, max_def]
   split_ifs <;> first | linarith | nlinarith
 
@@ -436,21 +440,19 @@ theorem base_ge_L {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s ≤ 1) (
   have h3 := mul_nonneg (sub_nonneg.2 hP) ht0
   have h4 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 ht1)
   unfold Left at h1L
-  try push Not at h1L
   unfold chain2 Fp Phi Aq Bq gq Cq at *
   simp only [abs_eq_max_neg, max_def]
   split_ifs <;> linarith
 
 set_option maxHeartbeats 40000000 in
 theorem base_ge_R {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht0 : 0 ≤ t)
-    (ht1 : t ≤ 1) (h1L : ¬ Left P s t) :
+    (ht1 : t ≤ 1) (h1L : Right P s t) :
     2 * gq P + Cq P + 2 / 9 + 3 / 2 * Phi P s t ≤ chain2 P s t 1 0 0 1 := by
   have h1 := mul_nonneg (sub_nonneg.2 hP) hs0
   have h2 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 hs1)
   have h3 := mul_nonneg (sub_nonneg.2 hP) ht0
   have h4 := mul_nonneg (sub_nonneg.2 hP) (sub_nonneg.2 ht1)
-  unfold Left at h1L
-  try push Not at h1L
+  unfold Right at h1L
   unfold chain2 Fp Phi Aq Bq gq Cq at *
   simp only [abs_eq_max_neg, max_def]
   split_ifs <;> first | linarith | nlinarith
@@ -473,8 +475,8 @@ theorem step_ge {P s t : ℝ} (hP : 5 ≤ P) (hs0 : 0 ≤ s) (hs1 : s ≤ 1) (ht
     nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ (-1 / 2 : ℝ) ^ m + 1 / 2) (sub_nonneg.2 e1),
       mul_nonneg (by linarith : (0 : ℝ) ≤ 1 - (-1 / 2 : ℝ) ^ m) (sub_nonneg.2 e2)]
   · refine ⟨0, 1, Or.inl rfl, Or.inr rfl, ?_⟩
-    have e1 := step_one_ge_right hP hs0 hs1 ht0 ht1 hL
-    have e2 := step_half_ge_right hP hs0 hs1 ht0 ht1 hL
+    have e1 := step_one_ge_right hP hs0 hs1 ht0 ht1 (right_of_not_left hL)
+    have e2 := step_half_ge_right hP hs0 hs1 ht0 ht1 (right_of_not_left hL)
     unfold Wb
     simp only [Nat.add_sub_cancel, pow_succ]
     push_cast
@@ -495,7 +497,7 @@ theorem chain_attain {P : ℝ} (hP : 5 ≤ P) {n : ℕ} (hn : 2 ≤ n) {s t : �
         2 * gq P + Cq P + 2 / 9 + 3 / 2 * Phi P s t ≤ chain2 P s t 1 0 z₁ w₁ := by
       by_cases hL : Left P s t
       · exact ⟨1, 0, Or.inr rfl, Or.inl rfl, base_ge_L hP hs0 hs1 ht0 ht1 hL⟩
-      · exact ⟨0, 1, Or.inl rfl, Or.inr rfl, base_ge_R hP hs0 hs1 ht0 ht1 hL⟩
+      · exact ⟨0, 1, Or.inl rfl, Or.inr rfl, base_ge_R hP hs0 hs1 ht0 ht1 (right_of_not_left hL)⟩
     refine ⟨fun k => if k = 0 then ((s + z₁) / 2 + 1) / 2 else if k = 1 then (s + z₁) / 2 else s,
       fun k => if k = 0 then ((t + w₁) / 2 + 0) / 2 else if k = 1 then (t + w₁) / 2 else t,
       fun k => if k = 0 then 1 else z₁, fun k => if k = 0 then 0 else w₁, ?_, ?_, ?_, ?_,
