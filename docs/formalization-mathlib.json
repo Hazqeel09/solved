@@ -78,6 +78,13 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/TwoPowThree.lean",
+      "theorems": [
+        "Solved.ICG.TwoPow.energy_max_three",
+        "Solved.ICG.TwoPow.energy_max_odd"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

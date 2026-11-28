@@ -2,6 +2,7 @@
 
 Outputs formal/Formal/ICG/EvenFamilies.lean (certificates and graph-energy theorems),
 formal/Formal/ICG/MultiFamilies.lean (region certificates for two symbolic primes),
+formal/Formal/ICG/TwoPowThree.lean (cell certificates for 2^a * 3, solved/lean_two_pow_three.py),
 formal/FormalTests/Axioms.lean (axiom audit), docs/formalization-mathlib.json (theorem
 registry of the Mathlib project) and the results table of
 results/icg-energy-even-orders/PROOF.md, from checks/expected/icg-families.json.
@@ -19,6 +20,7 @@ from solved.lean_icg import (
     render_from,
     table_from,
 )
+from solved.lean_two_pow_three import render_from as two_pow_three_from
 
 SOURCE = ROOT / "checks" / "expected" / "icg-families.json"
 MANUSCRIPT = ROOT / "results" / "icg-energy-even-orders" / "PROOF.md"
@@ -26,6 +28,7 @@ MULTI_MANUSCRIPT = ROOT / "results" / "icg-energy-two-symbolic-primes" / "PROOF.
 TARGETS = {
     ROOT / "formal" / "Formal" / "ICG" / "EvenFamilies.lean": render_from,
     ROOT / "formal" / "Formal" / "ICG" / "MultiFamilies.lean": multi_from,
+    ROOT / "formal" / "Formal" / "ICG" / "TwoPowThree.lean": two_pow_three_from,
     ROOT / "formal" / "FormalTests" / "Axioms.lean": axioms_from,
     ROOT / "docs" / "formalization-mathlib.json": registry_from,
     MANUSCRIPT: lambda source: table_from(source, MANUSCRIPT),

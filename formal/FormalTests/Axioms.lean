@@ -80,6 +80,14 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.TwoPow.energy_eq_max_iff
 
+/-- info: 'Solved.ICG.TwoPow.energy_max_three' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPow.energy_max_three
+
+/-- info: 'Solved.ICG.TwoPow.energy_max_odd' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPow.energy_max_odd
+
 /-- info: 'Solved.ICG.Families.energy_1_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Families.energy_1_1

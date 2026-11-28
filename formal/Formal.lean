@@ -28,3 +28,4 @@ import Formal.ICG.TwoPowChain
 import Formal.ICG.TwoPowGraph
 import Formal.ICG.TwoPowTight
 import Formal.ICG.TwoPowMax
+import Formal.ICG.TwoPowThree

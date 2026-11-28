@@ -37,14 +37,14 @@ For $n\ge2$ and a set $S$ of proper divisors of $n$, the integral circulant grap
 
 The table is generated from `checks/expected/icg-families.json` by `python -m scripts.lean_icg_families`, which also writes the Lean theorems, so the two cannot drift apart.
 
-**Theorem (every $a$, $b=1$).** Let $p\ge5$ be prime and $a\ge2$. Then
+**Theorem (every $a$, $b=1$).** Let $p$ be an odd prime and $a\ge2$. Then
 $$\max_S E(\mathrm{ICG}(2^ap,S))=c_a\,p-d_a,\qquad c_a=\frac{2^a(3a+4)+2(-1)^a}{3},\quad d_a=\frac{2^a(12a+10)+8(-1)^a}{9},$$
-over all sets $S$ of proper divisors. The maximum is attained exactly by the sets $S$ with
+over all sets $S$ of proper divisors, and the maximum is attained. For $p\ge5$ it is attained exactly by the sets $S$ with
 - $2^a,\ 2^{a-1}p,\ 1\in S$ and $2^{a-1},\ p\notin S$;
 - for each $1\le k\le a-2$, exactly one of $2^k$ and $2^kp$ in $S$;
 - for $1\le k\le a-3$, $2^k\in S$ if and only if $2^{k+1}\notin S$.
 
-So there is one maximiser for $a=2$ and there are two for $a\ge3$, which differ in the choice at $k=a-2$. For $a\le7$ this agrees with the rows above, which also cover $p=3$. Lean: `Solved.ICG.TwoPow.energy_max` (value) and `Solved.ICG.TwoPow.energy_eq_max_iff` (maximisers); the proof is in *Proof for every $a$* below.
+So there is one maximiser for $a=2$ and there are two for $a\ge3$, which differ in the choice at $k=a-2$. For $a\le7$ this agrees with the rows above, which also list every maximiser at $p=3$. Lean: `Solved.ICG.TwoPow.energy_max_odd` (value, every odd prime), `Solved.ICG.TwoPow.energy_max` ($p\ge5$) and `Solved.ICG.TwoPow.energy_eq_max_iff` (maximisers, $p\ge5$); the proofs are in *Proof for every $a$* below.
 
 ## Method
 
@@ -67,6 +67,8 @@ $$\Phi(s,t)=\max\bigl(Bt-As,\;As-Bt-(A-B)\bigr),\qquad W_n(s,t)=\tfrac12\bigl(ng
 4. **Attainment.** Choosing $(z,w)=(1,0)$ where $\Phi$ takes its first branch and $(0,1)$ otherwise makes each step an equality, and $(z_0,w_0)=(1,0)$ makes the base an equality (`step_ge`, `base_ge_L`, `base_ge_R`, `chain_attain`). The bits define a set $S\ni 2^a$ of proper divisors whose energy is $c_ap-d_a$ (`setOf`, `Ys_setOf`, `energy_max`).
 5. **Maximisers.** Every other choice loses strictly: $(0,0)$ and $(1,1)$ everywhere, $(0,1)$ strictly inside the first branch of $\Phi$, $(1,0)$ strictly inside the second, and at the bottom every choice but $(1,0)$ (`step_lt`, `base_lt`). So the bound is attained exactly along tight choices (`chain_eq_iff`), and $z_a=0$ loses strictly (`Wb_zero_lt`). Tight choices take exactly one bit, so the chain stays on $\sigma+\tau=1$, where the first branch of $\Phi$ is $\sigma\le\frac12$. From $(1,0)$ the chain is at $\sigma=\frac12$ exactly once, at level $a-1$ (the tie), and afterwards strictly alternates between the two sides (`path_facts`, `path_iff`). This is the rule above (`energy_eq_max_iff`).
 
+6. **The prime $3$.** At $p=3$ the potential $\Phi$ fails, but the exact value function is still a maximum of affine pieces: $Q_0=2F$, $Q_1$ with four pieces, $Q_2$ with six, and for $n\ge3$, $Q_n=\frac{10}3n+\frac{46}9+\max_iT_i\bigl((-\tfrac12)^n\bigr)$ with four pieces $T_i(\rho)=L_i+\rho\psi_i$ (two more than $\Phi$). Each step is proved piece by piece: for $n\ge3$ every pair of pieces has a slack affine in $\rho\in[-\frac18,\frac1{16}]$, and at each state one right-hand piece has nonnegative slack at both ends of that interval. A generator (`solved/lean_two_pow_three.py`) splits the square into polygonal cells, by exact clipping, and records the covering piece of each cell; Lean checks every cell with `linarith`, so the generator is not trusted. Attainment uses one covering choice per right-hand piece. At the top, $2^{a-1}Q_a(1,0)=3c_a-d_a$ (`energy_max_three`); for $a=3$ the state $(0,0)$ ties, which is the extra maximisers of $n=24$.
+
 $W_n$ is the exact value function of this chain for $n\ge2$; it was found by value iteration and checked in exact arithmetic before the Lean proof. The same kind of argument, a per-step potential along Dong's path, is how Dong proves the $q=3$ case [D26, Theorem 5]; here the potential is two-dimensional and depends on the remaining length.
 
 ## Trusted base
@@ -85,7 +87,7 @@ We found no earlier determination of the maximisers for the other even families,
 
 ## Observations, not claims
 
-For $n=2^ap$ the case $p=3$ with $a\ge8$ is not proved here (the potential $\Phi$ above fails at $p=3$); exhaustive search agrees with the closed form for $a\le10$ at $p=3$.
+For $n=2^ap$ at $p=3$ the maximising sets for $a\ge8$ are not determined here. Exhaustive search (a test) finds the same sets as for $p\ge5$ for $a\le7$ except $a=3$, where $n=24$ has six maximisers.
 
 ## Reproduction
 
