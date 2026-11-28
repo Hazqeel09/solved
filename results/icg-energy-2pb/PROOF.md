@@ -62,7 +62,7 @@ chain value of $S^*$ is at least the top piece, $S(b)$. The case $b=1$ is the ce
 - Lean: the whole argument, from Mathlib's eigenvalues, with axioms `propext`, `Classical.choice`, `Quot.sound`
   (audited in `formal/FormalTests/Axioms.lean`). The certificate data are untrusted search output
   (`checks/expected/two-pb-certificates.json`); `solved/lean_two_pb.py` turns them into Lean lemmas.
-- `tests/test_lean_two_pb.py`: the pieces against the exact chain recursion ($p=3,5,7$, $n\le8$, grid and random
+- `tests/test_lean_two_pb.py`: the pieces against the exact chain recursion ($p=3,5,7$, $n\le6$, grid and random
   points); the start value for $b\le20$; exhaustive maxima over all divisor sets by Ramanujan sums
   ($p=3$, $b\le4$; $p=5$, $b\le3$; $p=7,11$) and by adjacency eigenvalues; data shape and registration.
 - The closed form agrees with the branch-and-bound families $2p^b$, $b\le7$ (`closed_form_eq_family`).

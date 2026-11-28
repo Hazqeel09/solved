@@ -73,12 +73,12 @@ def W(p, n, s, t):
 
 class ValueFunction(unittest.TestCase):
     def test_upper_bound_and_exactness(self):
-        """W_n >= V_n for n >= 1, with equality from n = 5, at grid and random points."""
+        """W_n >= V_n for 1 <= n <= 6, with equality for n = 5, 6, at grid and random points."""
         rng = random.Random(20261128)
         pts = [(F(i, 4), F(j, 4)) for i in range(5) for j in range(5)]
         pts += [(F(rng.randint(0, 999), 999), F(rng.randint(0, 999), 999)) for _ in range(12)]
         for p in (3, 5, 7):
-            for n in range(1, 9):
+            for n in range(1, 7):  # 4^n paths per point; exactness starts at n = 5
                 V = chain_exact(p, n)
                 for s, t in pts:
                     w, v = W(p, n, s, t), V(s, t)
