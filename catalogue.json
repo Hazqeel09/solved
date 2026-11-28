@@ -1275,7 +1275,7 @@
           "Solved.ICG.energy_le_of_certifyP",
           "Solved.ICG.energy_le_of_certifyAt"
         ],
-        "scope": "Every row of the table, and the maximal energy and the maximisers of 2^a p for every a >= 2 and prime p >= 5 (energy_max, energy_max_odd, energy_eq_max_iff), is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved end to end from Mathlib's eigenvalues through Dong's bridge; certificates are checked with decide +kernel, without native_decide. Odd orders, three or more primes, more than 16 exponent cells outside 2^a p, the maximisers of 2^a * 3 for a >= 8, closed forms in b, and novelty are outside this formalization."
+        "scope": "Every row of the table, and the maximal energy and the maximisers of 2^a p for every a >= 2 and prime p >= 5 (energy_max, energy_max_odd, energy_eq_max_iff), is a theorem about graph energy in the Lean 4.34.1 / Mathlib project formal/, proved end to end from Mathlib's eigenvalues through Dong's bridge; certificates are checked with decide +kernel, without native_decide. Odd orders, three or more primes, more than 16 exponent cells outside 2^a p, the maximisers of 2^a * 3 for a >= 8, closed forms in b (for a = 1 see icg-energy-2pb), and novelty are outside this formalization."
       },
       "sources": [
         {
@@ -1370,6 +1370,77 @@
       ],
       "dependencies": [
         "icg-energy-exceptional-orders"
+      ]
+    },
+    {
+      "id": "icg-energy-2pb",
+      "title": "The maximal energy of integral circulant graphs of order 2p^b",
+      "subject": "Spectral graph theory",
+      "status": "proof-draft",
+      "review": "independent-review-pending",
+      "statement": "For every odd prime p and every b >= 1, max_S E(ICG(2p^b, S)) = 2 sum_{j=0}^{b} eps_j (b+1-j) p^(b-j) with eps = (1, -1, -1, 1) repeating, over all sets S of proper divisors, attained by p^b together with the cells of a walk around the corner 4-cycle of the unit square. Kernel-checked in Lean from Mathlib's eigenvalues through H. Dong's spectral bridge. No earlier determination for general b was found in three searches; Le-Sander (LAA 2012) could not be read, and the search may be incomplete.",
+      "proof": "results/icg-energy-2pb/PROOF.md",
+      "tests": [
+        "test_lean_two_pb.py"
+      ],
+      "implementation": [
+        "solved/lean_two_pb.py",
+        "scripts/lean_icg_families.py",
+        "checks/expected/two-pb-certificates.json"
+      ],
+      "formalization": {
+        "status": "complete",
+        "files": [
+          "formal/Formal/ICG/TwoPb/Max.lean",
+          "formal/Formal/ICG/TwoPb/Attain.lean",
+          "formal/Formal/ICG/TwoPb/Graph.lean",
+          "formal/Formal/ICG/TwoPb/Chain.lean",
+          "formal/Formal/ICG/TwoPb/Sum.lean",
+          "formal/Formal/ICG/TwoPb/Bridge.lean",
+          "formal/Formal/ICG/TwoPb/Cert.lean",
+          "formal/FormalTests/Axioms.lean"
+        ],
+        "statement_correspondence": "results/icg-energy-2pb/FORMALIZATION.md",
+        "theorems": [
+          "Solved.ICG.TwoPb.energy_max_all",
+          "Solved.ICG.TwoPb.energy_max",
+          "Solved.ICG.TwoPb.energy_le",
+          "Solved.ICG.TwoPb.closed_form_eq_family"
+        ],
+        "scope": "The maximal energy and one maximiser of ICG(2p^b, S) for every odd prime p and every b >= 1, as theorems about graph energy in the Lean 4.34.1 / Mathlib project formal/, with the generated step certificates checked by linear_combination and positivity, without native_decide. The complete list of maximisers and novelty are outside this formalization."
+      },
+      "sources": [
+        {
+          "url": "https://arxiv.org/abs/1109.3616",
+          "recorded": "2026-11-28"
+        },
+        {
+          "url": "https://arxiv.org/abs/1205.4603",
+          "recorded": "2026-11-28"
+        },
+        {
+          "url": "https://arxiv.org/abs/2608.29523",
+          "recorded": "2026-11-28"
+        },
+        {
+          "url": "https://arxiv.org/abs/2610.36883",
+          "recorded": "2026-11-28"
+        },
+        {
+          "url": "https://arxiv.org/abs/1104.4261",
+          "recorded": "2026-11-28"
+        },
+        {
+          "url": "https://doi.org/10.1016/j.laa.2012.04.012",
+          "recorded": "2026-11-28"
+        },
+        {
+          "url": "https://github.com/Horace-Maxwell/ai4math-results/tree/6334a95f2e0c2396f492f3476c1d4ce80e4106ab/lean",
+          "recorded": "2026-11-28"
+        }
+      ],
+      "dependencies": [
+        "icg-energy-even-orders"
       ]
     }
   ]

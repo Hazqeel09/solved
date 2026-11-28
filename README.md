@@ -28,6 +28,7 @@ These are exact computer certificates in Python. They are **not claimed as resul
 | [An obstruction to simultaneous square-root retention](results/root-retention-obstruction/PROOF.md) | [✅ Complete](results/root-retention-obstruction/FORMALIZATION.md) |
 | [Maximal-energy integral circulant graphs of order 2^a p^b](results/icg-energy-even-orders/PROOF.md) | [✅ Complete](results/icg-energy-even-orders/FORMALIZATION.md) |
 | [Maximal-energy integral circulant graphs with two symbolic primes](results/icg-energy-two-symbolic-primes/PROOF.md) | [✅ Complete](results/icg-energy-two-symbolic-primes/FORMALIZATION.md) |
+| [The maximal energy of integral circulant graphs of order 2p^b](results/icg-energy-2pb/PROOF.md) | [✅ Complete](results/icg-energy-2pb/FORMALIZATION.md) |
 | [An all-length block classification of two-small-step chains](results/two-small-steps/PROOF.md) | 🟡 Supporting lemmas |
 | [The counting exponent at every fixed AM defect](results/fixed-defect-counting/PROOF.md) | 🟡 Supporting lemmas |
 | [Well-ordering and global order type of real AM defects](results/am-defect-order/PROOF.md) | 🟡 Supporting lemmas |

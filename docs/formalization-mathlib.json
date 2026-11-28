@@ -85,6 +85,45 @@
       ]
     },
     {
+      "file": "formal/Formal/ICG/TwoPb/Bridge.lean",
+      "theorems": [
+        "Solved.ICG.TwoPb.energy_eq_chain"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/TwoPb/Sum.lean",
+      "theorems": [
+        "Solved.ICG.TwoPb.Ssum_closed",
+        "Solved.ICG.TwoPb.Ssum_eq_poly"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/TwoPb/Chain.lean",
+      "theorems": [
+        "Solved.ICG.TwoPb.chain_le"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/TwoPb/Graph.lean",
+      "theorems": [
+        "Solved.ICG.TwoPb.energy_le"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/TwoPb/Attain.lean",
+      "theorems": [
+        "Solved.ICG.TwoPb.lower_chain",
+        "Solved.ICG.TwoPb.energy_max"
+      ]
+    },
+    {
+      "file": "formal/Formal/ICG/TwoPb/Max.lean",
+      "theorems": [
+        "Solved.ICG.TwoPb.closed_form_eq_family",
+        "Solved.ICG.TwoPb.energy_max_all"
+      ]
+    },
+    {
       "file": "formal/Formal/ICG/EvenFamilies.lean",
       "theorems": [
         "Solved.ICG.Families.energy_1_1",

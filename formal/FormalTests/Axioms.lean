@@ -88,6 +88,42 @@ and `Quot.sound`: no `sorryAx`, and no `Lean.ofReduceBool` from `native_decide`.
 #guard_msgs in
 #print axioms Solved.ICG.TwoPow.energy_max_odd
 
+/-- info: 'Solved.ICG.TwoPb.energy_eq_chain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.energy_eq_chain
+
+/-- info: 'Solved.ICG.TwoPb.Ssum_closed' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.Ssum_closed
+
+/-- info: 'Solved.ICG.TwoPb.Ssum_eq_poly' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.Ssum_eq_poly
+
+/-- info: 'Solved.ICG.TwoPb.chain_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.chain_le
+
+/-- info: 'Solved.ICG.TwoPb.energy_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.energy_le
+
+/-- info: 'Solved.ICG.TwoPb.lower_chain' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.lower_chain
+
+/-- info: 'Solved.ICG.TwoPb.energy_max' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.energy_max
+
+/-- info: 'Solved.ICG.TwoPb.closed_form_eq_family' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.closed_form_eq_family
+
+/-- info: 'Solved.ICG.TwoPb.energy_max_all' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Solved.ICG.TwoPb.energy_max_all
+
 /-- info: 'Solved.ICG.Families.energy_1_1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms Solved.ICG.Families.energy_1_1

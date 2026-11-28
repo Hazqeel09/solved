@@ -90,3 +90,4 @@ Generated from [catalogue.json](catalogue.json). Status describes the main state
 | [Exact certificates for maximal-energy integral circulant graphs at the primes 2 and 3](results/icg-energy-exceptional-orders/PROOF.md) | proof-draft | none |
 | [Maximal-energy integral circulant graphs of order 2^a p^b](results/icg-energy-even-orders/PROOF.md) | proof-draft | complete |
 | [Maximal-energy integral circulant graphs with two symbolic primes](results/icg-energy-two-symbolic-primes/PROOF.md) | proof-draft | complete |
+| [The maximal energy of integral circulant graphs of order 2p^b](results/icg-energy-2pb/PROOF.md) | proof-draft | complete |
